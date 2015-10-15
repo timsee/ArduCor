@@ -146,8 +146,7 @@ Commands currently have either 1 or 3 parameters. There are only a small set of 
 | Blue          | 0 - 255       |
 **Example:** `2,255,127,0;` *(Header 1, Red 255, Green 127, Blue 0)*
 
-*Note: This command overrides the current mode with a glimmering color for the number of frames defined by `OVERRIDE_LENGTH`. If another override  packet comes in during this time, it will override the earlier packet. After no packets have been received and `OVERRIDE_LENGTH` has been reached, it will go back to its previous mode. *
-
+*Note: This command overrides the current mode with a glimmering color for the number of frames defined by `OVERRIDE_LENGTH`. If another override  packet comes in during this time, it will override the earlier packet. After no packets have been received and `OVERRIDE_LENGTH` has been reached, it will go back to its previous mode.*
 
 ### <a name="lighting-modes"></a>Lighting Modes
 
