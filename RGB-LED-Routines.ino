@@ -6,8 +6,8 @@
  * 
  * Provides a set of lighting routines and a serial interface. 
  * 
- * Version 1.0
- * Date: October 14, 2015
+ * Version 1.5
+ * Date: November 18, 2015
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -30,29 +30,36 @@
  * 4. If you have a single LED, set up its pins and whether its a common anode
  */
 
-#define IS_RAINBOWDUINO  0
-#define IS_NEOPIXEL      1
-#define IS_SINGLE_LED    0
+const int IS_RAINBOWDUINO   = 0;
+const int IS_NEOPIXEL       = 1;
+const int IS_SINGLE_LED     = 0;
 
-#define LED_COUNT        64 
+const int LED_COUNT         = 64; 
 
-#define CONTROL_PIN      6      // NeoPixels only, pin to control it
+const int CONTROL_PIN       = 6;     // NeoPixels only, pin to control it
 
-#define R_PIN            6     // SINGLE_LED only
-#define G_PIN            5     // SINGLE_LED only
-#define B_PIN            4     // SINGLE_LED only
-#define IS_COMMON_ANODE  1     // SINGLE_LED only, 0 if common cathode, 1 if common anode
+const int R_PIN             = 5;     // SINGLE_LED only
+const int G_PIN             = 4;     // SINGLE_LED only
+const int B_PIN             = 3;     // SINGLE_LED only
+const int IS_COMMON_ANODE   = 1;     // SINGLE_LED only, 0 if common cathode, 1 if common anode
+
+const int NUM_OF_COLORS     = 5;      // Number of saved colors
 
 // Default settings
-#define DEFAULT_SPEED    20     // default delay for LEDs update, suggested range: 1 (fast) - 1000 (slow)
-#define DEFAULT_BRIGHT   50     // default brightness for LEDs, range: 0 - 100
+const int DEFAULT_SPEED     = 40;     // default delay for LEDs update, suggested range: 1 (fast) - 1000 (slow)
+const int DEFAULT_BRIGHT    = 50;     // default brightness for LEDs, range: 0 - 100
 
 // LED routine parameters
-#define SOLID_FADE_SPEED 20     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
-#define ALL_FADE_SPEED   10     // change rate of all colors fade routine, range: 1 (slow) - 100 (fast)
-#define GLIMMER_PERCENT  20     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
-#define BLINK_EVERY_X    3      // slow down framerate of blinking routines: range 1 - 100
-#define OVERRIDE_LENGTH  15     // The number of frames a temporary color overrides current mode
+const int SOLID_FADE_SPEED  = 20;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
+const int ALL_FADE_SPEED    = 10;     // change rate of all colors fade routine, range: 1 (slow) - 100 (fast)
+const int SAVED_FADE_SPEED  = 10;     // change rate of saved colors fade routine, range: 1 (slow) - 100 (fast)
+const int GLIMMER_PERCENT   = 8;      // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
+const int BLINK_EVERY_X     = 3;      // slow down framerate of blinking routines: range 1 - 100
+const int OVERRIDE_LENGTH   = 15;     // The number of frames a temporary color overrides current mode
+const int BAR_SIZE          = 4;      // The number of LEDs in groups in bar-based lighting schemes such as twoSolidBars
+const int BARS_DEFAULT      = 2;      // Number of bars, should be less than NUM_OF_COLORS
+
+const unsigned long TIMEOUT_DEFAULT = 120;  // number of minutes without packets until the arduino times out.
 
 //================================================================================
 // Enumerated Types
@@ -77,7 +84,7 @@ enum ELightingMode
   eSolidFade,
   eSolidGlimmer,
   /*!
-   * preset color modes
+   * saved color modes
    */
   eGreenGlimmer,
   eTealGlimmer,
@@ -98,34 +105,63 @@ enum ELightingMode
    * Fades in between all the colors.
    */
   eFadeSolidColors,
+  /*!
+   * Does color[0] as main color and uses other saved colors 
+   * as glimmer.
+   */
+  eSavedGlimmer,
+  /*!
+   * Uses the saved colors and randomly lights up to them.
+   */
+  eSavedRandomIndividual,
+  /*!
+   * Uses the saved colors and randomly lights up to them.
+   */
+  eSavedRandomSolid,
+  /*!
+   * Uses the saved colors and fades between them.
+   */
+  eSavedFade,
+  /*!
+   * Colors alternating in groups of equal size
+   */
+  eSavedBarSolid,
+  /*!
+   * Colors alternating in groups of equal size and moving up in indices
+   */
+  eSavedBarMoving,
   eLightingMode_MAX //total number of modes
-  
 };
 
 
 /*!
- * mesage headers for packets coming over serial.
+ * Mesage headers for packets coming over serial.
  */
 enum EPacketHeader 
 {
   /*! 
-   * takes one int parameter that gets cast to ELightingMode.
+   * Takes one int parameter that gets cast to ELightingMode.
    */
   eModeChange,
   /*! 
-   * takes three parameters, a 0-255 representation of Red, Green, and Blue.
+   * Takes four parameters, three parameters, the LED, a 0-255 representation of Red, Green, and Blue.
    */
-  eSolidColorChange,
+  eColorChange,
   /*! 
-   * takes one parameter, sets the brightness between 0 and 100.
+   * Takes one parameter, sets the brightness between 0 and 100.
    */
   eBrightnessChange,
   /*! 
-   * takes one parameter, sets the delay value 1 - 23767.
+   * Takes one parameter, sets the delay value 1 - 23767.
    */
   eSpeedChange,
   /*! 
-   * takes 3 parameter, a 0-255 representation of Red, Green, and Blue.
+   * Set to 0 to turn off, set to any other number minutes until 
+   * idle timeout happens
+   */
+  eIdleTimeoutChange,
+  /*! 
+   * Takes 3 parameter, a 0-255 representation of Red, Green, and Blue.
    * Holds that color temporarily for the number of franmes defined 
    * in OVERRIDE_LENGTH
    */
@@ -156,11 +192,6 @@ int light_speed = DEFAULT_SPEED;
 // Stored Values and States
 //=======================
 
-// buffers for the individual LEDs channels.
-byte r_buffer[LED_COUNT];
-byte g_buffer[LED_COUNT];
-byte b_buffer[LED_COUNT];
-
 // used to store a color value
 struct Color 
 {
@@ -169,25 +200,67 @@ struct Color
   byte b;
 };
 
-//Stored colors used by light routines
-Color current_color =   {40,  0, 200};
-Color fade_color    =   {255, 0, 0};
-Color temporary_color = {0,   0, 0};
+// stored saved colors for routines
+Color colors[NUM_OF_COLORS];
+
+// buffers for the individual LEDs channels.
+byte r_buffer[LED_COUNT];
+byte g_buffer[LED_COUNT];
+byte b_buffer[LED_COUNT];
+
+// stores location for moving buffers
+byte moving_buffer[LED_COUNT];
+
+// colors used by specific routines
+Color fade_color       = {255, 0,0};
+Color temporary_color  = {0,   0,0};
+Color prest_fade_color = {0,   0,0};
+Color random_saved     = {0,   0,0};
+Color fade_saved       = {0,   0,0};
+Color goal_color       = {0,   0,0};
+
+// settings
+int num_of_bars = BARS_DEFAULT;
+unsigned long idle_timeout = TIMEOUT_DEFAULT * 60 * 1000; // convert to milliseconds
+
 // variables for tracking state of modes
 boolean should_blink = true;
 // controls direction of fade 
 boolean fade_up = true;
-// stored value for fade
-byte solid_fade_value = 0;
 // checks for override
 boolean has_override = false; 
+// used in two bar color schemes
+boolean use_first_bar = false;
+// used in moving two bar color scheme
+boolean start_with_first_bar = true;
+// looks for any values that are still fading
+boolean fade_met = true;
+// used at start of fade to switch colors
+boolean start_next_fade = true;
+// turn off the lights when idle
+boolean idle_timeout_on = true;
 
+// stored value for fade
+byte solid_fade_value = 0;
 
 // counters for routines
 int loop_counter  = 0;
 int fade_counter  = 0;
 int blink_counter = 0;
 int override_counter = 0;
+int bar_counter = 0;
+int moving_bar_counter = 0;
+int saved_blink_counter = 0;
+int fade_saved_counter = 0;
+
+// indices
+int bar_index = 0;
+int moving_bar_index = 0;
+int random_saved_index = 1;
+int moving_start_index = 0;
+
+// timeout variable
+unsigned long last_message_time;
 
 //=======================
 // String Parsing
@@ -225,14 +298,27 @@ void currentLightingRoutine(ELightingMode currentMode);
 void setup() 
 { 
   if (IS_RAINBOWDUINO) Rb.init(); 
-  if (IS_NEOPIXEL)     pixels.begin(); 
-  if (IS_SINGLE_LED)
-  {
+  if (IS_NEOPIXEL)     pixels.begin();
+   
+  if (IS_SINGLE_LED) {
     pinMode(R_PIN, OUTPUT);
     pinMode(G_PIN, OUTPUT);
     pinMode(B_PIN, OUTPUT); 
   }
-    
+
+  // setup the saved colors
+  colors[0] =   {0,   255, 0};   // green
+  colors[1] =   {125, 0,   255}; // teal
+  colors[2] =   {0,   0,   255}; // blue
+  colors[3] =   {40,  127, 40};  // light green
+  colors[4] =   {60,  0,   160}; // purple
+  
+  // setup the timeout. 
+  idle_timeout = TIMEOUT_DEFAULT * 60 * 1000; 
+  last_message_time = 0;
+  
+  // setup the moving buffer
+  movingBufferSetup(num_of_bars, BAR_SIZE);
   Serial.begin(19200);
 } 
 
@@ -240,17 +326,21 @@ void loop()
 {  
   serialLogic(); 
   
-  if (!(loop_counter % light_speed))
-  {
+  if (!(loop_counter % light_speed)) {
     // check for temporary override
-    if (!checkForOverride())
-    {
+    if (!checkForOverride()) {
       // if no override, display current mode
       currentLightingRoutine(current_mode); 
     }
     updateLEDs();
   }
-
+  
+  // Timeout the LEDs.
+  if (idle_timeout_on && last_message_time + idle_timeout < millis()) {
+    solidColor(0,0,0);
+    current_mode = eLightsOff;
+  }
+  
   loop_counter++;
   delay(10); 
 } 
@@ -261,22 +351,20 @@ void loop()
 
 /*!
  * Checks if Serial has incoming messages and takes the most recent one. 
- * In this application, the Serial messages are expected to be delimited strings.
+ * In this sketch, the Serial messages are expected to be delimited strings.
  * This string is converted to an int array and sent through a parser. 
  * 
  * The delimiter for the string is commas, and the endline is a semi-colon.
  */
 void serialLogic()
 {
-  if (Serial.available())
-  {
+  if (Serial.available()) {
     String currentPacket = Serial.readStringUntil(';');
     parsed_packet = delimitedStringToIntArray(currentPacket);
     // exit if no strings detected
     if (parsed_packet.count == 0) return;
     // pase a paceket only if its header is is in the correct range
-    if(parsed_packet.values[0] < ePacketHeader_MAX)
-    {
+    if(parsed_packet.values[0] < ePacketHeader_MAX) {
       parsePacket(parsed_packet.values[0]);
     }
   }
@@ -288,34 +376,53 @@ void serialLogic()
  */
 void parsePacket(int header)
 {
-  // in each case, theres a final check that the packet was properly
+  // In each case, theres a final check that the packet was properly
   // formatted by making sure its getting the right number of values.
-  boolean success = false;
+  boolean success = false;  
   switch (header) 
   {
     case eModeChange:
-      if (parsed_packet.count == 2 && parsed_packet.values[1] < eLightingMode_MAX)
-      {
+      if (parsed_packet.count == 2 && parsed_packet.values[1] < eLightingMode_MAX) {
         success = true;
         // change mode to new mode
         current_mode = (ELightingMode)parsed_packet.values[1];
         resetModeSpecificSettings();
       }
+      // pick up cases where the modes can take extra optional arguments
+      if (parsed_packet.count == 3 
+          && (parsed_packet.values[1] == eSavedBarSolid
+          || parsed_packet.values[1] == eSavedBarMoving)) {
+              
+        if (parsed_packet.values[1] == eSavedBarSolid) {
+          success = true;
+          current_mode = (ELightingMode)parsed_packet.values[1];
+          // set the number of bars used by the routine
+          num_of_bars = parsed_packet.values[2]; 
+          movingBufferSetup(num_of_bars, BAR_SIZE);
+        } else if (parsed_packet.values[1] == eSavedBarMoving) {
+          success = true;
+          current_mode = (ELightingMode)parsed_packet.values[1];
+          // set the number of bars used by the routine
+          num_of_bars = parsed_packet.values[2]; 
+          savedBarMoving(num_of_bars, BAR_SIZE);
+          movingBufferSetup(num_of_bars, BAR_SIZE);
+        }
+      }
       break;
-    case eSolidColorChange:
-      if (parsed_packet.count == 4)
-      {
-        success = true;
-        current_color.r = parsed_packet.values[1];
-        current_color.g = parsed_packet.values[2];
-        current_color.b = parsed_packet.values[3];
-        current_mode = eSolidConstant; 
+    case eColorChange:
+      if (parsed_packet.count == 5) {
+        int color_index = parsed_packet.values[1] - 1;
+        if (color_index >= 0 && color_index < eLightingMode_MAX) {
+          success = true;
+          colors[color_index].r = parsed_packet.values[2];
+          colors[color_index].g = parsed_packet.values[3];
+          colors[color_index].b = parsed_packet.values[4];
+        }
       }
       break;
     case eBrightnessChange:
     {
-      if (parsed_packet.count == 2)
-      {
+      if (parsed_packet.count == 2) {
         success = true;
         int param = constrain(parsed_packet.values[1], 0, 100);
         // update brightness level
@@ -324,17 +431,27 @@ void parsePacket(int header)
       break;
     }
     case eSpeedChange:
-      if (parsed_packet.count == 2)
-      {
+      if (parsed_packet.count == 2) {
         success = true;
         // update light speed
         light_speed = parsed_packet.values[1]; 
       }
       break;
+    case eIdleTimeoutChange:
+      if (parsed_packet.count == 2) {
+        success = true;
+        if (parsed_packet.values[1] == 0) {
+          idle_timeout_on = false;
+        } else {
+          idle_timeout_on = true;
+          unsigned long new_timeout = (unsigned long)parsed_packet.values[1];
+          idle_timeout = new_timeout * 60 * 1000;
+        }
+      }
+      break;
     case eOverrideColor:
     {
-      if (parsed_packet.count == 4)
-      {
+      if (parsed_packet.count == 4) {
         success = true;
         // double check the floor and ceiling before mapping
         temporary_color.r = constrain(parsed_packet.values[1], 0, 255);
@@ -348,9 +465,9 @@ void parsePacket(int header)
     default: 
       return;
   }
-  if (success)
-  {
-    //reset to 0 to draw to screen right away
+  if (success) {
+    last_message_time = millis();
+    // Reset to 0 to draw to screen right away.
     loop_counter = 0;  
   }
 }
@@ -361,13 +478,11 @@ void parsePacket(int header)
  */
 void resetModeSpecificSettings()
 {
-  if (current_mode == eSolidBlink)
-  {
+  if (current_mode == eSolidBlink) {
     blink_counter = 0;
     should_blink = true;
   }
-  if (current_mode == eRandomSolid)
-  {
+  if (current_mode == eRandomSolid) {
     blink_counter = 0;
   } 
 }
@@ -381,15 +496,13 @@ void resetModeSpecificSettings()
  */
 boolean checkForOverride()
 {
-  if (has_override)
-  {
+  if (has_override) {
     solidColorGlimmer(temporary_color.r, 
                       temporary_color.g, 
                       temporary_color.b, 
                       GLIMMER_PERCENT);
      override_counter++;
-     if (override_counter == OVERRIDE_LENGTH)
-     {
+     if (override_counter == OVERRIDE_LENGTH) {
        has_override = false;
        override_counter = 0;
      }
@@ -412,19 +525,19 @@ void currentLightingRoutine(ELightingMode currentMode)
       break;
 
     case eSolidConstant:
-      solidColor(current_color.r, current_color.g, current_color.b);
+      solidColor(colors[0].r, colors[0].g, colors[0].b);
       break;
 
     case eSolidBlink:
-      solidBlink(current_color.r, current_color.g, current_color.b);
+      solidBlink(colors[0].r, colors[0].g, colors[0].b);
       break;
       
     case eSolidFade:
-      solidFade(current_color.r, current_color.g, current_color.b, SOLID_FADE_SPEED);
+      solidFade(colors[0].r, colors[0].g, colors[0].b, SOLID_FADE_SPEED);
       break;
       
     case eSolidGlimmer:
-      solidColorGlimmer(current_color.r, current_color.g, current_color.b, GLIMMER_PERCENT);
+      solidColorGlimmer(colors[0].r, colors[0].g, colors[0].b, GLIMMER_PERCENT);
       break;
       
     case eGreenGlimmer:
@@ -464,11 +577,35 @@ void currentLightingRoutine(ELightingMode currentMode)
       break;
      
     case eFadeSolidColors:
-      colorCycle();
+      fadeAllColors();
+      break; 
+
+    case eSavedGlimmer:
+      savedGlimmer(GLIMMER_PERCENT);
       break; 
       
+    case eSavedRandomSolid:
+      savedRandomSolid();
+      break;
+      
+    case eSavedRandomIndividual:
+      savedRandomIndividual();
+      break; 
+    
+    case eSavedFade:
+      savedFade();
+      break;
+      
+    case eSavedBarSolid:
+      savedBarSolid(num_of_bars, BAR_SIZE);
+      break; 
+
+    case eSavedBarMoving:
+      savedBarMoving(num_of_bars, BAR_SIZE);
+      break;
+      
     default:
-      solidColor(0,0,0);
+      solidColorGlimmer(0, 255, 0, GLIMMER_PERCENT); 
       break;
   }
 }
@@ -488,8 +625,7 @@ void currentLightingRoutine(ELightingMode currentMode)
  */
 void solidColor(byte red, byte green, byte blue)
 {
-  for(int x = 0; x < LED_COUNT; x++)
-  {
+  for(int x = 0; x < LED_COUNT; x++) {
     r_buffer[x] = red;
     g_buffer[x] = green;
     b_buffer[x] = blue;
@@ -505,21 +641,15 @@ void solidColor(byte red, byte green, byte blue)
  */
 void solidBlink(byte red, byte green, byte blue)
 {
-  if (!(blink_counter % BLINK_EVERY_X))
-  {
-    if (should_blink)
-    {
-      for(int x = 0; x < LED_COUNT; x++)
-      {
+  if (!(blink_counter % BLINK_EVERY_X)) {
+    if (should_blink) {
+      for(int x = 0; x < LED_COUNT; x++) {
         r_buffer[x] = red;
         g_buffer[x] = green;
         b_buffer[x] = blue;
       }
-    }
-    else
-    {
-      for(int x = 0; x < LED_COUNT; x++)
-      {
+    } else {
+      for(int x = 0; x < LED_COUNT; x++) {
         r_buffer[x] = 0;
         g_buffer[x] = 0;
         b_buffer[x] = 0;
@@ -555,8 +685,7 @@ void solidFade(byte red, byte green, byte blue, byte fadeSpeed)
   else if (solid_fade_value == 0)    fade_up = true;
   
   // set up the buffers
-  for(int x = 0; x < LED_COUNT; x++)
-  {
+  for(int x = 0; x < LED_COUNT; x++) {
     r_buffer[x] = (byte)(red   * (solid_fade_value / (float)fadeSpeed));
     g_buffer[x] = (byte)(green * (solid_fade_value / (float)fadeSpeed));
     b_buffer[x] = (byte)(blue  * (solid_fade_value / (float)fadeSpeed));
@@ -575,13 +704,11 @@ void solidFade(byte red, byte green, byte blue, byte fadeSpeed)
  */
 void solidColorGlimmer(byte red, byte green, byte blue, long percent)
 {
-  for(int x = 0; x < LED_COUNT; x++)
-  {
-    // a random number is generated, if its less than the percent,
+  for(int x = 0; x < LED_COUNT; x++) {
+    // a random number is generated. If its less than the percent,
     // treat this as an LED that gets a glimmer effect
-    if (random(1,100) < percent && percent != 0)
-    {
-      // chooses how much to divide the input by 
+    if (random(1,100) < percent && percent != 0) {
+      // set a random level for the LED to be dimmed by.
       byte scaleFactor = (byte)random(2,5);
       
       byte rScaled = red / scaleFactor;
@@ -591,15 +718,50 @@ void solidColorGlimmer(byte red, byte green, byte blue, long percent)
       r_buffer[x] = rScaled;
       g_buffer[x] = gScaled;
       b_buffer[x] = bScaled;
-    }
-    else
-    {
+    } else {
       r_buffer[x] = red;
       g_buffer[x] = green;
       b_buffer[x] = blue;
     }  
   }
 }
+
+
+/*!
+ * Takes the color[0] from saved colors and sets that as the standard color. 
+ * Then, takes the GLIMMER_PERCENT, and randomly chooses a different
+ * saved to glimmer with. Also, glimmers the standard way with 
+ * random LEDs being set to dimmer values. 
+ */
+void savedGlimmer(long percent)
+{
+  for(int x = 0; x < LED_COUNT; x++) {
+    random_saved = colors[0];
+    if (random(1,100) < percent && percent != 0) {
+      setSavedRandom(); 
+    }
+   
+    // a random number is generated, if its less than the percent,
+    // treat this as an LED that gets a glimmer effect
+    if (random(1,100) < percent && percent != 0) {
+      // chooses how much to divide the input by 
+      byte scaleFactor = (byte)random(2,5);
+      
+      byte rScaled = random_saved.r / scaleFactor;
+      byte gScaled = random_saved.g / scaleFactor;
+      byte bScaled = random_saved.b / scaleFactor;
+      
+      r_buffer[x] = rScaled;
+      g_buffer[x] = gScaled;
+      b_buffer[x] = bScaled;
+    } else {
+      r_buffer[x] = random_saved.r;
+      g_buffer[x] = random_saved.g;
+      b_buffer[x] = random_saved.b;
+    }  
+  }
+}
+
 
 /*!
  * Each LED gets assigned a different random value for 
@@ -608,8 +770,7 @@ void solidColorGlimmer(byte red, byte green, byte blue, long percent)
  */
 void randomColorsIndividual()
 {
-  for(int x = 0; x < LED_COUNT; x++)
-  {
+  for(int x = 0; x < LED_COUNT; x++) {
      r_buffer[x] = (byte)random(0, 255);
      g_buffer[x] = (byte)random(0, 255);
      b_buffer[x] = (byte)random(0, 255);
@@ -621,13 +782,11 @@ void randomColorsIndividual()
  */
 void randomColorSolid()
 {
-  if (!(blink_counter % BLINK_EVERY_X))
-  {
+  if (!(blink_counter % BLINK_EVERY_X)) {
     byte r = (byte)random(0, 255);
     byte g = (byte)random(0, 255);
     byte b = (byte)random(0, 255);
-    for(int x = 0; x < LED_COUNT; x++)
-    {
+    for(int x = 0; x < LED_COUNT; x++) {
       r_buffer[x] = r;
       g_buffer[x] = g;
       b_buffer[x] = b;
@@ -637,60 +796,217 @@ void randomColorSolid()
 }
 
 /*!
- * cycle through the colors using stored variables.
+ * sets each individual LED as a random color
+ * based off of the set of saved colors.
  */
-void colorCycle()
+void savedRandomIndividual()
 {
-  fadeColors();
-  for(int x = 0; x < LED_COUNT; x++)
-  {
-    r_buffer[x] = applyBrightLevel(fade_color.r);
-    g_buffer[x] = applyBrightLevel(fade_color.g);
-    b_buffer[x] = applyBrightLevel(fade_color.b);
+  for(int x = 0; x < LED_COUNT; x++) {
+    setSavedRandom();
+    r_buffer[x] = random_saved.r;
+    g_buffer[x] = random_saved.g;
+    b_buffer[x] = random_saved.b;
   }
 }
-   
+
 /*!
- * logic of fade routine. Individually fades each channel of RGB LED
+ * A random color is chosen from the saved colors
+ * and applied to each LED.
+ */
+void savedRandomSolid()
+{
+  if (!(blink_counter % BLINK_EVERY_X)) {
+    setSavedRandom();
+    for(int x = 0; x < LED_COUNT; x++) {
+      r_buffer[x] = random_saved.r;
+      g_buffer[x] = random_saved.g;
+      b_buffer[x] = random_saved.b;
+    }
+  }
+  blink_counter++;
+}
+
+/*!
+ * Fade through all the colors in the rainbow!
+ */
+void fadeAllColors()
+{
+  fadeAllColorsIncrement();
+  for(int x = 0; x < LED_COUNT; x++) {
+    r_buffer[x] = fade_color.r;
+    g_buffer[x] = fade_color.g;
+    b_buffer[x] = fade_color.b;
+  }
+}
+
+
+/*! 
+ * Sets two colors alternating in patches the size of barSize.
+ * 
+ * @param colorCount number of colors used in bars, starts with lowest saved
+ * @param barSize how many LEDs before switching to the other bar.         
+ * 
+ */
+void savedBarSolid(int colorCount, byte barSize)
+{
+  bar_counter = 0;
+  bar_index = 0;
+  // set up the buffers
+  for(int x = 0; x < LED_COUNT; x++) {
+    r_buffer[x] = colors[bar_index].r;
+    g_buffer[x] = colors[bar_index].g;
+    b_buffer[x] = colors[bar_index].b; 
+    bar_counter++;
+    if (bar_counter == barSize) {
+      bar_counter = 0;
+      bar_index = (bar_index + 1) % colorCount;
+    }
+  }
+}
+
+
+/*! 
+ * Sets two colors alternating in patches the size of barSize.
+ * and moves them up in index on each frame.
+ * 
+ * @param colorCount how many color saved colors to use.
+ * @param barSize how many LEDs before switching to the other bar.         
+ */
+void movingBufferSetup(int colorCount, byte barSize)
+{
+  int index = 0;
+  int counter = 0;
+  for (int x = 0; x < LED_COUNT; x++) {
+     moving_buffer[x] = index;
+     counter++;
+     if (counter == barSize) {
+      counter = 0;
+      index++;
+      if (index == colorCount) {
+        index = 0;
+      }
+     }
+  }
+}
+
+
+/*!
+ * Moves groups of LEDs set to the same color (bars) from the
+ * set of saved colors.
+ */
+void savedBarMoving(int colorCount, byte barSize)
+{
+  for(int x = 0; x < LED_COUNT - moving_start_index; x++) {
+    r_buffer[x] = colors[moving_buffer[x + moving_start_index]].r;
+    g_buffer[x] = colors[moving_buffer[x + moving_start_index]].g;
+    b_buffer[x] = colors[moving_buffer[x + moving_start_index]].b; 
+  }
+  int z = 0;
+  for (int x = LED_COUNT - moving_start_index; x < LED_COUNT; x++) {
+    r_buffer[x] = colors[moving_buffer[z]].r;
+    g_buffer[x] = colors[moving_buffer[z]].g;
+    b_buffer[x] = colors[moving_buffer[z]].b;
+    z++;
+  }
+  moving_start_index = (moving_start_index + 1) % LED_COUNT;
+}
+
+
+/*!
+ * Chooses a random different color from the set of saved colors.
+ */
+void setSavedRandom()
+{ 
+    int possible_saved = random(0, NUM_OF_COLORS);
+    while (possible_saved == random_saved_index) {
+      possible_saved = random(0, NUM_OF_COLORS); 
+    }
+    random_saved_index = possible_saved;
+    random_saved = colors[random_saved_index];
+}
+
+/*!
+ * Logic of the fade routine. Individually fades each channel of RGB LED
  * up then down. 
  */
-void fadeColors()
+void fadeAllColorsIncrement()
 {
-  if (fade_counter < 255 / ALL_FADE_SPEED)
-  {
+  if (fade_counter < 255 / ALL_FADE_SPEED) {
     fade_color.g = fade_color.g + ALL_FADE_SPEED;
-  }
-  else if (fade_counter < 255 / ALL_FADE_SPEED * 2)
-  {
+  } else if (fade_counter < 255 / ALL_FADE_SPEED * 2) {
     fade_color.r = fade_color.r - ALL_FADE_SPEED;
-  }
-  else if (fade_counter < 255 / ALL_FADE_SPEED * 3)
-  {
+  } else if (fade_counter < 255 / ALL_FADE_SPEED * 3) {
     fade_color.b = fade_color.b + ALL_FADE_SPEED;
-  }
-  else if (fade_counter < 255 / ALL_FADE_SPEED * 4)
-  {
+  } else if (fade_counter < 255 / ALL_FADE_SPEED * 4) {
     fade_color.g = fade_color.g - ALL_FADE_SPEED;
-  }
-  else if (fade_counter < 255 / ALL_FADE_SPEED * 5)
-  {
+  } else if (fade_counter < 255 / ALL_FADE_SPEED * 5) {
     fade_color.r = fade_color.r + ALL_FADE_SPEED;
-  }
-  else if (fade_counter < 255 / ALL_FADE_SPEED * 6)
-  {
+  } else if (fade_counter < 255 / ALL_FADE_SPEED * 6) {
     fade_color.b = fade_color.b - ALL_FADE_SPEED;
-  }
-  else
-  {
+  } else {
     fade_counter = -1;
   }
   fade_counter++;
 }
 
+
 /*!
- * helper used to apply the brightness level to any value. 
+ * Fades between all saved colors.
  */
-byte applyBrightLevel(byte value) { return (byte)(value * (bright_level / 100.0f)); }
+void savedFade()
+{
+  if (start_next_fade) {
+    start_next_fade = false;
+    fade_saved_counter = (fade_saved_counter + 1) % NUM_OF_COLORS;
+    fade_saved = colors[fade_saved_counter];
+    goal_color = colors[(fade_saved_counter + 1) % NUM_OF_COLORS];
+  }
+
+  fade_met = true;
+  fade_saved.r = fadeBetweenValues(fade_saved.r, goal_color.r);
+  fade_saved.g = fadeBetweenValues(fade_saved.g, goal_color.g);
+  fade_saved.b = fadeBetweenValues(fade_saved.b, goal_color.b);
+  start_next_fade = fade_met;
+
+  for(int x = 0; x < LED_COUNT; x++) {
+    r_buffer[x] = fade_saved.r;
+    g_buffer[x] = fade_saved.g;
+    b_buffer[x] = fade_saved.b;
+  }
+}
+
+/*!
+ * Helper for fading between two predetermined channels
+ * of an overall color for saved fade routines.
+ */
+int fadeBetweenValues(int fadeChannel, int destinationChannel)
+{
+  if (fadeChannel < destinationChannel) {
+    int difference = destinationChannel - fadeChannel;
+    if (difference < SAVED_FADE_SPEED) {
+      fadeChannel = destinationChannel;
+    } else {
+      fadeChannel = fadeChannel + SAVED_FADE_SPEED;
+      fade_met = false;
+    }
+  }
+  else if (fadeChannel > destinationChannel) {
+    int difference = fadeChannel - destinationChannel;
+    if (difference < SAVED_FADE_SPEED) {
+      fadeChannel = destinationChannel;
+    } else {
+      fadeChannel = fadeChannel - SAVED_FADE_SPEED;
+      fade_met = false;
+    }
+  }
+  return fadeChannel;
+}
+
+
+/*!
+ * Helper used to apply the brightness level to any value. 
+ */
+byte applyBrightLevel(byte value) { return (byte)round((value * (bright_level / 100.0f))); }
 
 //================================================================================
 // Hardware Updates
@@ -702,14 +1018,11 @@ byte applyBrightLevel(byte value) { return (byte)(value * (bright_level / 100.0f
  */
 void updateLEDs()
 {
-  if (IS_RAINBOWDUINO)
-  {
+  if (IS_RAINBOWDUINO) {
     int index = 0;
     //Rainbowduino driver only has a setXY or setXYZ command
-    for(int x = 0; x < 8; x++)
-    {
-      for(int y = 0; y < 8; y++) 
-      {
+    for(int x = 0; x < 8; x++) {
+      for(int y = 0; y < 8; y++) {
         Rb.setPixelXY(x,y,
                       applyBrightLevel(r_buffer[index]), 
                       applyBrightLevel(g_buffer[index]), 
@@ -719,10 +1032,8 @@ void updateLEDs()
     }
   }
   
-  if (IS_NEOPIXEL)
-  {
-    for(int x = 0; x < LED_COUNT; x++) 
-    {
+  if (IS_NEOPIXEL) {
+    for(int x = 0; x < LED_COUNT; x++) {
       pixels.setPixelColor(x, pixels.Color(applyBrightLevel(r_buffer[x]),
                                            applyBrightLevel(g_buffer[x]),
                                            applyBrightLevel(b_buffer[x])));
@@ -731,16 +1042,12 @@ void updateLEDs()
     pixels.show();
   }
 
-  if (IS_SINGLE_LED)
-  {
-    if (IS_COMMON_ANODE)
-    {
+  if (IS_SINGLE_LED) {
+    if (IS_COMMON_ANODE) {
       analogWrite(R_PIN, 255 - applyBrightLevel(r_buffer[0]));
       analogWrite(G_PIN, 255 - applyBrightLevel(g_buffer[0]));
       analogWrite(B_PIN, 255 - applyBrightLevel(b_buffer[0]));
-    }
-    else
-    {
+    } else {
       analogWrite(R_PIN, applyBrightLevel(r_buffer[0]));
       analogWrite(G_PIN, applyBrightLevel(g_buffer[0]));
       analogWrite(B_PIN, applyBrightLevel(b_buffer[0]));
@@ -762,16 +1069,13 @@ void updateLEDs()
  */
 ParsedIntPacket delimitedStringToIntArray(String message)
 {
-  if (checkIfValidString(message))
-  {
+  if (checkIfValidString(message)) {
     int packetSize = countDelimitedValues(message);
     int valueStartIndex = 0;
     int valueCounter = 0;
     int valueArray[packetSize];
-    for (int i = 0; i < message.length(); i++)
-    {
-      if (message.charAt(i) == delimiter)
-      {
+    for (int i = 0; i < message.length(); i++) {
+      if (message.charAt(i) == delimiter) {
         String valueString = message.substring(valueStartIndex, i);
         valueArray[valueCounter] = valueString.toInt();
         valueCounter++;
@@ -783,9 +1087,7 @@ ParsedIntPacket delimitedStringToIntArray(String message)
     valueArray[valueCounter] = valueString.toInt();
     ParsedIntPacket packet = {valueArray, packetSize};
     return packet;
-  }
-  else
-  {
+  } else {
     int junkArray[0];
     ParsedIntPacket packet = {junkArray, 0};
     return packet;
@@ -793,7 +1095,7 @@ ParsedIntPacket delimitedStringToIntArray(String message)
 }
 
 /*!
- * does a naive check on if the string is parseable. For now, it just
+ * Does a naive check on if the string is parseable. For now, it just
  * makes sure that every character is either a digit, a negative sign, 
  * or a delimiter.
  * 
@@ -803,12 +1105,10 @@ ParsedIntPacket delimitedStringToIntArray(String message)
  */
 boolean checkIfValidString(String message)
 {
-  for (int i = 0; i < message.length(); i++)
-  {
+  for (int i = 0; i < message.length(); i++) {
     if (!(isDigit(message.charAt(i)) 
           || message.charAt(i) == delimiter 
-          || message.charAt(i) == '-'))
-    {
+          || message.charAt(i) == '-')) {
       Serial.println("String is not properly formatted!");
       return false;
     }
@@ -827,20 +1127,18 @@ boolean checkIfValidString(String message)
 int countDelimitedValues(String message)
 {
   int delimiters_count = 0;
-  for (int i = 0; i < message.length(); i++)
-  {
+  for (int i = 0; i < message.length(); i++) {
     if (message.charAt(i) == delimiter) delimiters_count++;
   }
 
-  if (delimiters_count == 0)
-  {
+  if (delimiters_count == 0) {
     return 1;
-  }
-  else
-  {
+  } else {
     return delimiters_count + 1; // first delimiter has two values
   } 
 }
+
+
 
 
 
