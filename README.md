@@ -11,11 +11,14 @@ Provides a set of lighting routines for Adafruit NeoPixels products, SeeedStudio
 	* [Rainbowduino](#rainbowduino-hardware)
 	* [Adafruit NeoPixels](#adafruit-hardware)
 	* [Single RGB LED](#RGBLED-hardware)
-* [Usage](#usage)
-	* [Saved Colors](#saved-colors)
+* [Library Usage](#library-usage)
+	* [Single Color Routines](#single-color)
+	* [Multi Color Routines](#multi-colors)
+	* [Routines with Saved Colors](#saved-colors)
+	* [Getters and Setters](#getters-setters)
+* [Sample Sketch Usage](#sample-usage)
 	* [Serial Interface](#serial-interface)
 	* [Lighting Modes](#lighting-modes)
-		* [Optional Parameters](#optional-params) 
 * [Contributing](#contributing)
 * [License](#license)
 
@@ -24,30 +27,31 @@ Provides a set of lighting routines for Adafruit NeoPixels products, SeeedStudio
 
 
 1. Download the git repository
-2. Add the contents of the project's libraries folder to your [Arduino Libraries](https://www.arduino.cc/en/Hacking/Libraries).
-3. Open the project, compile, and upload to your board.  
+2. Copy the RoutinesRGB directory into your [Arduino Libraries directory](https://www.arduino.cc/en/Hacking/Libraries).
+3. If any are missing, copy the missing libraries from the [libraries directory](libraries) into the same Arduino Libraries directory used in step 2.
+4. Open the project, compile, and upload to your board.  
 
 ## <a name="hardware"></a>Hardware Setup
 
 #### <a name="rainbowduino-hardware"></a>Rainbowduino
 
-To use the project with a Rainbowduino, connect an 8x8x8 RGB LED array or a 4x4x4 RGB LED cube to your rainbowduino. After that, set up these defines:
+To use the project with a Rainbowduino, connect an 8x8x8 RGB LED array or a 4x4x4 RGB LED cube to your rainbowduino. After that, set up these constants:
 * set `IS_RAINBOWDUINO` to 1, `IS_NEOPIXEL` to 0, and `IS_SINGLE_LED` to 0
 * set LED_COUNT to 64
 
 ```
-#define IS_RAINBOWDUINO  1
-#define IS_NEOPIXEL      0
-#define IS_SINGLE_LED    0
+const int IS_RAINBOWDUINO  1
+const int IS_NEOPIXEL      0
+const int IS_SINGLE_LED    0
 
-#define LED_COUNT        64 
+const int LED_COUNT        64 
 ```
 
 
 #### <a name="adafruit-hardware"></a>Adafruit NeoPixels
 
 
-To use the project with a NeoPixels product, set up these defines:
+To use the project with a NeoPixels product, set up these constants:
 * set `IS_NEOPIXEL` to 1, `IS_RAINBOWDUINO` to 0, and `IS_SINGLE_LED` to 0
 * set LED_COUNT to the number of LEDs you're using.
 * set CONTROL_PIN to the pin to the pin connected to the NeoPixel
@@ -55,19 +59,19 @@ To use the project with a NeoPixels product, set up these defines:
 Here is an example with 16 LEDs on control pin 6: 
 
 ```
-#define IS_RAINBOWDUINO  0
-#define IS_NEOPIXEL      1
-#define IS_SINGLE_LED    0
+const int IS_RAINBOWDUINO  0
+const int IS_NEOPIXEL      1
+const int IS_SINGLE_LED    0
 
-#define LED_COUNT        16
+const int LED_COUNT        16
 
-#define CONTROL_PIN      6  
+const int CONTROL_PIN      6  
 ```
 
 #### <a name="RGBLED-hardware"></a>Single RGB LED
 
 
-This project supports using a single RGB LED, although certain routines lose some of their features by only having one LED. For setup, consult your RGB LED datasheet for wiring to the arduino. Then, set up these defines: 
+This project supports using a single RGB LED, although certain routines lose some of their features by only having one LED. For setup, consult your RGB LED datasheet for wiring to the arduino. Then, set up these constants: 
 
 * set `IS_SINGLE_LED` to 1, `IS_RAINBOWDUINO` to 0, and `IS_NEOPIXEL` to 0
 * set the R, G, and B pins to the pins being used to control those channels.
@@ -76,27 +80,68 @@ This project supports using a single RGB LED, although certain routines lose som
 Here is an example with a common anode where red is on pin 6, green is on pin 5, and blue is on pin 4:
 
 ```
-#define IS_RAINBOWDUINO  0
-#define IS_NEOPIXEL      0
-#define IS_SINGLE_LED    1
+const int IS_RAINBOWDUINO  0
+const int IS_NEOPIXEL      0
+const int IS_SINGLE_LED    1
 
-#define R_PIN            6     // pin connected to R LED
-#define G_PIN            5     // pin connected to G LED
-#define B_PIN            4     // pin connected to B LED
-#define IS_COMMON_ANODE  1     // 0 if common cathode, 1 if common anode
+const int R_PIN            6     // pin connected to R LED
+const int G_PIN            5     // pin connected to G LED
+const int B_PIN            4     // pin connected to B LED
+const int IS_COMMON_ANODE  1     // 0 if common cathode, 1 if common anode
 ```
 
-## <a name="usage"></a>Usage
+## <a name="library-usage"></a>Library Usage
 
-### <a name="saved-colors"></a>Saved Colors
+### <a name="single-color"></a>Single Color Routines
 
-The sketch is designed to save a series of colors in the array `Color color[NUM_OF_COLORS];`. These colors are used by some of the lighting routines. Routines that use a single color tend to use `color[0]`. Modes that start with the word *Saved* use this set of colors.
+These routines take an R, G, and B values their parameters:
 
-You can change the value of `NUM_OF_COLORS` and the routines will scale to support as many colors as you want, limited only by space on your arduino. These colors are originally set in the `setup()` function, but can be changed through the serial interface. 
+* Solid
+* Blink
+* Fade
+* Glimmer
+
+### <a name="multi-colors"></a>Multi Color Routines
+
+These routines use all possible colors and require no additional parameters:
+
+* Random Solid
+* Random Individual 
+* Fade All Colors 
+
+### <a name="saved-colors"></a>Routines with Saved Colors
+
+These routines use the colors saved in memory to execute the routine. These routines take a parameter that determines how many colors to use:
+
+* Saved Glimmer
+* Saved Random Individual
+* Saved Random Solid
+* Saved Fade
+* Saved Bars Solid
+* Saved Bars Moving
+
+### <a name="getters-setters"></a>Getters and Setters
+
+#### Setters
+
+* setColor: takes an index and RGB values. Sets a color in the "saved colors" array, at the given index. 
+* setBrightness: sets the brightness between 0 and 100, with 0 being off and 100 being full power.
+* setFadeSpeed: sets the speed parameter that routines that fade utilize, must be set between 1 and 100, with 1 being the slowest possible fade. 
+* setBlinkSpeed: Sets how many updates it takes for a routine that switches between solid colors to update. Takes a value between 1 and 255, with 1 causing it to change on every frame. 
+
+
+#### Getters
+
+* getColor: returns the color at the given index.
+* getR: returns the r value of the buffer at the given index. 
+* getG: returns the g value of the buffer at the given index.
+* getB: returns the b value of the buffer at the given index.
+
+## <a name="sample-usage"></a>Sample Sketch Usage
 
 ### <a name="serial-interface"></a>Serial Interface
 
-The serial interface is designed to take ASCII strings at a baud rate of 19200. The commands are designed to be a list of integers in the following format:
+The sample sketch provides a serial interface that is designed to take ASCII strings at a baud rate of 19200. The commands are a list of integers in the following format:
 
 ```
 Header,param1,param2,param3,param4;
@@ -154,65 +199,38 @@ Header,param1,param2,param3,param4;
 *Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `4,0;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
 
 
-#### Override with Temporary Color 
+### <a name="lighting-modes"></a>Sample Lighting Modes
 
-| Parameter     | Values        | 
-| ------------- | ------------- |
-| Header        | 5             | 
-| Red           | 0 - 255       |
-| Green         | 0 - 255       |
-| Blue          | 0 - 255       |
-**Example:** `2,255,127,0;` *(Header 1, Red 255, Green 127, Blue 0)*
-
-*Note: This command overrides the current mode with a glimmering color for the number of frames defined by `OVERRIDE_LENGTH`. If another override  packet comes in during this time, it will override the earlier packet. After no packets have been received and `OVERRIDE_LENGTH` has been reached, it will go back to its previous mode.*
-
-### <a name="lighting-modes"></a>Lighting Modes
-
-These modes are currently implemented in the sketch:
+These modes are currently implemented in the sample sketch:
 
 | Mode | Name           | Notes         |
 |:---:| -------------- | ------------- |
 | 0    | All LEDs Off   |               |
-| 1    | Solid Constant | Displays `color[0]` continuously.            |
-| 2    | Solid Blink    | Blinks `color[0]` on and off. Speed is controlled by `BLINK_EVERY_X`. |
-| 3    | Solid Fade     | Fades `color[0]` in and out. Speed is controlled by `SOLID_FADE_SPEED`. |
-| 4    | Solid Glimmer  | Displays `color[0]` with some of its LEDs randomly dimmed on each update. |
-| 5    | Green          |               |
-| 6    | Teal           |               |
-| 7    | Blue           |               |
-| 8    | Purple         |               |
-| 9    | Red            |               |
-| 10   | Orange         |               |
-| 11   | White          |               |
-| 12   | Random Individual | Each LED gets assigned a random value for each channel. |
-| 13   | Random Solid | Every LED gets assigned the same random value for each channel. |
-| 14   | Fade All Colors | Fades through all the colors of the rainbow. |
-| 15   | Saved Glimmer | Displays `color[0]` with some of its LEDs randomly dimmed on each update and some LEDs randomly switched to other saved colors. |
-| 16   | Saved Random Individual | Each LED gets assigned a random value from the set of saved colors. |
-| 17   | Saved Random Solid | Every LED gets assigned a random value from the set of saved colors. |
-| 18   | Saved Fade  | Fades between all saved colors. |
-| 19   | Saved Bars Solid | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` |
-| 20   | Saved Bars Moving | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` and on each frame moves each bar up by one LED to give the effect of scrolling LEDs. |
+| 1    | Constant | Displays `color[0]` continuously.            |
+| 2    | Blink    | Blinks `color[0]` on and off. |
+| 3    | Fade     | Fades `color[0]` in and out.  |
+| 4    | Glimmer  | Displays `color[0]` with some of its LEDs randomly dimmed on each update. |
+| 5    | Red            |               |
+| 6    | Orange         |               |
+| 7    | Yellow         |               |
+| 8    | Green          |               |
+| 9    | Teal           |               |
+| 10   | Blue           |               |
+| 11   | Purple         |               |
+| 12   | Light Blue     |               |
+| 13   | Pink           |               |
+| 14   | White          |               |
+| 15   | Random Individual | Each LED gets assigned a random value for each channel. |
+| 16   | Random Solid | Every LED gets assigned the same random value for each channel. |
+| 17   | Fade All Colors | Fades through all the colors of the rainbow. |
+| 18   | Saved Glimmer | Displays `color[0]` with some of its LEDs randomly dimmed on each update and some LEDs randomly switched to other saved colors. |
+| 19   | Saved Random Individual | Each LED gets assigned a random value from the set of saved colors. |
+| 20   | Saved Random Solid | Every LED gets assigned a random value from the set of saved colors. |
+| 21   | Saved Fade  | Fades between all saved colors. |
+| 22   | Saved Bars Solid | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` |
+| 23   | Saved Bars Moving | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` and on each frame moves each bar up by one LED to give the effect of scrolling LEDs. |
 
-### <a name="optional-params"></a>Optional Parameters
-
-#### Saved Bars Solid
-
-| Parameter     | Range        | 
-| ------------- | ------------- |
-| Number of Bars        | 0 - `NUM_OF_COLORS`             | 
-
-Changes the number of colors used for the Bars Solid routine. 
-
-#### Saved Bars Moving
-
-| Parameter     | Range        | 
-| ------------- | ------------- |
-| Number of Bars        | 0 - `NUM_OF_COLORS`             | 
-
-
-Changes the number of colors used for the Bars Moving routine. 
-
+All routines that work with saved colors can take an additional optional parameter which controls how many saved colors are used. The parameter must be between the 1 and `NUM_OF_COLORS`. 
 
 ## <a name="contributing"></a>Contributing
 
@@ -225,16 +243,20 @@ Changes the number of colors used for the Bars Moving routine.
 
 ## <a name="changelog"></a>Change Log
 
-#### **v1.0** *October 14th, 2015*
+### **v1.0** 
 * Initial version
 
-#### **v1.5** *November 17th, 2015*
+### **v1.5** 
 * Added support for *x* number of saved colors, defined by the const `NUM_OF_COLORS`
 * Cleaned code and conformed closer to the [Arduino Style Guide](https://www.arduino.cc/en/Reference/StyleGuide).
 * Added Idle timeout
 * Added 6 new lighting routines.
 
-## <a name="license"></a>License
+### **v1.7** 
+* Refactored the lighting routines into their ownlibrary.
+* Cleaned up the API.
+* Reduced memory usage. 
 
+## <a name="license"></a>License
 
 MIT License, provided [here](LICENSE).
