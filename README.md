@@ -40,11 +40,11 @@ To use the project with a Rainbowduino, connect an 8x8x8 RGB LED array or a 4x4x
 * set LED_COUNT to 64
 
 ```
-const int IS_RAINBOWDUINO  1
-const int IS_NEOPIXEL      0
-const int IS_SINGLE_LED    0
+const int IS_RAINBOWDUINO = 1;
+const int IS_NEOPIXEL     = 0;
+const int IS_SINGLE_LED   = 0;
 
-const int LED_COUNT        64 
+const int LED_COUNT       = 64; 
 ```
 
 
@@ -59,13 +59,13 @@ To use the project with a NeoPixels product, set up these constants:
 Here is an example with 16 LEDs on control pin 6: 
 
 ```
-const int IS_RAINBOWDUINO  0
-const int IS_NEOPIXEL      1
-const int IS_SINGLE_LED    0
+const int IS_RAINBOWDUINO = 0;
+const int IS_NEOPIXEL     = 1;
+const int IS_SINGLE_LED   = 0;
 
-const int LED_COUNT        16
+const int LED_COUNT       = 16;
 
-const int CONTROL_PIN      6  
+const int CONTROL_PIN     = 6;  
 ```
 
 #### <a name="RGBLED-hardware"></a>Single RGB LED
@@ -80,14 +80,14 @@ This project supports using a single RGB LED, although certain routines lose som
 Here is an example with a common anode where red is on pin 6, green is on pin 5, and blue is on pin 4:
 
 ```
-const int IS_RAINBOWDUINO  0
-const int IS_NEOPIXEL      0
-const int IS_SINGLE_LED    1
+const int IS_RAINBOWDUINO = 0;
+const int IS_NEOPIXEL     = 0;
+const int IS_SINGLE_LED   = 1;
 
-const int R_PIN            6     // pin connected to R LED
-const int G_PIN            5     // pin connected to G LED
-const int B_PIN            4     // pin connected to B LED
-const int IS_COMMON_ANODE  1     // 0 if common cathode, 1 if common anode
+const int R_PIN           = 6;     // pin connected to R LED
+const int G_PIN           = 5;     // pin connected to G LED
+const int B_PIN           = 4;     // pin connected to B LED
+const int IS_COMMON_ANODE = 1;     // 0 if common cathode, 1 if common anode
 ```
 
 ## <a name="library-usage"></a>Library Usage
