@@ -42,7 +42,7 @@ class RoutinesRGB
      * @param ledCount number of individual RGB LEDs. 
      * @param number of colors that can be "saved".
      */
-	RoutinesRGB(uint16_t ledCount, uint16_t colorCount);
+    RoutinesRGB(uint16_t ledCount, uint16_t colorCount);
 
   
 //================================================================================
@@ -119,8 +119,9 @@ class RoutinesRGB
     void blink(uint8_t red, uint8_t green, uint8_t blue);
     
     /*!
-     * Fades the LEDs on and off based on the provided color.  Uses the parameter 
-     * fadeSpeed to determine how fast to fade. A larger number leads to a slower fade.
+     * Fades the LEDs on and off based on the provided color. 
+     * Uses the parameter fadeSpeed to determine how fast to fade. A larger
+     * number leads to a slower fade.
      * 
      * @param red strength of red LED, between 0 and 255
      * @param green strength of green LED, between 0 and 255
@@ -130,8 +131,9 @@ class RoutinesRGB
     void fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed);
     
     /*!
-     * Set every LED to the provided color. A subset of the LEDs based on the percent 
-     * parameter will be less bright than the rest of the LEDs. 
+     * Set every LED to the provided color. A subset of the LEDs
+     * based on the percent parameter will be less bright than the 
+     * rest of the LEDs. 
      * 
      * @param red strength of red LED, between 0 and 255
      * @param green strength of green LED, between 0 and 255
@@ -151,8 +153,9 @@ class RoutinesRGB
     void randomSolid();
     
     /*!
-     * Each LED gets assigned a different random value for its R,G, and B components. 
-     * This results in a lot of pastel colored lights and an overall white glow.
+     * Each LED gets assigned a different random value for 
+     * its R,G, and B components. This results in a lot of
+     * pastel colored lights and an overall white glow.
      */
     void randomIndividual();
     
@@ -186,7 +189,7 @@ class RoutinesRGB
     
     /*!
      * A random color is chosen from the saved colors and applied to each LED.
-	 *
+     *
      * @param colorCount the number of saved colors used for the routine.
      */
     void savedRandomSolid(uint16_t colorCount);
@@ -211,7 +214,7 @@ class RoutinesRGB
      * Provides a similar effect as savedBarSolid, but the alternating patches 
      * move up one LED index on each frame update to create a "scrolling" effect.
      *     
-	 * @param colorCount number of colors used in bars, starts with lowest saved
+     * @param colorCount number of colors used in bars, starts with lowest saved
      * @param barSize how many LEDs before switching to the other bar.
      */
     void savedBarMoving(uint16_t colorCount, byte barSize);     
@@ -219,7 +222,7 @@ class RoutinesRGB
 
 private:
 
-	// array of saved colors
+    // array of saved colors
     Color* colors;
     
     // buffers used for storing the RGB LED values
@@ -241,9 +244,9 @@ private:
     uint8_t* m_temp_buffer;
     uint16_t m_temp_counter;
     uint16_t m_temp_index;
-	boolean  m_temp_bool;
-	Color 	 m_temp_color;
-	
+    boolean  m_temp_bool;
+    Color    m_temp_color;
+    
     // colors used by specific routines
     Color m_fade_color;
     Color m_goal_color;
