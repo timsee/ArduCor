@@ -1,94 +1,33 @@
 
 # RGB LED Routines for Arduino
 
-Provides a set of lighting routines for Adafruit NeoPixels products, SeeedStudio Rainbowduino, and a single standard RGB LED. 
+This project is based around an arduino library that generates a set of lighting routines for various arduino-based lighting arrays.
 
+Sample sketches are provided for Rainbowduino, a NeoPixel products, or a standard RGB LED. The samples
+provide an ASCII based serial interface to change the lighting routines, the brightness of the lights, and more. A Qt-based GUI is also provided which can control the arduino sketches. The GUI has been tested on Windows and Mac OS X and requires Qt 5.1 or later.
 
 ## <a name="toc"></a>Table of Contents
 
 * [Installation](#installation)
-* [Hardware Setup](#hardware)
-	* [Rainbowduino](#rainbowduino-hardware)
-	* [Adafruit NeoPixels](#adafruit-hardware)
-	* [Single RGB LED](#RGBLED-hardware)
 * [Library Usage](#library-usage)
 	* [Single Color Routines](#single-color)
 	* [Multi Color Routines](#multi-colors)
 	* [Routines with Saved Colors](#saved-colors)
 	* [Getters and Setters](#getters-setters)
 * [Sample Sketch Usage](#sample-usage)
-	* [Serial Interface](#serial-interface)
-	* [Lighting Modes](#lighting-modes)
 * [Contributing](#contributing)
 * [License](#license)
 
 
 ## <a name="installation"></a>Installation
 
-
 1. Download the git repository
 2. Copy the RoutinesRGB directory into your [Arduino Libraries directory](https://www.arduino.cc/en/Hacking/Libraries).
-3. If any are missing, copy the missing libraries from the [libraries directory](libraries) into the same Arduino Libraries directory used in step 2.
-4. Open the project, compile, and upload to your board.  
+3. Choose the proper sample for your hardware setup from the [samples folder](samples).
+4. Build and upload to your board.  
 
-## <a name="hardware"></a>Hardware Setup
-
-#### <a name="rainbowduino-hardware"></a>Rainbowduino
-
-To use the project with a Rainbowduino, connect an 8x8x8 RGB LED array or a 4x4x4 RGB LED cube to your rainbowduino. After that, set up these constants:
-* set `IS_RAINBOWDUINO` to 1, `IS_NEOPIXEL` to 0, and `IS_SINGLE_LED` to 0
-* set LED_COUNT to 64
-
-```
-const int IS_RAINBOWDUINO = 1;
-const int IS_NEOPIXEL     = 0;
-const int IS_SINGLE_LED   = 0;
-
-const int LED_COUNT       = 64; 
-```
-
-
-#### <a name="adafruit-hardware"></a>Adafruit NeoPixels
-
-
-To use the project with a NeoPixels product, set up these constants:
-* set `IS_NEOPIXEL` to 1, `IS_RAINBOWDUINO` to 0, and `IS_SINGLE_LED` to 0
-* set LED_COUNT to the number of LEDs you're using.
-* set CONTROL_PIN to the pin to the pin connected to the NeoPixel
-
-Here is an example with 16 LEDs on control pin 6: 
-
-```
-const int IS_RAINBOWDUINO = 0;
-const int IS_NEOPIXEL     = 1;
-const int IS_SINGLE_LED   = 0;
-
-const int LED_COUNT       = 16;
-
-const int CONTROL_PIN     = 6;  
-```
-
-#### <a name="RGBLED-hardware"></a>Single RGB LED
-
-
-This project supports using a single RGB LED, although certain routines lose some of their features by only having one LED. For setup, consult your RGB LED datasheet for wiring to the arduino. Then, set up these constants: 
-
-* set `IS_SINGLE_LED` to 1, `IS_RAINBOWDUINO` to 0, and `IS_NEOPIXEL` to 0
-* set the R, G, and B pins to the pins being used to control those channels.
-* set `IS_COMMON_ANODE` to 1 if you are using a common anode LED, or 0 if its a common cathode. 
-
-Here is an example with a common anode where red is on pin 6, green is on pin 5, and blue is on pin 4:
-
-```
-const int IS_RAINBOWDUINO = 0;
-const int IS_NEOPIXEL     = 0;
-const int IS_SINGLE_LED   = 1;
-
-const int R_PIN           = 6;     // pin connected to R LED
-const int G_PIN           = 5;     // pin connected to G LED
-const int B_PIN           = 4;     // pin connected to B LED
-const int IS_COMMON_ANODE = 1;     // 0 if common cathode, 1 if common anode
-```
+ If there is compilation issues, make sure you have the library for your hardware setup installed. For a Rainbowduino, you can find the library [here](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0). For a NeoPixels, you can find the library [here](https://github.com/adafruit/Adafruit_NeoPixel). 
+ 
 
 ## <a name="library-usage"></a>Library Usage
 
@@ -109,22 +48,23 @@ These routines use all possible colors and require no additional parameters:
 * Random Individual 
 * Fade All Colors 
 
-### <a name="saved-colors"></a>Routines with Saved Colors
+### <a name="saved-colors"></a>Routines with the Array Colors
 
-These routines use the colors saved in memory to execute the routine. These routines take a parameter that determines how many colors to use:
+These routines use the colors saved in an array to execute the routine. These routines take a parameter that determines how many colors to use:
 
-* Saved Glimmer
-* Saved Random Individual
-* Saved Random Solid
-* Saved Fade
-* Saved Bars Solid
-* Saved Bars Moving
+* Array Glimmer
+* Array Random Individual
+* Array Random Solid
+* Array Fade
+* Array Bars Solid
+* Array Bars Moving
 
 ### <a name="getters-setters"></a>Getters and Setters
 
 #### Setters
 
-* setColor: takes an index and RGB values. Sets a color in the "saved colors" array, at the given index. 
+* setMainColor: takes RGB values. Sets the main color used for single color routines.
+* setColor: takes an index and RGB values. Sets a color in the `colors` array, at the given index. 
 * setBrightness: sets the brightness between 0 and 100, with 0 being off and 100 being full power.
 * setFadeSpeed: sets the speed parameter that routines that fade utilize, must be set between 1 and 100, with 1 being the slowest possible fade. 
 * setBlinkSpeed: Sets how many updates it takes for a routine that switches between solid colors to update. Takes a value between 1 and 255, with 1 causing it to change on every frame. 
@@ -139,98 +79,8 @@ These routines use the colors saved in memory to execute the routine. These rout
 
 ## <a name="sample-usage"></a>Sample Sketch Usage
 
-### <a name="serial-interface"></a>Serial Interface
+Sample code is generated off of the main project using the generate_samples script. All sample code is stored in the samples directory.
 
-The sample sketch provides a serial interface that is designed to take ASCII strings at a baud rate of 19200. The commands are a list of integers in the following format:
-
-```
-Header,param1,param2,param3,param4;
-```
-
-#### Mode Change
-
-| Parameter     | Values        | 
-| ------------- | ------------- |
-| Header        |     0         | 
-| New Mode      | 0 - 20        |  
-**Example:** `0,1;` *(Header 0, New Mode 1)* 
-
-*Note: To find the number representation of the modes, check the number in [Lighting Modes](#lighting-modes)*
-
-#### Set Saved Colors
-
-| Parameter     | Values        | 
-| ------------- | ------------- |
-| Header        |     1         | 
-| Saved Color   | 0 - NUM_OF_COLORS | 
-| Red           | 0 - 255       |
-| Green         | 0 - 255       |
-| Blue          | 0 - 255       |
-**Example:** `1,3,255,127,0;` *(Header 1, Saved Color 3, Red 255, Green 127, Blue 0)*
-
-*Note: The number of saved is defined by the const `NUM_OF_COLORS` in the code. By default it is set to 5.*
-
-#### Set Brightness
-
-| Parameter     | Values        | 
-| ------------- | ------------- |
-| Header        |     2         | 
-| Brightness %  | 0 - 100       |
-**Example:** `2,90;` *(Header 2, 90% brightness)*
-
-#### Set Delay 
-
-| Parameter     | Values        | 
-| ------------- | ------------- |
-| Header        |     3         | 
-| Delay Milliseconds      | 1 - 1000      |
-**Example:** `3,50;` *(Header 3, 500 msec updates)*
-
-*Note: This delay is defined as the delay value multiplied by 10 msec.*
-
-#### Set Idle Timeout
-
-| Parameter     | Values        | 
-| ------------- | ------------- |
-| Header        |     4        | 
-| Idle Timeout Minutes       | 0 - 1000      |
-**Example:** `4,120;` *(Header 4, 120 Minutes)*
-
-*Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `4,0;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
-
-
-### <a name="lighting-modes"></a>Sample Lighting Modes
-
-These modes are currently implemented in the sample sketch:
-
-| Mode | Name           | Notes         |
-|:---:| -------------- | ------------- |
-| 0    | All LEDs Off   |               |
-| 1    | Constant | Displays `color[0]` continuously.            |
-| 2    | Blink    | Blinks `color[0]` on and off. |
-| 3    | Fade     | Fades `color[0]` in and out.  |
-| 4    | Glimmer  | Displays `color[0]` with some of its LEDs randomly dimmed on each update. |
-| 5    | Red            |               |
-| 6    | Orange         |               |
-| 7    | Yellow         |               |
-| 8    | Green          |               |
-| 9    | Teal           |               |
-| 10   | Blue           |               |
-| 11   | Purple         |               |
-| 12   | Light Blue     |               |
-| 13   | Pink           |               |
-| 14   | White          |               |
-| 15   | Random Individual | Each LED gets assigned a random value for each channel. |
-| 16   | Random Solid | Every LED gets assigned the same random value for each channel. |
-| 17   | Fade All Colors | Fades through all the colors of the rainbow. |
-| 18   | Saved Glimmer | Displays `color[0]` with some of its LEDs randomly dimmed on each update and some LEDs randomly switched to other saved colors. |
-| 19   | Saved Random Individual | Each LED gets assigned a random value from the set of saved colors. |
-| 20   | Saved Random Solid | Every LED gets assigned a random value from the set of saved colors. |
-| 21   | Saved Fade  | Fades between all saved colors. |
-| 22   | Saved Bars Solid | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` |
-| 23   | Saved Bars Moving | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` and on each frame moves each bar up by one LED to give the effect of scrolling LEDs. |
-
-All routines that work with saved colors can take an additional optional parameter which controls how many saved colors are used. The parameter must be between the 1 and `NUM_OF_COLORS`. 
 
 ## <a name="contributing"></a>Contributing
 
@@ -256,6 +106,11 @@ All routines that work with saved colors can take an additional optional paramet
 * Refactored the lighting routines into their ownlibrary.
 * Cleaned up the API.
 * Reduced memory usage. 
+
+### **v1.8** 
+* Arduino sample code is now split into a different sketch for each supported product. These sketches generates off a single sketch using a script.
+* Added a Qt GUI
+* Miscellaneous changes to support a GUI.
 
 ## <a name="license"></a>License
 

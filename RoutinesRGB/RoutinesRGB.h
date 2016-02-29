@@ -4,7 +4,7 @@
  * with various RGB LED arduino products such as a Rainbowduino by SeedStudio 
  * or Neopixels by Adafruit.  
  * 
- * Version 1.7
+ * Version 1.8
  * Date: December 6, 2015
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
@@ -40,7 +40,7 @@ class RoutinesRGB
      * It will allocate (4 * ledCount) + (3 * colorCount) bytes. 
      *
      * @param ledCount number of individual RGB LEDs. 
-     * @param number of colors that can be "saved".
+     * @param number of colors that are allocated for the array.
      */
     RoutinesRGB(uint16_t ledCount, uint16_t colorCount);
 
@@ -49,6 +49,11 @@ class RoutinesRGB
 // Getters and Setters
 //================================================================================
   
+    /*! 
+     * Sets the color used for single color routines
+     */
+     void setMainColor(byte r, byte g, byte b);
+     
     /*!
      * Set the color at a given index with the RGB values provided. colorIndex must
      * be less than the colorCount provided to the constructor or else it will not 
@@ -76,7 +81,12 @@ class RoutinesRGB
     void setBlinkSpeed(uint8_t blinkSpeed);
     
     /*!
-     * Retrieve the color at the given number.
+     * Retrieve the main color, which is used for single color routines.
+     */
+    Color getMainColor();
+    
+    /*!
+     * Retrieve the color at the given index.
      */
     Color getColor(uint16_t i);
     
@@ -128,7 +138,7 @@ class RoutinesRGB
      * @param blue strength of blue LED, between 0 and 255
      * @param fadeSpeed how many ticks it takes to fade. Higher numbers are slower.           
      */
-    void fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed);
+    void fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate);
     
     /*!
      * Set every LED to the provided color. A subset of the LEDs
@@ -140,7 +150,7 @@ class RoutinesRGB
      * @param blue strength of blue LED, between 0 and 255
      * @param percent determines how many LEDs will be slightly dimmer than the rest
      */
-    void glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent);
+    void glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate);
     
     
 //================================================================================
@@ -166,64 +176,67 @@ class RoutinesRGB
 
 
 //================================================================================
-// Routines With Saved Colors
+// Routines With The Color Array
 //================================================================================
 
     /*!
-     * Takes the color[0] from saved colors and sets that as the standard color. 
+     * Takes the color[0] from the color array and sets that as the standard color. 
      * Then, takes the GLIMMER_PERCENT, and randomly chooses a different
-     * saved to glimmer with. Also, glimmers the standard way with 
+     * array color to glimmer with. Also, glimmers the standard way with 
      * random LEDs being set to dimmer values. 
      *
-     * @param colorCount the number of saved colors used for the routine. 
+     * @param colorCount the number of colors in the array used for the routine. 
      * @param percent percent of LEDs that will get the glimmer applied
      */
-    void savedGlimmer(uint16_t colorCount, long percent);
+    void arrayGlimmer(uint16_t colorCount, long percent);
      
     /*!
-     * sets each individual LED as a random color based off of the set of saved colors.
+     * sets each individual LED as a random color from the color array.
      *
-     * @param colorCount the number of saved colors used for the routine. 
+     * @param colorCount the number of colors in the array used for the routine. 
      */
-    void savedRandomIndividual(uint16_t colorCount);
+    void arrayRandomIndividual(uint16_t colorCount);
     
     /*!
-     * A random color is chosen from the saved colors and applied to each LED.
+     * A random color is chosen from the color array and applied to each LED.
      *
-     * @param colorCount the number of saved colors used for the routine.
+     * @param colorCount the number of colors in the array used for the routine. 
      */
-    void savedRandomSolid(uint16_t colorCount);
+    void arrayRandomSolid(uint16_t colorCount);
     
     /*!
-     * Fades between all saved colors.
+     * Fades between the number of colors in the array.
      *
-     * @param colorCount the number of saved colors used for the routine.
+     * @param colorCount the number of colors in the array used for the routine. 
      */
-    void savedFade(uint16_t colorCount);
+    void arrayFade(uint16_t colorCount);
 
     /*! 
-     * Sets saved colors in alternating patches with a size of barSize.
+     * Uses the color array to set the LEDs in alternating patches with a size of barSize.
      * 
-     * @param colorCount number of colors used in bars, starts with lowest saved
+     * @param colorCount the number of colors in the array used for the routine. 
      * @param barSize how many LEDs before switching to the other bar.         
      * 
      */
-    void savedBarSolid(uint16_t colorCount, byte barSize);
+    void arrayBarSolid(uint16_t colorCount, byte barSize);
     
     /*!
-     * Provides a similar effect as savedBarSolid, but the alternating patches 
+     * Provides a similar effect as arrayBarSolid, but the alternating patches 
      * move up one LED index on each frame update to create a "scrolling" effect.
      *     
-     * @param colorCount number of colors used in bars, starts with lowest saved
+     * @param colorCount the number of colors in the array used for the routine. 
      * @param barSize how many LEDs before switching to the other bar.
      */
-    void savedBarMoving(uint16_t colorCount, byte barSize);     
+    void arrayBarMoving(uint16_t colorCount, byte barSize);     
     
 
 private:
 
-    // array of saved colors
+    // array of colors
     Color* colors;
+    
+    // used for single color routines
+    Color m_main_color;
     
     // buffers used for storing the RGB LED values
     uint8_t* r_buffer;
@@ -260,7 +273,7 @@ private:
   
     // fades save their place between modes so they use their own counters
     uint16_t m_fade_counter;
-    uint16_t m_fade_saved_counter;  
+    uint16_t m_fade_array_counter;  
 
     /*!
      * Called before every function. Used to update the library state tracking
@@ -282,7 +295,7 @@ private:
      * Sets two colors alternating in patches the size of barSize.
      * and moves them up in index on each frame.
      *
-     * @param colorCount how many color saved colors to use.
+     * @param colorCount the number of colors in the array used for the routine. 
      * @param barSize how many LEDs before switching to the other bar.
      */
     void movingBufferSetup(uint16_t colorCount, byte barSize);
@@ -295,14 +308,14 @@ private:
     
     /*!
      * Helper for fading between two predetermined channels
-     * of an overall color for saved fade routines.
+     * of an overall color for array fade routines.
      */
     uint16_t fadeBetweenValues(uint16_t fadeChannel, uint16_t destinationChannel);
     
     /*!
-     * Chooses a random different color from the set of saved colors.
+     * Chooses a random different color from the array of colors.
      */
-    void chooseRandomSaved(uint16_t maxColorIndex, boolean canRepeat); 
+    void chooseRandomFromArray(uint16_t maxColorIndex, boolean canRepeat); 
 };
 
 #endif

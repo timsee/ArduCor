@@ -4,7 +4,7 @@
  * with various RGB LED arduino products such as a Rainbowduino by SeedStudio 
  * or Neopixels by Adafruit.  
  * 
- * Version 1.7
+ * Version 1.8
  * Date: December 6, 2015
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
@@ -31,12 +31,12 @@ enum ELightingState
   eRandomIndividual,
   eRandomSolid,
   eFadeAllColors,
-  eSavedGlimmer,
-  eSavedRandomIndividual,
-  eSavedRandomSolid,
-  eSavedFade,
-  eSavedBarSolid,
-  eSavedBarMoving
+  eArrayGlimmer,
+  eArrayRandomIndividual,
+  eArrayRandomSolid,
+  eArrayFade,
+  eArrayBarSolid,
+  eArrayBarMoving
 };
 
 
@@ -104,7 +104,7 @@ RoutinesRGB::RoutinesRGB(uint16_t ledCount, uint16_t colorCount)
     
     // counters for routines
     m_fade_counter  = 0;
-    m_fade_saved_counter = 0;  
+    m_fade_array_counter = 0;  
 }
 
 
@@ -112,6 +112,11 @@ RoutinesRGB::RoutinesRGB(uint16_t ledCount, uint16_t colorCount)
 // Getters and Setters
 //================================================================================
 
+void
+RoutinesRGB::setMainColor(uint8_t r, uint8_t g, uint8_t b)
+{
+    m_main_color = (RoutinesRGB::Color){r, g, b};
+}
 
 void
 RoutinesRGB::setColor(uint16_t colorIndex, uint8_t r, uint8_t g, uint8_t b)
@@ -146,6 +151,14 @@ RoutinesRGB::setBlinkSpeed(uint8_t blinkSpeed)
         m_blink_speed = blinkSpeed;
     }
 }
+
+
+RoutinesRGB::Color
+RoutinesRGB::getMainColor()
+{  
+    return m_main_color;
+}
+
 
 RoutinesRGB::Color
 RoutinesRGB::getColor(uint16_t i)
@@ -288,19 +301,21 @@ RoutinesRGB::blink(uint8_t red, uint8_t green, uint8_t blue)
 
 
 void
-RoutinesRGB::fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed)
+RoutinesRGB::fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)
 {
     preProcess(eFade);
-    // catch illegal argument and fix it
-    if (fadeSpeed == 0) fadeSpeed = 1;
+    if (shouldUpdate) {
+        // catch illegal argument and fix it
+        if (fadeSpeed == 0) fadeSpeed = 1;
     
-    // apply the fade
-    if (m_temp_bool)  m_solid_fade_value++;
-    else              m_solid_fade_value--;
+        // apply the fade
+        if (m_temp_bool)  m_solid_fade_value++;
+        else              m_solid_fade_value--;
     
-    // constrain the fade
-    if (m_solid_fade_value == fadeSpeed) m_temp_bool = false;
-    else if (m_solid_fade_value == 0)    m_temp_bool = true;
+        // constrain the fade
+        if (m_solid_fade_value == fadeSpeed) m_temp_bool = false;
+        else if (m_solid_fade_value == 0)    m_temp_bool = true;
+    }
     
     // set up the buffers
     for (int x = 0; x < m_LED_count; x++) {
@@ -314,13 +329,13 @@ RoutinesRGB::fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed)
 
 
 void
-RoutinesRGB::glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent)
+RoutinesRGB::glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate)
 {
     preProcess(eGlimmer);
     for (uint16_t x = 0; x < m_LED_count; x++) {
         // a random number is generated. If its less than the percent,
         // treat this as an LED that gets a glimmer effect
-        if (random(1,101) < percent && percent != 0) {
+        if (random(1,101) < percent && percent != 0 && shouldUpdate) {
             // set a random level for the LED to be dimmed by.
             byte scaleFactor = (byte)random(2,6);
             
@@ -395,22 +410,21 @@ RoutinesRGB::fadeBetweenAllColors()
 
 
 //================================================================================
-// Routines With Saved Colors
+// Routines With The Color Array
 //================================================================================
 
-
 void
-RoutinesRGB::savedGlimmer(uint16_t colorCount, long percent)
+RoutinesRGB::arrayGlimmer(uint16_t colorCount, long percent)
 {
     // protect from illegal arguments
     colorCount = constrain(colorCount, 1, m_color_count);
     
-    preProcess(eSavedGlimmer);
+    preProcess(eArrayGlimmer);
     for (uint16_t x = 0; x < m_LED_count; x++) {
         m_temp_color = colors[0];
         if (random(1,101) < percent && percent != 0) {
-            // m_temp_color is set in chooseRandomSaved
-            chooseRandomSaved(colorCount, true);
+            // m_temp_color is set in chooseRandomFromArray
+            chooseRandomFromArray(colorCount, true);
         }
         
         // a random number is generated, if its less than the percent,
@@ -437,14 +451,14 @@ RoutinesRGB::savedGlimmer(uint16_t colorCount, long percent)
 
 
 void
-RoutinesRGB::savedRandomSolid(uint16_t colorCount)
+RoutinesRGB::arrayRandomSolid(uint16_t colorCount)
 {
-    preProcess(eSavedRandomSolid);
+    preProcess(eArrayRandomSolid);
     if (!(m_temp_counter % m_blink_speed)) {
         // protect from illegal arguments
         colorCount = constrain(colorCount, 1, m_color_count);
         
-        chooseRandomSaved(colorCount, false);
+        chooseRandomFromArray(colorCount, false);
         for (uint16_t x = 0; x < m_LED_count; x++) {
             r_buffer[x] = m_temp_color.r;
             g_buffer[x] = m_temp_color.g;
@@ -456,14 +470,14 @@ RoutinesRGB::savedRandomSolid(uint16_t colorCount)
 }
 
 void
-RoutinesRGB::savedRandomIndividual(uint16_t colorCount)
+RoutinesRGB::arrayRandomIndividual(uint16_t colorCount)
 {
-    preProcess(eSavedRandomIndividual);
+    preProcess(eArrayRandomIndividual);
     for (uint16_t x = 0; x < m_LED_count; x++) {
         // protect from illegal arguments
         colorCount = constrain(colorCount, 1, m_color_count);
         
-        chooseRandomSaved(colorCount, true);
+        chooseRandomFromArray(colorCount, true);
         r_buffer[x] = m_temp_color.r;
         g_buffer[x] = m_temp_color.g;
         b_buffer[x] = m_temp_color.b;
@@ -473,9 +487,9 @@ RoutinesRGB::savedRandomIndividual(uint16_t colorCount)
 
 
 void
-RoutinesRGB::savedFade(uint16_t colorCount)
+RoutinesRGB::arrayFade(uint16_t colorCount)
 {
-    preProcess(eSavedFade);
+    preProcess(eArrayFade);
     
     // protect from illegal arguments
     colorCount = constrain(colorCount, 1, m_color_count);
@@ -483,11 +497,11 @@ RoutinesRGB::savedFade(uint16_t colorCount)
     if (m_start_next_fade) {
         m_start_next_fade = false;
         if (colorCount > 1) {
-            m_fade_saved_counter = (m_fade_saved_counter + 1) % colorCount;
-            m_temp_color = colors[m_fade_saved_counter];
-            m_goal_color = colors[(m_fade_saved_counter + 1) % colorCount];
+            m_fade_array_counter = (m_fade_array_counter + 1) % colorCount;
+            m_temp_color = colors[m_fade_array_counter];
+            m_goal_color = colors[(m_fade_array_counter + 1) % colorCount];
         } else {
-            m_fade_saved_counter = 0;
+            m_fade_array_counter = 0;
             m_goal_color = colors[0];
             m_temp_color = colors[0];
         }
@@ -509,7 +523,7 @@ RoutinesRGB::savedFade(uint16_t colorCount)
 
 
 void
-RoutinesRGB::savedBarSolid(uint16_t colorCount, uint8_t barSize)
+RoutinesRGB::arrayBarSolid(uint16_t colorCount, uint8_t barSize)
 {
     // protect from illegal arguments
     colorCount = constrain(colorCount, 1, m_color_count);
@@ -518,7 +532,7 @@ RoutinesRGB::savedBarSolid(uint16_t colorCount, uint8_t barSize)
         movingBufferSetup(colorCount, barSize);
     }
     
-    preProcess(eSavedBarSolid);
+    preProcess(eArrayBarSolid);
     
     m_temp_counter = 0;
     m_temp_index = 0;
@@ -538,7 +552,7 @@ RoutinesRGB::savedBarSolid(uint16_t colorCount, uint8_t barSize)
 
 
 void
-RoutinesRGB::savedBarMoving(uint16_t colorCount, uint8_t barSize)
+RoutinesRGB::arrayBarMoving(uint16_t colorCount, uint8_t barSize)
 {
     // protect from illegal arguments
     colorCount = constrain(colorCount, 1, m_color_count);
@@ -546,7 +560,7 @@ RoutinesRGB::savedBarMoving(uint16_t colorCount, uint8_t barSize)
     if (colorCount != m_bar_count || barSize != m_bar_size) {
         movingBufferSetup(colorCount, barSize);
     }
-    preProcess(eSavedBarMoving);
+    preProcess(eArrayBarMoving);
     
     for(uint16_t x = 0; x < m_LED_count - m_temp_index; x++) {
         r_buffer[x] = colors[m_temp_buffer[x + m_temp_index]].r;
@@ -637,15 +651,15 @@ RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t barSize)
 }
 
 void
-RoutinesRGB::chooseRandomSaved(uint16_t colorCount, boolean canRepeat)
+RoutinesRGB::chooseRandomFromArray(uint16_t colorCount, boolean canRepeat)
 {   
-    uint16_t possible_saved = random(0, colorCount);
+    uint16_t possible_array_color = random(0, colorCount);
     if (!canRepeat && colorCount > 2) {
-      while (possible_saved == m_temp_index) {
-         possible_saved = random(0, colorCount);
+      while (possible_array_color == m_temp_index) {
+         possible_array_color = random(0, colorCount);
       }
     }
-    m_temp_index = possible_saved;
+    m_temp_index = possible_array_color;
     m_temp_color = colors[m_temp_index];
 }
 

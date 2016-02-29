@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/settingsgear.png</file>
+        <file>images/color_wheel.png</file>
+    </qresource>
+</RCC>
