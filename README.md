@@ -26,7 +26,8 @@ provide an ASCII based serial interface to change the lighting routines, the bri
 3. Choose the proper sample for your hardware setup from the [samples folder](samples).
 4. Build and upload to your board.  
 
- If there is compilation issues, make sure you have the library for your hardware setup installed. For a Rainbowduino, you can find the library [here](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0). For a NeoPixels, you can find the library [here](https://github.com/adafruit/Adafruit_NeoPixel). 
+
+If there are compilation issues, make sure you have the library for your hardware setup installed. For a Rainbowduino, you can find the library [here](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0). For a NeoPixels, you can find the library [here](https://github.com/adafruit/Adafruit_NeoPixel). 
  
 
 ## <a name="library-usage"></a>Library Usage
@@ -72,7 +73,8 @@ These routines use the colors saved in an array to execute the routine. These ro
 
 #### Getters
 
-* getColor: returns the color at the given index.
+* getMainColor: returns the color used for single color routines. 
+* getColor: returns the color from the `colors` array at the given index.
 * getR: returns the r value of the buffer at the given index. 
 * getG: returns the g value of the buffer at the given index.
 * getB: returns the b value of the buffer at the given index.
