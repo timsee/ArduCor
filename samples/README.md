@@ -123,7 +123,7 @@ These modes are currently implemented in the sample sketch:
 | 22   | Array Bars Solid | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` |
 | 23   | Array Bars Moving | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` and on each frame moves each bar up by one LED to give the effect of scrolling LEDs. |
 
-All routines that work with saved colors can take an additional optional parameter which controls how many saved colors are used. The parameter must be between the 1 and `NUM_OF_COLORS`. 
+All routines that work with saved colors can take an additional optional parameter which controls how many array colors are used. The parameter must be between the 1 and `NUM_OF_COLORS`. 
 
 ### <a name="generating-samples"></a>Generating Samples
 
