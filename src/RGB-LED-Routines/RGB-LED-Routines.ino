@@ -12,7 +12,7 @@
  * by the RoutinesRGB library.
  *
  * Version 1.8
- * Date: February 28, 2015
+ * Date: February 28, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
