@@ -99,20 +99,20 @@ Sample code is generated off of the main project using the generate_samples scri
 * Initial version
 
 ### **v1.5** 
-* Added support for *x* number of saved colors, defined by the const `NUM_OF_COLORS`
+* Added support for *x* number of saved colors, defined by the const `NUM_OF_COLORS`.
 * Cleaned code and conformed closer to the [Arduino Style Guide](https://www.arduino.cc/en/Reference/StyleGuide).
-* Added Idle timeout
+* Added Idle timeout.
 * Added 6 new lighting routines.
 
 ### **v1.7** 
-* Refactored the lighting routines into their ownlibrary.
+* Refactored the lighting routines into their own library.
 * Cleaned up the API.
 * Reduced memory usage. 
 
 ### **v1.8** 
-* Arduino sample code is now split into a different sketch for each supported product. These sketches generates off a single sketch using a script.
-* Added a Qt GUI
-* Miscellaneous changes to support a GUI.
+* Arduino sample code is now split into a different sketch for each supported product. 
+* Added a Qt GUI.
+* Updated API to better support a GUI.
 
 ## <a name="license"></a>License
 
