@@ -1,7 +1,6 @@
+# Qt Lighting GUI for RGB LED Routines
 
-# RGB LED Routines for Arduino
-
-The GUI interacts with sample arduino sketches. It is built on Qt and requires version 5.1 or later since it uses QSerialPort. The GUI's goal is to simplify controlling the LEDs so any action or mode change requires only a few clicks instead of having to write up an ASCII packet.
+The GUI interacts with the sample arduino sketches. It is built on Qt and requires version 5.1 or later for QSerialPort. The GUI's goal is to simplify controlling the LEDs so any action or mode change requires only a few clicks instead of having to write up an ASCII packet.
 
 The GUI has a main window which shows 4 pages: Single Color Control, Array Color Control, Multi Color Routines, and Settings. 
 
@@ -20,6 +19,7 @@ The GUI has a main window which shows 4 pages: Single Color Control, Array Color
 
 ##<a name="main-window"></a>Main Window
 
+![mainWindowPreview](mainWindowPreview.png)
 
 The MainWindow contains a QStackedWidget which shows the various
 pages of the app, an on/off button in the top left, and a brightness slider across the top. It also 
@@ -28,15 +28,16 @@ has four buttons which are used to change the current page of the GUI.
 
 ##<a name="single-color"></a>Single Color Page
 
+![singlePagePreview](singlePagePreview.png)
 
 The SingleColorPage class allows uses to change
 the main color of the LED system, which is used to display
 single color routines such as blinking on and off or
 displaying a single solid color.
 
-
 ##<a name="array-colors"></a>Array Colors Page
 
+![arrayPagePreview](arrayPagePreview.png)
 
 The ArrayColorsPage uses the saved array on the arduino
 to set the lights. This array can have all its colors changed individually,
@@ -49,16 +50,18 @@ but currently it just allows you to choose how many colors to use from the array
 
 ##<a name="multi-color"></a>Multi Color Page
 
+![multiPagePreview](multiPagePreview.png)
 
-The MultiColorPage class contains
+The MultiColorPage contains
 preprogrammed lighting routines that use a
 a variety of colors. One example is individually
 setting each LED a different random color.
 
 ##<a name="settings"></a>Settings Page
 
+![settingsPagePreview](settingsPagePreview.png)
 
-The SettingsPage class allows you
+The SettingsPage allows you
 to change the timeout or speed of the LEDs
 It also shows a list of the available serial connections
 and clicking  on a serial connection will attempt to connect to it.
@@ -67,7 +70,9 @@ and clicking  on a serial connection will attempt to connect to it.
 
 ###<a name="color-wheel"></a>Color Wheel
 
-The ColorWheel class provides a color wheel that shows all hues
+![colorWheelPreview](colorWheelPreview.png)
+
+The ColorWheel provides a color wheel that shows all hues
 within the visual spectrum, and allows the user to click anywhere
 in the color wheel and it will send a signal of that specific color.
 
@@ -78,7 +83,9 @@ the hue and black, while the remaining 1/4 mixes the hue with white.
 
 ###<a name="lights-slider"></a>Lights Slider
 
-The LightsSlider class is mostly a QSlider, but we plan to do
+![lightsSliderPreview](lightsSliderPreview.png)
+
+The LightsSlider is mostly a QSlider, but we plan to do
 some things out side of the context of just QSlider, so we're subclassing
 QWidget instead.
  
