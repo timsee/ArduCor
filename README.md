@@ -13,7 +13,7 @@ provide an ASCII based serial interface to change the lighting routines, the bri
     * [Single Color Routines](#single-color)
     * [Multi Color Routines](#multi-colors)
     * [Routines with Saved Colors](#saved-colors)
-* Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/class_routines_r_g_b.html)) ([pdf](https://github.com/timsee/RGB-LED-Routines/docs/RoutinesRGB-API.pdf))
+* Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/class_routines_r_g_b.html)) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
 * [Sample Sketch Usage](samples)
 * [Qt Based GUI](GUI)
     *  [Frontend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/front_overview.html)
