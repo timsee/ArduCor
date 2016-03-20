@@ -1,12 +1,4 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
+
 
 #ifndef ARRAYCOLORSPAGE_H
 #define ARRAYCOLORSPAGE_H
@@ -21,9 +13,17 @@ class ArrayColorsPage;
 }
 
 /*!
- * \brief The ArrayColorsPage class uses the saved array on the arduino
- * to set the lights. This array can have all its colors changed individually,
- * but currently it just allows you to choose how many colors to use from the array.
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ *
+ * \brief The ArrayColorsPage class uses the color array from the arduino's RoutinesRGB library.
+ *
+ * The bar at the top of the page determines how many of the colors from the array to use. For example,
+ * when its set to `2` it will use only the first `2` colors. Setting it to `5` will use `5`
+ * array colors, etc.
+ *
+ * \todo Add the ability to set each array color individually.
+ *
  */
 class ArrayColorsPage : public QWidget
 {

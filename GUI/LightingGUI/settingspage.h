@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef SETTINGSPAGE_H
 #define SETTINGSPAGE_H
@@ -22,11 +13,19 @@ class SettingsPage;
 }
 
 /*!
- * \brief The SettingsPage class allows you
- * to change the timeout or speed of the LEDs
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ *
+ * \brief The SettingsPage class provides a way to configure
+ * the application settings.
+ *
+ * It currently provides the ability to change the speed the LEDs update
+ * and the amount of minutes it takes for the LEDs to timeout.
+ *
  * It also shows a list of the available serial connections
  * and clicking  on a serial connection will attempt to connect
  * to it.
+ *
  */
 class SettingsPage : public QWidget
 {

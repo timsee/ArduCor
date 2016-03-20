@@ -1,13 +1,8 @@
 /*!
- * RGB-LED-Routines
- * LightingGUI
+ * @copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
  */
-
 #include "mainwindow.h"
 #include <QApplication>
 #include <QFile>

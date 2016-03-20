@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef ICONDATA_H
 #define ICONDATA_H
@@ -19,15 +10,37 @@
 #include <stdio.h>
 
 /*!
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ *
  * \brief The IconData class creates all the grids of colors that are seen throughout
- * the app's icons. The grids are made by using a buffer to do the computation and
- * then upscaling it to the actual image size to give the square pixel-y effect.
+ * the app's icons. The grids are made by using a very small buffer of RGB values to do the 
+ * computation. For display, this buffer gets upscaled to the desired icon size. This 
+ * gives it the square pixel-y effect.
+ *
+ * \todo Clean up some of the messier data manipulations such as the fades.
+ * \todo Clean up the icons that don't accurately represent their modes such as the "Bars Moving" icon.
  */
 class IconData
 {
 public:
     IconData();
+    /*!
+     * Standard Constructor, values must
+     * be a multiple of four.
+     *
+     * \param width the width
+     * \param height the height
+     */
     IconData(int width, int height);
+    /*!
+     * Required constructor when the icons
+     * use the color array.
+     *
+     * \param width the width
+     * \param height the height
+     * \param data some more sutff
+     */
     IconData(int width, int height, DataLayer *data); // necessary for array colors
 
     /*!

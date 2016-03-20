@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef DATALAYER_H
 #define DATALAYER_H
@@ -14,11 +5,15 @@
 #include <QApplication>
 
 /*!
- * \brief The DataLayer class contains all the saved data
- * about the states of the LEDs system. This is including but
- * not limited to its mode and its brightness.
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
- * TODO: make this class save its data between sessions
+ * \brief The DataLayer class contains all the saved data
+ * about the state and settings of the LEDs array. It saves
+ * things such as the current brightness and the current mode.
+ *
+ * \todo Make this class save its data between sessions.
+ * \todo Remove the Color struct and use QColor instead.
  */
 class DataLayer
 {
@@ -54,7 +49,6 @@ public:
         eLightingModeSavedBarsMoving
     };
 
-    //TODO: remove this in favor of QColor
     struct Color {
       uint8_t r;
       uint8_t g;
@@ -100,7 +94,7 @@ public:
     int getBrightness();
 
     /*!
-     * time it takes the LEDs to turn off in minutes
+     * Time it takes the LEDs to turn off in minutes.
      */
     bool setTimeOut(int timeOut);
     int getTimeOut();

@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -21,10 +12,17 @@ class MainWindow;
 }
 
 /*!
- * \brief The MainWindow class is well, the main window.
- * It contains a QStackedWidget which shows the various
- * pages of the app, an on/off button in the top left,
- * and a brightness slider across the top.
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ *
+ * \brief The MainWindow class is the only window in this application.
+ * It contains a QStackedWidget which shows 4 pages: SingleColorPage, ArrayColorsPage,
+ * MultiColorPage, and the SettingsPage.
+ *
+ * On the top of the MainWindow, there is an on/off button in the far left. This button
+ * will reflect the current mode when on, and will be black when off. There is
+ * also a slider to control the overall brightness of the LEDs. 
+ *
  */
 class MainWindow : public QMainWindow
 {

@@ -50,34 +50,46 @@ Header,param1,param2,param3,param4;
 
 *Note: To find the number representation of the modes, check the number in [Lighting Modes](#lighting-modes)*
 
-#### Set Saved Colors
+#### Set Main Color
 
 | Parameter     | Values        | 
 | ------------- | ------------- |
 | Header        |     1         | 
+| Red           | 0 - 255       |
+| Green         | 0 - 255       |
+| Blue          | 0 - 255       |
+**Example:** `1,255,127,0;` *(Header 1, Saved Color 3, Red 255, Green 127, Blue 0)*
+
+*Note: In the sample sketches, this color is used for single color routines.*
+
+#### Set color in Colors Array
+
+| Parameter     | Values        | 
+| ------------- | ------------- |
+| Header        |     2         | 
 | Saved Color   | 0 - NUM_OF_COLORS | 
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
-**Example:** `1,3,255,127,0;` *(Header 1, Saved Color 3, Red 255, Green 127, Blue 0)*
+**Example:** `1,3,255,127,0;` *(Header 2, Saved Color 3, Red 255, Green 127, Blue 0)*
 
-*Note: The number of saved is defined by the const `NUM_OF_COLORS` in the code. By default it is set to 5.*
+*Note: The number of array colors is defined by the const `NUM_OF_COLORS` in the code. By default it is set to 5.*
 
 #### Set Brightness
 
 | Parameter     | Values        | 
 | ------------- | ------------- |
-| Header        |     2         | 
+| Header        |     3         | 
 | Brightness %  | 0 - 100       |
-**Example:** `2,90;` *(Header 2, 90% brightness)*
+**Example:** `2,90;` *(Header 3, 90% brightness)*
 
 #### Set Speed 
 
 | Parameter     | Values        | 
 | ------------- | ------------- |
-| Header        |     3         | 
+| Header        |     4         | 
 | FPS * 100     | 1 - 2000      |
-**Example:** `3,500;` *(Header 3, 5 FPS)*
+**Example:** `3,500;` *(Header 4, 5 FPS)*
 
 *Note: The value sent is the desired FPS * 100. To do 1 FPS, send 100, to do 10 FPS, send 1000.*
 
@@ -85,49 +97,51 @@ Header,param1,param2,param3,param4;
 
 | Parameter     | Values        | 
 | ------------- | ------------- |
-| Header        |     4        | 
+| Header        |     5        | 
 | Idle Timeout Minutes       | 0 - 1000      |
-**Example:** `4,120;` *(Header 4, 120 Minutes)*
+**Example:** `4,120;` *(Header 5, 120 Minutes)*
 
-*Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `4,0;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
+*Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `5,0;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
 
 
 ### <a name="lighting-modes"></a>Sample Lighting Modes
 
 These modes are currently implemented in the sample sketch:
 
-| Mode | Name           | Notes         |
-|:---:| -------------- | ------------- |
-| 0    | All LEDs Off   |               |
-| 1    | Constant | Displays `mainColor` continuously.            |
-| 2    | Blink    | Blinks `mainColor` on and off. |
-| 3    | Fade     | Fades `mainColor` in and out.  |
-| 4    | Glimmer  | Displays `mainColor` with some of its LEDs randomly dimmed on each update. |
-| 5    | Red            |               |
-| 6    | Orange         |               |
-| 7    | Yellow         |               |
-| 8    | Green          |               |
-| 9    | Teal           |               |
-| 10   | Blue           |               |
-| 11   | Purple         |               |
-| 12   | Light Blue     |               |
-| 13   | Pink           |               |
-| 14   | White          |               |
-| 15   | Random Individual | Each LED gets assigned a random value for each channel. |
-| 16   | Random Solid | Every LED gets assigned the same random value for each channel. |
-| 17   | Fade All Colors | Fades through all the colors of the rainbow. |
-| 18   | Array Glimmer | Displays `color[0]` with some of its LEDs randomly dimmed on each update and some LEDs randomly switched to other saved colors. |
-| 19   | Array Random Individual | Each LED gets assigned a random value from the set of array colors. |
-| 20   | Array Random Solid | Every LED gets assigned a random value from the set of array colors. |
-| 21   | Array Fade  | Fades between all saved colors. |
-| 22   | Array Bars Solid | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` |
-| 23   | Array Bars Moving | Sets LEDs in groups of alternating colors based off of `BAR_SIZE` and on each frame moves each bar up by one LED to give the effect of scrolling LEDs. |
+| Mode | Name           |
+|:---:| -------------- | 
+| 0    | All LEDs Off   |  
+| 1    | Constant |
+| 2    | Blink    |
+| 3    | Fade     | 
+| 4    | Glimmer  | 
+| 5    | Red            |
+| 6    | Orange         |
+| 7    | Yellow         |
+| 8    | Green          |
+| 9    | Teal           |
+| 10   | Blue           |
+| 11   | Purple         |
+| 12   | Light Blue     |
+| 13   | Pink           |
+| 14   | White          |
+| 15   | Random Individual |
+| 16   | Random Solid |
+| 17   | Fade All Colors |
+| 18   | Array Glimmer |
+| 19   | Array Random Individual |
+| 20   | Array Random Solid |
+| 21   | Array Fade  |
+| 22   | Array Bars Solid |
+| 23   | Array Bars Moving |
 
 All routines that work with saved colors can take an additional optional parameter which controls how many array colors are used. The parameter must be between the 1 and `NUM_OF_COLORS`. 
 
 ### <a name="generating-samples"></a>Generating Samples
 
-Samples are generated off of the `RGB-LED-Routines` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates 3 versions of the sketch which contains only the relevant code for each of the hardware setups. To make changes to all the samples, changes need to be made the `RGB-LED-Routines` sketch and then the `generate_samples.sh` script must be ran again. To test any independent sketch from the `RGB-LED-Routines` sketch, you can set the preprocessor directives on the first few lines of the sketch. Only one define should be set to `1` at any given time. 
+Samples are generated off of the `RGB-LED-Routines` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates 3 versions of the sketch. Each of these versions contains only the relevant code for one of the hardware setups. To make changes to all the samples, changes need to be made the `RGB-LED-Routines` sketch and then the `generate_samples.sh` script must be ran again. To test any independent sketch from the `RGB-LED-Routines` sketch, you can set the preprocessor directives on the first few lines of the sketch. Only one define should be set to `1` at any given time. 
+
+There is also the option for a custom sketch, which is useful if you have a complex light setup but you still want to use the master project instead of sketches for development. Generation of this sketch is commented out by default and custom sketches are not pushed to github. 
 
 
 

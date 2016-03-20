@@ -1,6 +1,7 @@
 #define IS_RAINBOWDUINO 0
 #define IS_NEOPIXEL 1
 #define IS_SINGLE_LED 0
+#define IS_CUSTOM 0
 #define IS_YUN 0
 /*!
  * RGB-LED-Routines
@@ -11,8 +12,8 @@
  * COM_PLACEHOLDER
  * by the RoutinesRGB library.
  *
- * Version 1.8
- * Date: February 28, 2016
+ * Version 1.8.1
+ * Date: March 20, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -30,6 +31,10 @@
 #include <YunServer.h>
 #include <YunClient.h>
 #endif
+#if IS_CUSTOM
+#include <Adafruit_NeoPixel.h>
+#include <SoftwareSerial.h>
+#endif
 
 //================================================================================
 // Settings
@@ -43,6 +48,13 @@ const int R_PIN             = 5;      // SINGLE_LED only
 const int G_PIN             = 4;      // SINGLE_LED only
 const int B_PIN             = 3;      // SINGLE_LED only
 const int IS_COMMON_ANODE   = 1;      // SINGLE_LED only, 0 if common cathode, 1 if common anode
+#endif
+#if IS_CUSTOM
+const int CONTROL_PIN       = 6;     
+const int CONTROL_PIN_2     = 5;     
+
+const int CUBE_IN           = 4;    
+const int CUBE_OUT          = 3; 
 #endif
 const int LED_COUNT         = 64;
 const int COLOR_COUNT       = 25;     // Number of array colors
@@ -234,6 +246,13 @@ void currentLightingRoutine(ELightingMode currentMode);
 #if IS_NEOPIXEL
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
 #endif
+#if IS_CUSTOM
+// NeoPixels controller object
+Adafruit_NeoPixel pixels_desk = Adafruit_NeoPixel(60, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels_dresser = Adafruit_NeoPixel(60, CONTROL_PIN_2, NEO_GRB + NEO_KHZ800);
+
+SoftwareSerial cubeSerial(CUBE_IN, CUBE_OUT); // RX, TX
+#endif
 #if IS_YUN
 YunServer server;
 #endif
@@ -254,6 +273,11 @@ void setup()
   pinMode(R_PIN, OUTPUT);
   pinMode(G_PIN, OUTPUT);
   pinMode(B_PIN, OUTPUT);
+#endif
+#if IS_CUSTOM
+  pixels_desk.begin();
+  pixels_dresser.begin(); 
+  cubeSerial.begin(19200); 
 #endif
 #if IS_YUN
   Bridge.begin();
@@ -291,6 +315,10 @@ void loop()
     String currentPacket = Serial.readStringUntil(';');
     // remove any extraneous whitepsace or newline characters
     currentPacket.trim();
+#if IS_CUSTOM
+    String repeatString = currentPacket + ";";
+    cubeSerial.println(repeatString);
+#endif
     parsed_packet = delimitedStringToIntArray(currentPacket);
     // parse a paceket only if its header is is in the correct range
     if (parsed_packet.isValid
@@ -316,9 +344,9 @@ void loop()
 }
 
 
+#if IS_RAINBOWDUINO
 void updateLEDs()
 {
-#if IS_RAINBOWDUINO
   int index = 0;
   for (int x = 0; x < 8; x++) {
     for (int y = 0; y < 8; y++)  {
@@ -329,16 +357,22 @@ void updateLEDs()
       index++;
     }
   }
+}
 #endif
 #if IS_NEOPIXEL
+void updateLEDs()
+{
   for (int x = 0; x < LED_COUNT; x++) {
     pixels.setPixelColor(x, pixels.Color(routines.getR(x),
                                          routines.getG(x),
                                          routines.getB(x)));
   }
   pixels.show();
+}
 #endif
 #if IS_SINGLE_LED
+void updateLEDs()
+{
   if (IS_COMMON_ANODE) {
     analogWrite(R_PIN, 255 - routines.getR(0));
     analogWrite(G_PIN, 255 - routines.getG(0));
@@ -349,8 +383,32 @@ void updateLEDs()
     analogWrite(G_PIN, routines.getG(0));
     analogWrite(B_PIN, routines.getB(0));
   }
-#endif
 }
+#endif
+#if IS_CUSTOM
+int reverse_counter;
+void updateLEDs()
+{
+  for(int x = 0; x < LED_COUNT; x++) 
+    {
+     pixels_desk.setPixelColor(x, pixels_desk.Color(routines.getR(x),
+                                                    routines.getG(x),
+                                                    routines.getB(x)));
+    }
+
+    reverse_counter = LED_COUNT;
+    for(int x = 0; x < LED_COUNT; x++) 
+    {
+      pixels_dresser.setPixelColor(reverse_counter, pixels_dresser.Color(routines.getR(x),
+                                                                         routines.getG(x),
+                                                                         routines.getB(x)));
+      reverse_counter--;
+    }
+    // Neopixels use the show function to update the pixels
+    pixels_desk.show();
+    pixels_dresser.show();
+}
+#endif
 
 
 //================================================================================

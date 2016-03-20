@@ -1,21 +1,59 @@
-/*!
- * RoutinesRGB
- * Arduino library that provides a set of lighting routines that can be used
- * with various RGB LED arduino products such as a Rainbowduino by SeedStudio 
- * or Neopixels by Adafruit.  
- * 
- * Version 1.8
- * Date: February 28, 2016
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
- 
 
 #ifndef RoutinesRGB_h
 #define RoutinesRGB_h
 
 #include "Arduino.h"
 
+/*!
+ * @version v1.8.1
+ * @date March 20, 2016
+ * @author Tim Seemann
+ * @copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
+ *            MIT License
+ *            </a>
+ *
+ *
+ * @brief An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware.
+ *
+ * @details This library has been tested with SeeedStudio Rainbowduinos, quite a few of the
+ *  Adafruit Neopixels products, and a standard RGB LED. Sample code is provided in the git repo for all
+ * tested hardware in the samples folder of the git repository.  
+ *
+ * If you are starting a project from scratch, first you'll need to make a global object in the
+ * arduino sketch:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~
+ * RoutinesRGB routines = RoutinesRGB(LED_COUNT, COLOR_COUNT);
+ * ~~~~~~~~~~~~~~~~~~~~~
+ *
+ * where `LED_COUNT` is the number of LEDs in your array, and `COLOR_COUNT` is the maximum number of
+ * colors you want to use in the array color routines.
+ *
+ * After setting up the global object, it will be showing a solid green color with a glimmer by default. To
+ * update the colors, first call the proper functions to change it to the mode you want. For instance,
+ * to update to a red blinking light, call this function:
+ *  
+ * ~~~~~~~~~~~~~~~~~~~~~
+ * routines.blink(255, 0, 0);
+ * ~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Then, update the LED array with the values from the library's RGB buffer. The way to do this will
+ * vary from hardware to hardware, but for a NeoPixels sample, it would look something like this:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~
+ * for (int x = 0; x < LED_COUNT; x++) {
+ *    pixels.setPixelColor(x, pixels.Color(routines.getR(x),
+ *                                         routines.getG(x),
+ *                                         routines.getB(x)));
+ * }
+ * pixels.show();
+ * ~~~~~~~~~~~~~~~~~~~~~
+ *
+ * Some routines, such as the random solid and all of the fades, change their values overtime.
+ * For these, put the routine's API call and the hardware update in your `loop()` and use your loop's
+ * update speed to determime how fast the LEDs change.
+ *
+ */
 class RoutinesRGB
 {
   public:
@@ -33,11 +71,11 @@ class RoutinesRGB
     };
     
     /*!
-     * Required constructor. This library support as many LEDs and colors
+     * Required constructor. This library can support as many LEDs and colors
      * as your arduino's memory can support. The library should be stored in 
      * global memory and allocated only once at startup.
      * 
-     * It will allocate (4 * ledCount) + (3 * colorCount) bytes. 
+     * It will allocate `(4 * ledCount) + (3 * colorCount)` bytes.
      *
      * @param ledCount number of individual RGB LEDs. 
      * @param number of colors that are allocated for the array.
@@ -48,9 +86,15 @@ class RoutinesRGB
 //================================================================================
 // Getters and Setters
 //================================================================================
-  
-    /*! 
-     * Sets the color used for single color routines
+    /*! @defgroup gettersetters Getters and Setters
+     *  These are the getters and setters for RoutinesRGB that are used to control
+     *  the settings and the colors.
+     *  @{
+     */
+    
+    
+    /*!
+     * Sets the color used for single color routines.
      */
      void setMainColor(byte r, byte g, byte b);
      
@@ -73,10 +117,12 @@ class RoutinesRGB
     void setFadeSpeed(uint8_t fadeSpeed);
     
     /*!
-     * sets how many updates to wait before changing the light state in the blink
-     * routine and in routines that switch between solid colors. Takes a value between
-     * 1 and 255. A value of 1 will make it blink on every frame, which may be too fast
-     * when used with other routines.
+     * Sets how many updates to wait before changing the light state in the blink
+     * routine and in routines that switch between solid colors.
+     *
+     * @param blinkSpeed a value between 1 and 255 representing how fast to blink.
+     *        A value of 1 will make it blink on every frame, which may be too fast
+     *        when used with other routines.
      */
     void setBlinkSpeed(uint8_t blinkSpeed);
     
@@ -105,11 +151,20 @@ class RoutinesRGB
      */
     uint8_t getB(uint16_t i);
        
-  
+    /*! @} */
 //================================================================================
 // Single Color Routines
 //================================================================================
+    /*! @defgroup singleRoutines Single Color Routines
+     *  These routines each take a R, G, and B value as parameters to generate
+     *  a color. This color is the only color used by the routine. 
+     *
+     *  Blink, fade, and glimmer, should be called repeatedly on a loop for their full effect.
+     *  The speed of the loop determines how fast the LEDs update.
+     *  @{
+     */
 
+    
     /*!
      * Set every LED to the provided color.
      * 
@@ -152,10 +207,18 @@ class RoutinesRGB
      */
     void glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate);
     
-    
+    /*! @} */
 //================================================================================
 // Multi Color Routines
 //================================================================================
+    /*! @defgroup multiRoutines Multi Color Routines
+     *  These routines use their own set of predefined colors and require no additional parameters.
+     *
+     *  Blink, fade, and glimmer, should be called repeatedly on a loop for their full effect.
+     *  The speed of the loop determines how fast the LEDs update.
+     *  @{
+     */
+    
     
     /*!
      * A random color is chosen and applied to each LED.
@@ -174,16 +237,26 @@ class RoutinesRGB
      */
     void fadeBetweenAllColors();
 
-
+    /*! @} */
 //================================================================================
 // Routines With The Color Array
 //================================================================================
-
+    /*! @defgroup arrayRoutines Array Colors Routines
+     *  These routines use the `colors` array as a basis for their colors.
+     *  They all take the parameter of `colorCount` which is used to determine how many
+     *  colors to use.
+     *
+     *  Blink, fade, and glimmer, should be called repeatedly on a loop for their full effect.
+     *  The speed of the loop determines how fast the LEDs update.
+     *  @{
+     */
+    
+    
     /*!
-     * Takes the color[0] from the color array and sets that as the standard color. 
-     * Then, takes the GLIMMER_PERCENT, and randomly chooses a different
-     * array color to glimmer with. Also, glimmers the standard way with 
-     * random LEDs being set to dimmer values. 
+     * This method uses its percent parameter to dim LEDs randomly, similar to the 
+     * standard glimmer mode. It also uses the percent to randomly change the color
+     * of select LEDs to a color in the `colors` array. The base color is `color[0]` 
+     * from the colors array.
      *
      * @param colorCount the number of colors in the array used for the routine. 
      * @param percent percent of LEDs that will get the glimmer applied
@@ -229,12 +302,11 @@ class RoutinesRGB
      */
     void arrayBarMoving(uint16_t colorCount, byte barSize);     
     
-
+    /*! @} */ 
 private:
 
     // array of colors
     Color* colors;
-    
     // used for single color routines
     Color m_main_color;
     

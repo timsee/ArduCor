@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef LIGHTSCONTROL_H
 #define LIGHTSCONTROL_H
@@ -15,11 +6,12 @@
 #include "datalayer.h"
 
 /*!
- * \brief The LightsControl class the beginning of a backend
- * class. This class will eventually contain all the systems
- * used to control the lights. For now, it contains two objects:
- * an object that controls communication to the lights, and an
- * object that stores data about the lights.
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ *
+ * \brief The LightsControl class is a simple object
+ * that contains the two backend classes required
+ * for communciation to the LED array.
  */
 class LightsControl
 {
