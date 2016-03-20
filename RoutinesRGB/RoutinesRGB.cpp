@@ -1,13 +1,14 @@
 /*!
- * RoutinesRGB
- * Arduino library that provides a set of lighting routines that can be used
- * with various RGB LED arduino products such as a Rainbowduino by SeedStudio 
- * or Neopixels by Adafruit.  
- * 
- * Version 1.8
- * Date: February 28, 2016
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
+ * @version v1.8.1
+ * @date March 20, 2016
+ * @author Tim Seemann
+ * @copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
+ *            MIT License
+ *            </a>
+ *
+ *
+ * @brief An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware.
+ *
  */
  
 #include "RoutinesRGB.h"
