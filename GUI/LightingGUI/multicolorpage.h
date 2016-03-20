@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef MULTICOLORPAGE_H
 #define MULTICOLORPAGE_H
@@ -20,10 +11,14 @@ class MultiColorPage;
 }
 
 /*!
- * \brief The MultiColorPage class contains
- * preprogrammed lighting routines that use a
- * a variety of colors. One example is individually
- * setting each LED a different random color.
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ *
+ * \brief The MultiColorPage class contains preprogrammed lighting routines
+ * that use a variety of colors. These routines require no parameters
+ * or settings and because of this, its the simplest page in the
+ * application: Its a grid of buttons.
+ *
  */
 class MultiColorPage : public QWidget
 {

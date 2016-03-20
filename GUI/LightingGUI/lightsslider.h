@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef LIGHTSSLIDER_H
 #define LIGHTSSLIDER_H
@@ -17,16 +8,23 @@
 #include <QSlider>
 
 /*!
- * \brief The LightsSlider class is mostly a QSlider, but we plan to do
- * some things out side of the context of just QSlider, so we're subclassing
- * QWidget instead.
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
- * QSliders have their tick marks break when theres a
- * custom style sheet, so tick marks are drawn using QPaint, if needed.
+ * \brief The LightsSlider class provides a slider with behaviors similiar
+ * to sliders on mobile devices. Clicking on the slider jumps the slider's value
+ * to the location you clicked instead of the QSlider default of jumping by the page 
+ * value. There is also the option to use a gradient instead of a solid color as the 
+ * background color for the slider.
  *
- * The slider also has some custom logic. Clicking on the slider jumps the value
- * to the location of your click instead of doing a tick towards it. Also, sliders
- * can be given a minimum value that they can't go below.
+ * QSliders can have their tick marks break when the project uses a custom style sheet,
+ * so tick marks are drawn using QPaint, if needed.
+ *
+ * There is also an option for developers to set a value that above the slider's minimum 
+ * as the "minmum possible." Users will see a slider that shows the minimum value, but they
+ * won't below the value set as the minimum possible. This is used by the Array Colors Page 
+ * in order to prevent users from choosing less than 2 colors for the array routines.
+ *
  */
 class LightsSlider : public QWidget
 {
@@ -64,8 +62,8 @@ public:
 
 
 /*!
- * Sends out the value that the slider has been set to after all the processing of snapping it to a tick or
- * accounting for its minium value or any of that.
+ * Sends out the value that the slider has been set to after all the processing of snapping 
+ * it to a tick or accounting for its minium value or any of that.
  */
 signals:
     void valueChanged(int);

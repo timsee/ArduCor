@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef SINGLECOLORPAGE_H
 #define SINGLECOLORPAGE_H
@@ -23,10 +14,17 @@ class SingleColorPage;
 }
 
 /*!
- * \brief The SingleColorPage class allows uses to change
- * the main color of the LED system, which is used to display
- * single color routines such as blinking on and off or
- * displaying a single solid color.
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ *
+ * \brief The SingleColorPage class allows users to change
+ * the main color of the LED system and to set it in single-color modes.
+ *
+ * The single color modes current supported are solid, blink, fade, and glimmer.
+ *
+ * The page provides a color wheel and RGB sliders to give the user multiple ways
+ * to set the color.
+ *
  */
 class SingleColorPage : public QWidget
 {

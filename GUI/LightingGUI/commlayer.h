@@ -1,12 +1,3 @@
-/*!
- * RGB-LED-Routines
- * LightingGUI
- *
- * A Qt-based GUI for controlling LED arrays.
- *
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
- * License: MIT-License, LICENSE provided in root of git repo
- */
 
 #ifndef COMMLAYER_H
 #define COMMLAYER_H
@@ -17,10 +8,15 @@
 #include <QList>
 
 /*!
- * \brief The CommLayer class contains a connection to an LED
- *  array as well as the ability to build and send packets to
- *  that LED array. Currently it supports serial communication.
+ * \copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
+ * \brief The CommLayer class provides communication protocols
+ *  that allow the user to connect and send packets to an LED
+ *  array. Currently it supports serial communication. In a future
+ *  update it will also support UDP.
+ *
+ * \todo Add UDP support.
  */
 class CommLayer
 {
@@ -41,7 +37,7 @@ public:
      * \brief serialList list of possible serial ports
      * for connection
      */
-    QList<QSerialPortInfo> serialList;\
+    QList<QSerialPortInfo> serialList;
     /*!
      * \brief serial the serial port currently in use
      */
