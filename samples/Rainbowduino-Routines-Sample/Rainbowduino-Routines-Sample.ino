@@ -7,8 +7,8 @@
  * Provides a serial interface to a set of lighting routines generated
  * by the RoutinesRGB library.
  *
- * Version 1.8.1
- * Date: March 20, 2016
+ * Version 1.8.3
+ * Date: March 27, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */

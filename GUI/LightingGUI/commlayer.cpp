@@ -9,7 +9,7 @@
 
 CommLayer::CommLayer() {
     bool waitingForConnection = true;
-    serial = new QSerialPort;
+    serial = std::shared_ptr<QSerialPort>(new QSerialPort);
 
     // Example use QSerialPortInfo
     for (const QSerialPortInfo &info : QSerialPortInfo::availablePorts()) {
@@ -75,7 +75,7 @@ bool CommLayer::connectSerialPort(QString serialPortName) {
         serial->setFlowControl(QSerialPort::NoFlowControl);
         // set up lights to the defaults
         sendMainColorChange(0,255,0);
-        sendModeChange(DataLayer::eLightingModeSingleGlimmer);
+        sendModeChange(ELightingMode::eLightingModeSingleGlimmer);
         sendBrightness(50);
         sendTimeOut(120);
         sendSpeed(300); // desired FPS * 100
@@ -104,18 +104,18 @@ void CommLayer::sendArrayColorChange(int color, int r, int g, int b) {
     serial->write(message.toStdString().c_str());
 }
 
-void CommLayer::sendModeChange(DataLayer::ELightingMode mode) {
+void CommLayer::sendModeChange(ELightingMode mode) {
     QString message = QString("0,%1;").arg(QString::number((int)mode));
     serial->write(message.toStdString().c_str());
 }
 
-void CommLayer::sendArrayModeChange(DataLayer::ELightingMode mode, int count) {
-    if (mode == DataLayer::ELightingMode::eLightingModeSavedBarsMoving
-          || mode == DataLayer::ELightingMode::eLightingModeSavedBarsSolid
-          || mode == DataLayer::ELightingMode::eLightingModeSavedFade
-          || mode == DataLayer::ELightingMode::eLightingModeSavedGlimmer
-          || mode == DataLayer::ELightingMode::eLightingModeSavedRandomIndividual
-          || mode == DataLayer::ELightingMode::eLightingModeSavedRandomSolid) {
+void CommLayer::sendArrayModeChange(ELightingMode mode, int count) {
+    if (mode == ELightingMode::eLightingModeSavedBarsMoving
+          || mode == ELightingMode::eLightingModeSavedBarsSolid
+          || mode == ELightingMode::eLightingModeSavedFade
+          || mode == ELightingMode::eLightingModeSavedGlimmer
+          || mode == ELightingMode::eLightingModeSavedRandomIndividual
+          || mode == ELightingMode::eLightingModeSavedRandomSolid) {
         QString message = QString("0,%1,%2;").arg(QString::number((int)mode), QString::number(count));
         serial->write(message.toStdString().c_str());
     }

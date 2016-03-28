@@ -8,34 +8,40 @@
 #include "ui_ArrayColorsPage.h"
 #include "icondata.h"
 
+#include <QSignalMapper>
+
 ArrayColorsPage::ArrayColorsPage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ArrayColorsPage) {
     ui->setupUi(this);
 
-    // set up the menu buttons to change the widgets
-    connect(ui->glimmerButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToGlimmer()));
-    connect(ui->randomIndividualButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToRandomIndividual()));
-    connect(ui->randomSolidButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToRandomSolid()));
-    connect(ui->fadeButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToFade()));
-    connect(ui->barsSolidButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToBarsSolid()));
-    connect(ui->barsMovingButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToBarsMoving()));
+    mPageButtons = std::shared_ptr<std::vector<QToolButton*> >(new std::vector<QToolButton*>(6, nullptr));
+    (*mPageButtons.get())[0] = ui->glimmerButton;
+    (*mPageButtons.get())[1] = ui->randomIndividualButton;
+    (*mPageButtons.get())[2] = ui->randomSolidButton;
+    (*mPageButtons.get())[3] = ui->fadeButton;
+    (*mPageButtons.get())[4] = ui->barsSolidButton;
+    (*mPageButtons.get())[5] = ui->barsMovingButton;
 
-    ui->glimmerButton->setCheckable(true);
-    ui->randomIndividualButton->setCheckable(true);
-    ui->randomSolidButton->setCheckable(true);
-    ui->fadeButton->setCheckable(true);
-    ui->barsSolidButton->setCheckable(true);
-    ui->barsMovingButton->setCheckable(true);
+    // loop through the buttons and set up their clicks to a mapper
+    QSignalMapper* signalMapper = new QSignalMapper(this);
+    for (uint i = 0; i < mPageButtons->size(); i++)
+    {
+        QToolButton* button =(*mPageButtons.get())[i];
+        button->setCheckable(true);
+        connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
+    }
 
-    connect(ui->arraySlider, SIGNAL(valueChanged(int)),
-            this, SLOT(colorCountChanged(int)));
+    signalMapper->setMapping(ui->glimmerButton, (int)ELightingMode::eLightingModeSavedGlimmer);
+    signalMapper->setMapping(ui->randomIndividualButton, (int)ELightingMode::eLightingModeSavedRandomIndividual);
+    signalMapper->setMapping(ui->randomSolidButton, (int)ELightingMode::eLightingModeSavedRandomSolid);
+    signalMapper->setMapping(ui->fadeButton, (int)ELightingMode::eLightingModeSavedFade);
+    signalMapper->setMapping(ui->barsSolidButton, (int)ELightingMode::eLightingModeSavedBarsSolid);
+    signalMapper->setMapping(ui->barsMovingButton, (int)ELightingMode::eLightingModeSavedBarsMoving);
+
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(modeChanged(int)));
+
+    connect(ui->arraySlider, SIGNAL(valueChanged(int)), this, SLOT(colorCountChanged(int)));
     ui->arraySlider->setSliderColorBackground({0,255,0});
     ui->arraySlider->slider->setMaximum(50);
     ui->arraySlider->slider->setTickInterval(10);
@@ -44,79 +50,74 @@ ArrayColorsPage::ArrayColorsPage(QWidget *parent) :
     ui->arraySlider->setMinimumPossible(true, 20);
 }
 
-
-void ArrayColorsPage::updateIcons() {
-    IconData buttonData = IconData(ui->glimmerButton->iconSize().width(),
-                                   ui->glimmerButton->iconSize().height(),
-                                   LEDs->data);
-    buttonData.setArrayGlimmer();
-    ui->glimmerButton->setIcon(buttonData.renderAsQPixmap());
-
-    buttonData = IconData(ui->fadeButton->iconSize().width(),
-                          ui->fadeButton->iconSize().height(),
-                          LEDs->data);
-    buttonData.setArrayFade();
-    ui->fadeButton->setIcon(buttonData.renderAsQPixmap());
-
-    buttonData = IconData(ui->randomSolidButton->iconSize().width(),
-                          ui->randomSolidButton->iconSize().height(),
-                          LEDs->data);
-    buttonData.setArrayRandomSolid();
-    ui->randomSolidButton->setIcon(buttonData.renderAsQPixmap());
-
-    buttonData = IconData(ui->randomIndividualButton->iconSize().width(),
-                          ui->randomIndividualButton->iconSize().height(),
-                          LEDs->data);
-    buttonData.setArrayRandomIndividual();
-    ui->randomIndividualButton->setIcon(buttonData.renderAsQPixmap());
-
-    buttonData = IconData(ui->barsSolidButton->iconSize().width(),
-                          ui->barsSolidButton->iconSize().height(),
-                          LEDs->data);
-    buttonData.setArrayBarsSolid();
-    ui->barsSolidButton->setIcon(buttonData.renderAsQPixmap());
-
-    buttonData = IconData(ui->barsMovingButton->iconSize().width(),
-                          ui->barsMovingButton->iconSize().height(),
-                          LEDs->data);
-    buttonData.setArrayBarsMoving();
-    ui->barsMovingButton->setIcon(buttonData.renderAsQPixmap());
-}
-
-
 ArrayColorsPage::~ArrayColorsPage() {
     delete ui;
 }
 
-void ArrayColorsPage::highlightButton(DataLayer::ELightingMode lightingMode) {
-    ui->glimmerButton->setChecked(false);
-    ui->randomIndividualButton->setChecked(false);
-    ui->randomSolidButton->setChecked(false);
-    ui->fadeButton->setChecked(false);
-    ui->barsSolidButton->setChecked(false);
-    ui->barsMovingButton->setChecked(false);
 
-    if (lightingMode == DataLayer::eLightingModeSavedGlimmer) {
+void ArrayColorsPage::highlightButton(ELightingMode lightingMode) {
+
+    for (uint i = 0; i < mPageButtons->size(); i++) {
+        QToolButton* button =(*mPageButtons.get())[i];
+        button->setChecked(false);
+    }
+
+    if (lightingMode == ELightingMode::eLightingModeSavedGlimmer) {
         ui->glimmerButton->setChecked(true);
-    } else if (lightingMode == DataLayer::eLightingModeSavedRandomIndividual) {
+    } else if (lightingMode == ELightingMode::eLightingModeSavedRandomIndividual) {
         ui->randomIndividualButton->setChecked(true);
-    } else if (lightingMode == DataLayer::eLightingModeSavedRandomSolid) {
+    } else if (lightingMode == ELightingMode::eLightingModeSavedRandomSolid) {
         ui->randomSolidButton->setChecked(true);
-    } else if (lightingMode == DataLayer::eLightingModeSavedFade) {
+    } else if (lightingMode == ELightingMode::eLightingModeSavedFade) {
         ui->fadeButton->setChecked(true);
-    } else if (lightingMode == DataLayer::eLightingModeSavedBarsSolid) {
+    } else if (lightingMode == ELightingMode::eLightingModeSavedBarsSolid) {
         ui->barsSolidButton->setChecked(true);
-    } else if (lightingMode == DataLayer::eLightingModeSavedBarsMoving) {
+    } else if (lightingMode == ELightingMode::eLightingModeSavedBarsMoving) {
         ui->barsMovingButton->setChecked(true);
     }
 }
 
+// ----------------------------
+// Slots
+// ----------------------------
+
+void ArrayColorsPage::colorCountChanged(int newCount) {
+    int count = newCount / 10;
+    ELightingMode mode = mData->currentMode();
+    if (count != mData->colorCount()) {
+        mData->colorCount(count);
+        updateIcons();
+
+        if (mode == ELightingMode::eLightingModeSavedBarsMoving
+            || mode == ELightingMode::eLightingModeSavedBarsSolid
+            || mode == ELightingMode::eLightingModeSavedFade
+            || mode == ELightingMode::eLightingModeSavedGlimmer
+            || mode == ELightingMode::eLightingModeSavedRandomIndividual
+            || mode == ELightingMode::eLightingModeSavedRandomSolid) {
+            mData->currentMode(mode);
+            mComm->sendArrayModeChange(mode, count);
+        }
+
+    }
+}
+
+
+void ArrayColorsPage::modeChanged(int newMode) {
+    mData->currentMode((ELightingMode)newMode);
+    mComm->sendArrayModeChange(mData->currentMode(), mData->colorCount());
+    highlightButton(mData->currentMode());
+    emit updateMainIcons();
+}
+
+
+// ----------------------------
+// Protected
+// ----------------------------
 
 void ArrayColorsPage::showEvent(QShowEvent *event) {
   Q_UNUSED(event);
 
-  mCurrentMode = LEDs->data->getCurrentMode();
-  highlightButton(mCurrentMode);
+  highlightButton(mData->currentMode());
   if (ui->arraySlider->slider->value() < 20) {
     ui->arraySlider->slider->setValue(20);
   }
@@ -124,72 +125,45 @@ void ArrayColorsPage::showEvent(QShowEvent *event) {
 }
 
 
-void ArrayColorsPage::colorCountChanged(int newCount) {
-    int count = newCount / 10;
-    DataLayer::ELightingMode mode = LEDs->data->getCurrentMode();
-    if (count != LEDs->data->getColorCount()) {
-        LEDs->data->setColorCount(count);
-        updateIcons();
+// ----------------------------
+// Private
+// ----------------------------
 
-        if (mode == DataLayer::ELightingMode::eLightingModeSavedBarsMoving
-            || mode == DataLayer::ELightingMode::eLightingModeSavedBarsSolid
-            || mode == DataLayer::ELightingMode::eLightingModeSavedFade
-            || mode == DataLayer::ELightingMode::eLightingModeSavedGlimmer
-            || mode == DataLayer::ELightingMode::eLightingModeSavedRandomIndividual
-            || mode == DataLayer::ELightingMode::eLightingModeSavedRandomSolid) {
-            LEDs->data->setCurrentMode(mode);
-            LEDs->comm->sendArrayModeChange(mode, count);
-        }
+void ArrayColorsPage::updateIcons() {
+    IconData buttonData = IconData(ui->glimmerButton->iconSize().width(),
+                                   ui->glimmerButton->iconSize().height(),
+                                   mData);
+    buttonData.setArrayGlimmer();
+    ui->glimmerButton->setIcon(buttonData.renderAsQPixmap());
 
-    }
-}
+    buttonData = IconData(ui->fadeButton->iconSize().width(),
+                          ui->fadeButton->iconSize().height(),
+                          mData);
+    buttonData.setArrayFade();
+    ui->fadeButton->setIcon(buttonData.renderAsQPixmap());
 
+    buttonData = IconData(ui->randomSolidButton->iconSize().width(),
+                          ui->randomSolidButton->iconSize().height(),
+                          mData);
+    buttonData.setArrayRandomSolid();
+    ui->randomSolidButton->setIcon(buttonData.renderAsQPixmap());
 
-void ArrayColorsPage::changeToGlimmer() {
-    mCurrentMode = DataLayer::eLightingModeSavedGlimmer;
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendArrayModeChange(mCurrentMode, LEDs->data->getColorCount());
-    highlightButton(mCurrentMode);
-    emit updateMainIcons();
-}
+    buttonData = IconData(ui->randomIndividualButton->iconSize().width(),
+                          ui->randomIndividualButton->iconSize().height(),
+                          mData);
+    buttonData.setArrayRandomIndividual();
+    ui->randomIndividualButton->setIcon(buttonData.renderAsQPixmap());
 
-void ArrayColorsPage::changeToRandomIndividual() {
-    mCurrentMode = DataLayer::eLightingModeSavedRandomIndividual;
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendArrayModeChange(mCurrentMode, LEDs->data->getColorCount());
-    highlightButton(mCurrentMode);
-    emit updateMainIcons();
-}
+    buttonData = IconData(ui->barsSolidButton->iconSize().width(),
+                          ui->barsSolidButton->iconSize().height(),
+                          mData);
+    buttonData.setArrayBarsSolid();
+    ui->barsSolidButton->setIcon(buttonData.renderAsQPixmap());
 
-void ArrayColorsPage::changeToRandomSolid() {
-    mCurrentMode = DataLayer::eLightingModeSavedRandomSolid;
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendArrayModeChange(mCurrentMode, LEDs->data->getColorCount());
-    highlightButton(mCurrentMode);
-    emit updateMainIcons();
-}
-
-void ArrayColorsPage::changeToFade() {
-    mCurrentMode = DataLayer::eLightingModeSavedFade;
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendArrayModeChange(mCurrentMode, LEDs->data->getColorCount());
-    highlightButton(mCurrentMode);
-    emit updateMainIcons();
-}
-
-void ArrayColorsPage::changeToBarsSolid() {
-    mCurrentMode = DataLayer::eLightingModeSavedBarsSolid;
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendArrayModeChange(mCurrentMode, LEDs->data->getColorCount());
-    highlightButton(mCurrentMode);
-    emit updateMainIcons();
-}
-
-void ArrayColorsPage::changeToBarsMoving() {
-    mCurrentMode = DataLayer::eLightingModeSavedBarsMoving;
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendArrayModeChange(mCurrentMode, LEDs->data->getColorCount());
-    highlightButton(mCurrentMode);
-    emit updateMainIcons();
+    buttonData = IconData(ui->barsMovingButton->iconSize().width(),
+                          ui->barsMovingButton->iconSize().height(),
+                          mData);
+    buttonData.setArrayBarsMoving();
+    ui->barsMovingButton->setIcon(buttonData.renderAsQPixmap());
 }
 

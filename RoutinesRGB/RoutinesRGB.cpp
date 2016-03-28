@@ -1,6 +1,6 @@
 /*!
- * @version v1.8.1
- * @date March 20, 2016
+ * @version v1.8.3
+ * @date March 27, 2016
  * @author Tim Seemann
  * @copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License

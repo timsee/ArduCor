@@ -178,11 +178,11 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="SingleColorPage" name="singleColorPage"/>
-        <widget class="MultiColorPage" name="multiColorPage"/>
         <widget class="ArrayColorsPage" name="arrayColorsPage"/>
+        <widget class="MultiColorPage" name="multiColorPage"/>
         <widget class="SettingsPage" name="settingsPage"/>
        </widget>
       </item>

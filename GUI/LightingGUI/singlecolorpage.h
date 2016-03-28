@@ -2,12 +2,13 @@
 #ifndef SINGLECOLORPAGE_H
 #define SINGLECOLORPAGE_H
 
-#include "lightscontrol.h"
 #include "icondata.h"
 #include "lightsslider.h"
+#include "lightingpage.h"
 
 #include <QWidget>
 #include <QSlider>
+#include <QToolButton>
 
 namespace Ui {
 class SingleColorPage;
@@ -26,37 +27,33 @@ class SingleColorPage;
  * to set the color.
  *
  */
-class SingleColorPage : public QWidget
+class SingleColorPage : public QWidget, public LightingPage
 {
     Q_OBJECT
 
 public:
     explicit SingleColorPage(QWidget *parent = 0);
     ~SingleColorPage();
-    LightsControl *LEDs;
-    void highlightButton(DataLayer::ELightingMode lightingMode);
+    void highlightButton(ELightingMode lightingMode);
+    void updateColorPreview();
 
 /*!
  * used to signal back to the main page that it should update its top-left icon
  * with new RGB values
  */
 signals:
-    void colorUpdated(int, int, int);
+    void updateMainIcons();
 
 public slots:
-    void rChanged(int newR);
-    void gChanged(int newG);
-    void bChanged(int newB);
-
-    void changeToOff();
-    void changeToSolid();
-    void changeToBlink();
-    void changeToFade();
-    void changeToGlimmer();
+    void modeChanged(int);
 
     void setNewColor();
-    void updateIcons();
-    void colorWheelChanged(int r, int g, int b);
+    void colorWheelChanged(QColor);
+
+    void rChanged(int);
+    void gChanged(int);
+    void bChanged(int);
+
 
 protected:
     void showEvent(QShowEvent *);
@@ -64,17 +61,23 @@ protected:
 
 private:
     Ui::SingleColorPage *ui;
-    int mRed;
-    int mGreen;
-    int mBlue;
+
+    /*!
+     * \brief mPageButtons pointers to all the main buttons, used
+     * to iterate through them quickly.
+     */
+    std::shared_ptr<std::vector<QToolButton*> > mPageButtons;
+
+    std::vector<IconData> iconData;
 
     IconData mSolidData;
     IconData mFadeData;
     IconData mBlinkData;
     IconData mGlimmerData;
 
-    DataLayer::ELightingMode mCurrentMode;
-    void updateColorPreview();
+    ELightingMode mCurrentMode;
+    void updateIcons();
+
 };
 
 #endif // SINGLECOLORPAGE_H

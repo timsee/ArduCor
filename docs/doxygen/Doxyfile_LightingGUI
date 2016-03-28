@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "LightingGUI"
-PROJECT_NUMBER         = v0.1.1
+PROJECT_NUMBER         = v0.1.3
 PROJECT_BRIEF          = 
 PROJECT_LOGO           = resources/icon.png
 OUTPUT_DIRECTORY       = ../LightingGUI

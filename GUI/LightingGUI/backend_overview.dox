@@ -6,16 +6,15 @@
 
 The backend handles communicating with the lights, storing data about the session, and generating the icons for the GUI. 
 
-\section sec_1 Light Control Classes
+\section sec_1 CommLayer
 
-\copydoc LightsControl
+\copydoc CommLayer
 
-<ul>
-  <li> \copydoc CommLayer </li>
-  <li> \copydoc DataLayer </li>
-</ul>
+\section sec_2 DataLayer
 
-\section sec_2 GUI Data Classes
+\copydoc DataLayer
+
+\section sec_3 IconData
 
 \copydoc IconData
 

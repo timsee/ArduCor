@@ -71,7 +71,7 @@ Header,param1,param2,param3,param4;
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
-**Example:** `1,3,255,127,0;` *(Header 2, Saved Color 3, Red 255, Green 127, Blue 0)*
+**Example:** `2,3,255,127,0;` *(Header 2, Saved Color 3, Red 255, Green 127, Blue 0)*
 
 *Note: The number of array colors is defined by the const `NUM_OF_COLORS` in the code. By default it is set to 5.*
 
@@ -81,7 +81,7 @@ Header,param1,param2,param3,param4;
 | ------------- | ------------- |
 | Header        |     3         | 
 | Brightness %  | 0 - 100       |
-**Example:** `2,90;` *(Header 3, 90% brightness)*
+**Example:** `3,90;` *(Header 3, 90% brightness)*
 
 #### Set Speed 
 
@@ -89,7 +89,7 @@ Header,param1,param2,param3,param4;
 | ------------- | ------------- |
 | Header        |     4         | 
 | FPS * 100     | 1 - 2000      |
-**Example:** `3,500;` *(Header 4, 5 FPS)*
+**Example:** `4,500;` *(Header 4, 5 FPS)*
 
 *Note: The value sent is the desired FPS * 100. To do 1 FPS, send 100, to do 10 FPS, send 1000.*
 
@@ -99,7 +99,7 @@ Header,param1,param2,param3,param4;
 | ------------- | ------------- |
 | Header        |     5        | 
 | Idle Timeout Minutes       | 0 - 1000      |
-**Example:** `4,120;` *(Header 5, 120 Minutes)*
+**Example:** `5,120;` *(Header 5, 120 Minutes)*
 
 *Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `5,0;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
 
@@ -141,7 +141,7 @@ All routines that work with saved colors can take an additional optional paramet
 
 Samples are generated off of the `RGB-LED-Routines` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates 3 versions of the sketch. Each of these versions contains only the relevant code for one of the hardware setups. To make changes to all the samples, changes need to be made the `RGB-LED-Routines` sketch and then the `generate_samples.sh` script must be ran again. To test any independent sketch from the `RGB-LED-Routines` sketch, you can set the preprocessor directives on the first few lines of the sketch. Only one define should be set to `1` at any given time. 
 
-There is also the option for a custom sketch, which is useful if you have a complex light setup but you still want to use the master project instead of sketches for development. Generation of this sketch is commented out by default and custom sketches are not pushed to github. 
+There is also the option for a custom sketch, which is useful if you have a complex light setup but you still want to use the master project instead of sketches for development.
 
 
 

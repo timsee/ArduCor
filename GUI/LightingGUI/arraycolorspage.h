@@ -3,10 +3,10 @@
 #ifndef ARRAYCOLORSPAGE_H
 #define ARRAYCOLORSPAGE_H
 
-#include "lightscontrol.h"
-
+#include "lightingpage.h"
 #include <QWidget>
 #include <QDebug>
+#include <QToolButton>
 
 namespace Ui {
 class ArrayColorsPage;
@@ -25,21 +25,21 @@ class ArrayColorsPage;
  * \todo Add the ability to set each array color individually.
  *
  */
-class ArrayColorsPage : public QWidget
+class ArrayColorsPage : public QWidget, public LightingPage
 {
     Q_OBJECT
 
 public:
     explicit ArrayColorsPage(QWidget *parent = 0);
     ~ArrayColorsPage();
-    LightsControl *LEDs;
-    void highlightButton(DataLayer::ELightingMode lightingMode);
+    void highlightButton(ELightingMode lightingMode);
 
-/*!
- * used to signal back to the main page that it should update its top-left icon
- * with a new color mode
- */
+
 signals:
+    /*!
+     * used to signal back to the main page that it should update its top-left icon
+     * with a new color mode
+     */
     void updateMainIcons();
 
 /*!
@@ -47,20 +47,20 @@ signals:
  * or to change the settings of the different modes
  */
 public slots:
-    void changeToGlimmer();
-    void changeToRandomIndividual();
-    void changeToRandomSolid();
-    void changeToFade();
-    void changeToBarsSolid();
-    void changeToBarsMoving();
-    void colorCountChanged(int newCount);
+    void modeChanged(int);
+    void colorCountChanged(int);
 
 protected:
     void showEvent(QShowEvent *event);
 
 private:
     Ui::ArrayColorsPage *ui;
-    DataLayer::ELightingMode mCurrentMode;
+
+    /*!
+     * \brief mPageButtons pointers to all the main buttons, used
+     * to iterate through them quickly.
+     */
+    std::shared_ptr<std::vector<QToolButton*> > mPageButtons;
 
     void updateIcons();
 };

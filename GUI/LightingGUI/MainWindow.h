@@ -3,8 +3,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPushButton>
 
-#include "lightscontrol.h"
+#include "lightingpage.h"
 #include "icondata.h"
 
 namespace Ui {
@@ -31,34 +32,69 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    LightsControl *LEDs;
 
-/*!
- * These slots change pages or change the states
- * of the top menu
- */
 public slots:
-    void changeToSingleColor();
-    void changeToMultiColor();
-    void changeToSavedColors();
-    void changeToSettings();
-    void brightnessChanged(int newBrightness);
+    /*!
+     * \brief toggleOnOff Connected to the button in the top left of the GUI at all times.
+     * Toggles between running the current routine at current settings, and off.
+     */
     void toggleOnOff();
-    void updateSingleColor(int r, int g, int b);
-    void updateToArrayColors();
-    void updateToMultiColors();
+    /*!
+     * \brief brightnessChanged Connected to the the slider at the top, this takeas a value between 0-100
+     *  and sends that value to the lights to control how bright they are.
+     */
+    void brightnessChanged(int);
+    /*!
+     * \brief pageChanged Connected to the main menu buttons. Each button sends a different int,
+     * which opens a different page on the QStackedWidget.
+     */
+    void pageChanged(int);
+    /*!
+     * \brief updatePreviewIcon used to update the icon in the top left of the screen that shows
+     *        the current mode.
+     */
+    void updatePreviewIcon(int);
 
 private:
     Ui::MainWindow *ui;
-    int mBrightness;
-    bool mIsOn;
 
-    IconData onButtonData;
-    IconData offButtonData;
-    IconData singleButtonData;
-    IconData arrayButtonData;
+    /*!
+     * \brief communication pointer to communication object
+     * for sending comannds to the lights
+     */
+    std::shared_ptr<CommLayer> mComm;
+
+    /*!
+     * \brief data layer that maintains and tracks the states of the lights
+     *  and the saved data of the GUI
+     */
+    std::shared_ptr<DataLayer> mData;
+
+    /*!
+     * \brief mPageButtons pointers to all the main buttons, used
+     * to iterate through them quickly.
+     */
+    std::shared_ptr<std::vector<QPushButton*> > mPageButtons;
+
+    /*!
+     * \brief mPreviewIcon the data used by the PreviewButton. This gets updated
+     * whenever the lighting mode changes or when a single LED routine changes hues.
+     */
+    IconData mPreviewIcon;
+    /*!
+     * \brief mSinglePageIcon the icon data used by the SinglePageButton. This mode
+     * changes when a single LED routine changes hues.
+     */
+    IconData mSinglePageIcon;
 
 protected:
+    /*!
+     * \brief paintEvent called whenever there is a paint update. This is used
+     *        to draw the dark grey background, since using the stylesheet
+     *        for backgrounds makes some lesser features of GUI elements break.
+     *
+     * \param event event triggered that requires a repaint
+     */
     void paintEvent(QPaintEvent *event);
 };
 

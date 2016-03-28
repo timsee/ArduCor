@@ -24,3 +24,8 @@
 * Added full Doxygen support for `LightingGUI` and `RoutinesRGB`.
 * Cleanup of project's markdown.
 * Added `custom` option to sample code sketch generation scripts.
+
+### **v1.8.3** 
+#### Code Cleaning Update
+* Rewrote sample generation script to be more reusable.
+* Cleaned code and fixed bugs in GUI project. 

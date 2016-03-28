@@ -6,6 +6,7 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QList>
+#include <memory>
 
 /*!
  * \copyright
@@ -41,7 +42,7 @@ public:
     /*!
      * \brief serial the serial port currently in use
      */
-    QSerialPort *serial;
+    std::shared_ptr<QSerialPort> serial;
 
     /*!
      * \brief sendMainColorChange change the main color of the lighting settings
@@ -67,7 +68,7 @@ public:
      *        and some use a saved array.
      * \param mode the mode being sent to the LED system
      */
-    void sendModeChange(DataLayer::ELightingMode mode);
+    void sendModeChange(ELightingMode mode);
 
     /*!
      * \brief sendArrayModeChange similar to sendModeChange, but this command works specifically
@@ -76,7 +77,7 @@ public:
      * \param mode the array mode being sent to the LED system
      * \param count the number of colors from the array it will use.
      */
-    void sendArrayModeChange(DataLayer::ELightingMode mode, int count);
+    void sendArrayModeChange(ELightingMode mode, int count);
 
     /*!
      * \brief sendBrightness sends a brightness value between 0 and 100, with 100 being full brightness.
