@@ -14,7 +14,15 @@ DataLayer::~DataLayer() {
 
 }
 
-bool DataLayer::setBrightness(int brightness) {
+bool DataLayer::isOn(bool isOn) {
+    mIsOn = isOn;
+}
+
+bool DataLayer::isOn() {
+    return mIsOn;
+}
+
+bool DataLayer::brightness(int brightness) {
     if (brightness >= 0 && brightness <= 100) {
         mBrightness = brightness;
         return true;
@@ -23,12 +31,22 @@ bool DataLayer::setBrightness(int brightness) {
     }
 }
 
-int DataLayer::getBrightness() {
+int DataLayer::brightness() {
     return mBrightness;
 }
 
-bool DataLayer::setCurrentMode(ELightingMode mode) {
-    if (mode >= 0 && mode < 23) {
+
+bool DataLayer::color(QColor newColor) {
+    mColor = newColor;
+    return true;
+}
+
+QColor DataLayer::color() {
+    return mColor;
+}
+
+bool DataLayer::currentMode(ELightingMode mode) {
+    if ((int)mode >= 0 && (int)mode < 23) {
         mCurrentMode = mode;
         return true;
     } else {
@@ -36,11 +54,11 @@ bool DataLayer::setCurrentMode(ELightingMode mode) {
     }
 }
 
-DataLayer::ELightingMode DataLayer::getCurrentMode() {
+ELightingMode  DataLayer::currentMode() {
     return mCurrentMode;
 }
 
-bool DataLayer::setTimeOut(int timeOut) {
+bool DataLayer::timeOut(int timeOut) {
     if (timeOut >= 0) {
         mTimeOut = timeOut;
         return true;
@@ -49,7 +67,7 @@ bool DataLayer::setTimeOut(int timeOut) {
     }
 }
 
-int DataLayer::getTimeOut() {
+int DataLayer::timeOut() {
     return mTimeOut;
 }
 
@@ -58,7 +76,7 @@ bool DataLayer::setupSerial(QString serial) {
     return true;
 }
 
-QString DataLayer::getSerialPort() {
+QString DataLayer::serialPort() {
     return mSerialPort;
 }
 
@@ -70,17 +88,17 @@ bool DataLayer::setupUDP(QString ip, int port) {
 }
 
 // NYI: UDP
-int DataLayer::getUDPPort() {
+int DataLayer::UDPPort() {
     return mUDPPort;
 }
 
 // NYI: UDP
-QString DataLayer::getIP() {
+QString DataLayer::IP() {
     return mIpAddress;
 }
 
 
-bool DataLayer::setColorCount(int count) {
+bool DataLayer::colorCount(int count) {
     if (count > 0) {
         mColorCount = count;
         return true;
@@ -90,12 +108,12 @@ bool DataLayer::setColorCount(int count) {
 }
 
 
-int DataLayer::getColorCount() {
+int DataLayer::colorCount() {
     return mColorCount;
 }
 
 
-bool DataLayer::setSpeed(int speed) {
+bool DataLayer::speed(int speed) {
     if (speed > 0) {
         mSpeed = speed;
         return true;
@@ -105,23 +123,24 @@ bool DataLayer::setSpeed(int speed) {
 }
 
 
-int DataLayer::getSpeed() {
+int DataLayer::speed() {
     return mSpeed;
 }
 
 
 void DataLayer::resetToDefaults() {
-    mCurrentMode = eLightingModeSingleGlimmer;
+    mCurrentMode = ELightingMode::eLightingModeSingleGlimmer;
     mTimeOut = 120;
     mBrightness = 50;
     mColorCount = 5;
     mSpeed = 300;
-    colors = new Color[mColorCount];
+    mColor = QColor(0,255,0);
+    colors = std::vector<QColor>(mColorCount, QColor(0,0,0));
     for (int i = 0; i < mColorCount; i = i + 5) {
-        colors[i] =     {0,    255, 0};
-        colors[i + 1] = {125,  0,   255};
-        colors[i + 2] = {0,    0,   255};
-        colors[i + 3] = {40,   127, 40};
-        colors[i + 4] = {60,   0,   160};
+        colors[i]     = QColor(0,    255, 0);
+        colors[i + 1] = QColor(125,  0,   255);
+        colors[i + 2] = QColor(0,    0,   255);
+        colors[i + 3] = QColor(40,   127, 40);
+        colors[i + 4] = QColor(60,   0,   160);
     }
 }

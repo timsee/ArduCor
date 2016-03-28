@@ -8,6 +8,8 @@
 #include <QImage>
 
 #include <stdio.h>
+#include <memory>
+
 
 /*!
  * \copyright
@@ -41,7 +43,7 @@ public:
      * \param height the height
      * \param data some more sutff
      */
-    IconData(int width, int height, DataLayer *data); // necessary for array colors
+    IconData(int width, int height, std::shared_ptr<DataLayer>(data)); // necessary for array colors
 
     /*!
      * \brief setSolidColor sets the icon as a solid color
@@ -49,7 +51,7 @@ public:
      * \param g a value between 0-255
      * \param b a value between 0-255
      */
-    void setSolidColor(int r, int g, int b);
+    void setSolidColor(QColor color);
     /*!
      * \brief setRandomColors sets every region to a random color.
      */
@@ -139,13 +141,13 @@ private:
 
     void setup(int width, int height);
 
-    DataLayer *mDataLayer;
+    std::shared_ptr<DataLayer> mDataLayer;
 
     /*!
      * the full data used when rendering an image.
      * It matches in size the size of the image
      */
-    uint8_t *mData;
+    std::unique_ptr<std::vector<uint8_t> > mData;
     uint mWidth;
     uint mHeight;
     uint mDataLength;
@@ -155,7 +157,7 @@ private:
      * region of the mData. A function bufferToOutput() must
      * be called in any function to map mBuffer to mData.
      */
-    uint8_t *mBuffer;
+    std::unique_ptr<std::vector<uint8_t> > mBuffer;
     uint mBufferWidth;
     uint mBufferHeight;
     uint mBufferLength;
@@ -166,13 +168,13 @@ private:
      */
     void bufferToOutput();
 
-    DataLayer::Color getMiddleColor(DataLayer::Color c_1,
-                                    DataLayer::Color c_2);
+    QColor getMiddleColor(QColor c_1,
+                          QColor c_2);
 
-    DataLayer::Color* setupFadeGroup(DataLayer::Color c_1, DataLayer::Color c_2,
-                                     DataLayer::Color c_3, DataLayer::Color c_4,
-                                     DataLayer::Color c_5, DataLayer::Color c_6,
-                                     DataLayer::Color c_7, DataLayer::Color c_8);
+    QColor *setupFadeGroup(QColor c_1, QColor c_2,
+                           QColor c_3, QColor c_4,
+                           QColor c_5, QColor c_6,
+                           QColor c_7, QColor c_8);
 
 };
 

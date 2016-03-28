@@ -1,7 +1,7 @@
-#define IS_RAINBOWDUINO 0
-#define IS_NEOPIXEL 1
-#define IS_SINGLE_LED 0
-#define IS_CUSTOM 0
+#define IS_RAINBOWDUINO 0 
+#define IS_NEOPIXELS 1 
+#define IS_SINGLE_LED 0 
+#define IS_CUSTOM 0 
 #define IS_YUN 0
 /*!
  * RGB-LED-Routines
@@ -12,15 +12,15 @@
  * COM_PLACEHOLDER
  * by the RoutinesRGB library.
  *
- * Version 1.8.1
- * Date: March 20, 2016
+ * Version 1.8.3
+ * Date: March 27, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
 
 #include <SoftwareSerial.h>
 #include <RoutinesRGB.h>
-#if IS_NEOPIXEL
+#if IS_NEOPIXELS
 #include <Adafruit_NeoPixel.h>
 #endif
 #if IS_RAINBOWDUINO
@@ -40,7 +40,7 @@
 // Settings
 //================================================================================
 
-#if IS_NEOPIXEL
+#if IS_NEOPIXELS
 const int CONTROL_PIN       = 6;      // pin used by NeoPixels library
 #endif
 #if IS_SINGLE_LED
@@ -243,7 +243,7 @@ RoutinesRGB routines = RoutinesRGB(LED_COUNT, COLOR_COUNT);
 // prototype function, needed for compiler to recognize the enum.
 void currentLightingRoutine(ELightingMode currentMode);
 
-#if IS_NEOPIXEL
+#if IS_NEOPIXELS
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
 #endif
 #if IS_CUSTOM
@@ -266,7 +266,7 @@ void setup()
 #if IS_RAINBOWDUINO
   Rb.init();
 #endif
-#if IS_NEOPIXEL
+#if IS_NEOPIXELS
   pixels.begin();
 #endif
 #if IS_SINGLE_LED
@@ -359,7 +359,7 @@ void updateLEDs()
   }
 }
 #endif
-#if IS_NEOPIXEL
+#if IS_NEOPIXELS
 void updateLEDs()
 {
   for (int x = 0; x < LED_COUNT; x++) {

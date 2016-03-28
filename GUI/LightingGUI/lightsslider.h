@@ -7,6 +7,8 @@
 #include <QWidget>
 #include <QSlider>
 
+#include <memory>
+
 /*!
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
@@ -36,14 +38,14 @@ public:
     /*!
      * \brief slider The actual and factual QSlider in this slider class
      */
-    QSlider *slider;
+    std::shared_ptr<QSlider> slider;
 
     /*!
      * \brief setSliderColorBackground Does a dark to light gradient on the color provided on the background
      *        of the slider to the left of the thumb piece of the slider Uses a custom style sheet to achieve this effect.
      * \param color the color that will be put into a custom style sheet
      */
-    void setSliderColorBackground(DataLayer::Color color);
+    void setSliderColorBackground(QColor color);
 
     /*!
      * \brief setSnapToNearestTick set this if you want the slider to snap to the nearest tick instead
@@ -83,8 +85,8 @@ private:
      * solution based on this stack overflow response:
      * http://stackoverflow.com/a/15321654
      */
-    int jumpSliderToPosition(QSlider *slider, int newPos);
-    int snapSliderToNearestTick(QSlider *slider, int pos);
+    int jumpSliderToPosition(std::shared_ptr<QSlider> slider, int newPos);
+    int snapSliderToNearestTick(std::shared_ptr<QSlider> slider, int pos);
 };
 
 #endif // LIGHTSSLIDER_H

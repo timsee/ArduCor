@@ -7,6 +7,7 @@
 #include "multicolorpage.h"
 #include "ui_multicolorpage.h"
 #include <QDebug>
+#include <QSignalMapper>
 #include "icondata.h"
 
 MultiColorPage::MultiColorPage(QWidget *parent) :
@@ -14,18 +15,23 @@ MultiColorPage::MultiColorPage(QWidget *parent) :
     ui(new Ui::MultiColorPage) {
     ui->setupUi(this);
 
-    // setup the buttons
-    ui->randomIndividualButton->setCheckable(true);
-    ui->randomSolidButton->setCheckable(true);
-    ui->fadeAllButton->setCheckable(true);
+    mPageButtons = std::shared_ptr<std::vector<QToolButton*> >(new std::vector<QToolButton*>(3, nullptr));
+    (*mPageButtons.get())[0] = ui->randomSolidButton;
+    (*mPageButtons.get())[1] = ui->randomIndividualButton;
+    (*mPageButtons.get())[2] = ui->fadeAllButton;
 
-    // setup the signals and slots
-    connect(ui->randomSolidButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToRandomSolid()));
-    connect(ui->randomIndividualButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToRandomIndividual()));
-    connect(ui->fadeAllButton, SIGNAL(clicked(bool)),
-            this, SLOT(changeToFadeAll()));
+    QSignalMapper* signalMapper = new QSignalMapper(this);
+    for (uint i = 0; i < mPageButtons->size(); i++) {
+        QToolButton* button =(*mPageButtons.get())[i];
+        button->setCheckable(true);
+        connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
+    }
+
+    signalMapper->setMapping(ui->randomSolidButton, (int)ELightingMode::eLightingModeMultiRandomSolid);
+    signalMapper->setMapping(ui->randomIndividualButton, (int)ELightingMode::eLightingModeMultiRandomIndividual);
+    signalMapper->setMapping(ui->fadeAllButton, (int)ELightingMode::eLightingModeMultiFade);
+
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(modeChanged(int)));
 
     // setup the icons
     IconData iconData = IconData(ui->randomIndividualButton->iconSize().width(),
@@ -44,51 +50,44 @@ MultiColorPage::MultiColorPage(QWidget *parent) :
     ui->fadeAllButton->setIcon(iconData.renderAsQPixmap());
 }
 
-void MultiColorPage::highlightButton(DataLayer::ELightingMode lightingMode) {
-    // set all to false
-    ui->randomSolidButton->setChecked(false);
-    ui->randomIndividualButton->setChecked(false);
-    ui->fadeAllButton->setChecked(false);
+MultiColorPage::~MultiColorPage() {
+    delete ui;
+}
+
+void MultiColorPage::highlightButton(ELightingMode lightingMode) {
+    for (uint i = 0; i < mPageButtons->size(); i++) {
+        QToolButton* button =(*mPageButtons.get())[i];
+        button->setChecked(false);
+    }
+
     // set the new mode to true
-    if (lightingMode == DataLayer::eLightingModeMultiFade) {
+    if (lightingMode == ELightingMode::eLightingModeMultiFade) {
         ui->fadeAllButton->setChecked(true);
-    } else if (lightingMode == DataLayer::eLightingModeMultiRandomIndividual) {
+    } else if (lightingMode == ELightingMode::eLightingModeMultiRandomIndividual) {
         ui->randomIndividualButton->setChecked(true);
-    } else if (lightingMode == DataLayer::eLightingModeMultiRandomSolid) {
+    } else if (lightingMode == ELightingMode::eLightingModeMultiRandomSolid) {
         ui->randomSolidButton->setChecked(true);
     }
 }
 
 
-MultiColorPage::~MultiColorPage() {
-    delete ui;
+// ----------------------------
+// Slots
+// ----------------------------
+
+void MultiColorPage::modeChanged(int newMode) {
+    mData->currentMode((ELightingMode)newMode);
+    mComm->sendModeChange(mData->currentMode());
+    highlightButton(mData->currentMode());
+    emit updateMainIcons();
 }
+
+
+// ----------------------------
+// Protected
+// ----------------------------
 
 void MultiColorPage::showEvent(QShowEvent *) {
-    mCurrentMode =  LEDs->data->getCurrentMode();
-    highlightButton(mCurrentMode);
+    highlightButton(mData->currentMode());
 }
 
-void MultiColorPage::changeToRandomSolid() {
-    mCurrentMode = DataLayer::eLightingModeMultiRandomSolid;
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendModeChange(mCurrentMode);
-    highlightButton(mCurrentMode);
-    emit updateMainIcons();
-}
-
-void MultiColorPage::changeToRandomIndividual() {
-    mCurrentMode = DataLayer::eLightingModeMultiRandomIndividual;
-    highlightButton(mCurrentMode);
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendModeChange(mCurrentMode);
-    emit updateMainIcons();
-}
-
-void MultiColorPage::changeToFadeAll() {
-    mCurrentMode = DataLayer::eLightingModeMultiFade;
-    highlightButton(mCurrentMode);
-    LEDs->data->setCurrentMode(mCurrentMode);
-    LEDs->comm->sendModeChange(mCurrentMode);
-    emit updateMainIcons();
-}

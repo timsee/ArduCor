@@ -3,6 +3,37 @@
 #define DATALAYER_H
 
 #include <QApplication>
+#include <QColor>
+
+/*!
+ * \brief The ELightingMode enum Lighting modes in the arduino library.
+ */
+enum class ELightingMode {
+    eLightingModeOff,
+    eLightingModeSingleConstant,
+    eLightingModeSingleBlink,
+    eLightingModeSingleFade,
+    eLightingModeSingleGlimmer,
+    eLightingModeSingleRed,
+    eLightingModeSingleOrange,
+    eLightingModeSingleYellow,
+    eLightingModeSingleGreen,
+    eLightingModeSingleTeal,
+    eLightingModeSingleBlue,
+    eLightingModeSinglePurple,
+    eLightingModeSingleLightBlue,
+    eLightingModeSinglePink,
+    eLightingModeSingleWhite,
+    eLightingModeMultiRandomIndividual,
+    eLightingModeMultiRandomSolid,
+    eLightingModeMultiFade,
+    eLightingModeSavedGlimmer,
+    eLightingModeSavedRandomIndividual,
+    eLightingModeSavedRandomSolid,
+    eLightingModeSavedFade,
+    eLightingModeSavedBarsSolid,
+    eLightingModeSavedBarsMoving
+};
 
 /*!
  * \copyright
@@ -22,48 +53,16 @@ public:
     DataLayer();
     ~DataLayer();
 
-    enum ELightingMode {
-        eLightingModeOff,
-        eLightingModeSingleConstant,
-        eLightingModeSingleBlink,
-        eLightingModeSingleFade,
-        eLightingModeSingleGlimmer,
-        eLightingModeSingleRed,
-        eLightingModeSingleOrange,
-        eLightingModeSingleYellow,
-        eLightingModeSingleGreen,
-        eLightingModeSingleTeal,
-        eLightingModeSingleBlue,
-        eLightingModeSinglePurple,
-        eLightingModeSingleLightBlue,
-        eLightingModeSinglePink,
-        eLightingModeSingleWhite,
-        eLightingModeMultiRandomIndividual,
-        eLightingModeMultiRandomSolid,
-        eLightingModeMultiFade,
-        eLightingModeSavedGlimmer,
-        eLightingModeSavedRandomIndividual,
-        eLightingModeSavedRandomSolid,
-        eLightingModeSavedFade,
-        eLightingModeSavedBarsSolid,
-        eLightingModeSavedBarsMoving
-    };
-
-    struct Color {
-      uint8_t r;
-      uint8_t g;
-      uint8_t b;
-    };
-
     /*!
      * \brief colors all saved colors sent to the arduino.
      */
-    Color* colors;
+    std::vector<QColor> colors;
 
     /*!
      * \brief the main saved color, used for single color routines.
      */
-    Color mainColor;
+    bool color(QColor newColor);
+    QColor color();
 
     /*!
      * \brief isUsingSerial true if using serial, false if using UDP
@@ -74,43 +73,49 @@ public:
      * serial port maintence
      */
     bool setupSerial(QString serial);
-    QString getSerialPort();
+    QString serialPort();
 
     // NYI: UDP
     bool setupUDP(QString ip, int port);
-    QString getIP();
-    int getUDPPort();
+    QString IP();
+    int UDPPort();
+
+    /*!
+     * true if lights are on, false otherwise
+     */
+    bool isOn(bool isOn);
+    bool isOn();
 
     /*!
      * mode of LEDs
      */
-    bool setCurrentMode(ELightingMode mode);
-    ELightingMode getCurrentMode();
+    bool currentMode(ELightingMode mode);
+    ELightingMode currentMode();
 
     /*!
      * value between 0-100 that represents how bright the LEDs shine
      */
-    bool setBrightness(int brightness);
-    int getBrightness();
+    bool brightness(int brightness);
+    int brightness();
 
     /*!
      * Time it takes the LEDs to turn off in minutes.
      */
-    bool setTimeOut(int timeOut);
-    int getTimeOut();
+    bool timeOut(int timeOut);
+    int timeOut();
 
     /*!
      *  Time between LED updates as FPS * 100. For example,
      *  a FPS of 5 is 500.
      */
-    bool setSpeed(int speed);
-    int getSpeed();
+    bool speed(int speed);
+    int speed();
 
     /*!
      * number of colors in the color array
      */
-    bool setColorCount(int count);
-    int getColorCount();
+    bool colorCount(int count);
+    int colorCount();
 
     /*!
      * \brief resetToDefaults resets the GUI and the arduino to the default values, as defined at compile time.
@@ -118,6 +123,12 @@ public:
     void resetToDefaults();
 
 private:
+    QColor mColor;
+
+    /*!
+     * \brief true if lights are on, false otherwise
+     */
+    bool mIsOn;
     /*!
      * \brief currentMode the mode of the LEDs
      */

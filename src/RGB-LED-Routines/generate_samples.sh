@@ -11,7 +11,7 @@
 #
 #
 #
-# Script Version: 1.1
+# Script Version: 1.2
 # Github repository: http://www.github.com/timsee/RGB-LED-Routines
 # License: MIT-License, LICENSE provided in root of git repo
 #
@@ -19,174 +19,192 @@
 #
 #------------------------------------------------------------------------------
 
+# Currently a variable set to 0 because we haven't implemented the yun samples yet
+# Eventually, we'll remove this variable.
+GENERATE_YUN_SAMPLES=0
 
 #----------------------------------------
-# Variables
+# Project Setup
 #----------------------------------------
+# When adding a new project, make sure that you maintain the order of these arrays.
+# This script is quick and dirty and assumes that all project's are in the same
+# order in each array.
+PROJECT_NAME=(
+    "Rainbowduino"
+    "Neopixels"
+    "Single-LED"
+    "Custom"
+)
 
-#project names
-MASTER_PROJ="RGB-LED-Routines"
-RAINBOWDUINO_PROJ="Rainbowduino-Routines-Sample"
-NEOPIXELS_PROJ="NeoPixels-Routines-Sample"
-SINGLE_LED_PROJ="Single-LED-Routines-Sample"
-CUSTOM_PROJ="Custom-LED-Routines-Sample"
+# Give the line that would overwrite the sketch's PLACEHOLDER_DESCRIPTION
+PROJECT_DESCRIPTION=(
+    " * Supports SeeedStudio Rainbowduino projects."
+    " * Supports Adafruit NeoPixels products."
+    " * Supports a single RGB LED but can be easily hacked to support more."
+    " * Custom Sketch."
+)
 
-#paths
-PROJ_PATH="$MASTER_PROJ.ino"
-SAMPLES_PATH=../../samples
+# communication descriptions
+SERIAL_COMM_DESCRIPTION=" * Provides a serial interface to a set of lighting routines generated"
+UDP_COMM_DESCRIPTION=" * Provides a UDP interface to a set of lighting routines generated"
 
-# set up identifiers for the hacky preprocessor system
-RAINBOWDUINO_FLAG="#if IS_RAINBOWDUINO"
-NEOPIXELS_FLAG="#if IS_NEOPIXEL"
-SINGLE_LED_FLAG="#if IS_SINGLE_LED"
-CUSTOM_FLAG="#if IS_CUSTOM"
+# this array gets filled automatically based off of the
+# PROJECT_NAME array
+PROJECT_FLAG=()
+for project_id in "${PROJECT_NAME[@]}"
+do
+    project_id=`echo ${project_id} | tr [a-z] [A-Z] | tr '-' '_'`
+    PROJECT_FLAG["${#PROJECT_FLAG[@]}"]="#if IS_${project_id}"
+done
 
-YUN_FLAG="#if IS_YUN"
-END_FLAG="#endif"
+#----------------------------------------
+# Variable Setup
+#----------------------------------------
 
 # save possible descriptions
 DESCRIPTION_PLACEHOLDER=" * DESCRIPTION_PLACEHOLDER"
-RAINBOWDUINO_DESCRIPTION=" * Supports SeeedStudio Rainbowduino projects."
-LED_DESCRIPTION=" * Supports a single RGB LED but can be easily hacked to support more."
-NEOPIXELS_DESCRIPTION=" * Supports Adafruit NeoPixels products."
-CUSTOM_DESCRIPTION=" * Custom Sketch."
-
 COM_PLACEHOLDER=" * COM_PLACEHOLDER"
-SERIAL_DESCRIPTION=" * Provides a serial interface to a set of lighting routines generated"
-UDP_DESCRIPTION=" * Provides a UDP interface to a set of lighting routines generated"
+
+#paths
+PROJ_PATH="RGB-LED-Routines.ino"
+SAMPLES_PATH=../../samples
+
+# set up identifiers for the hacky preprocessor system
+YUN_FLAG="#if IS_YUN"
+END_FLAG="#endif"
+
 
 #----------------------------------------
 # Parsing Function
 #----------------------------------------
-
 # a function that parses through the preprocessor directives and determines based off
 # of them whether or not to include the lines in a hardware specific sample code
+# This function creates potentially two samples: a standard sample that uses serial
+# comunication and a a yun-specific sample that uses UDP communication.
 function generate_hardware_specific_sample() 
 {
-    SHOULD_WRITE=1
-    cat $PROJ_PATH.temp | while read line
+    # set the project-specific variables
+    WRITE_PROJ="${1}-Routines-Sample"
+    FLAG="${PROJECT_FLAG[${2}]}"
+    DESCRIPTION="${PROJECT_DESCRIPTION[${2}]}"
+
+    # creates two sets of hardware samples and repeat the sketch
+    # generation twice: once for serial communication and once for UDP
+    for (( i=1; i<=2; i++ )) ;
     do
-        # check for any flags, don't write the actual line that contains them
-        if [ "$line" == "$NEOPIXELS_FLAG" ] \
-           || [ "$line" == "$SINGLE_LED_FLAG" ] \
-           || [ "$line" == "$RAINBOWDUINO_FLAG" ] \
-           || [ "$line" == "$CUSTOM_FLAG" ] \
-           || [ "$line" == "$YUN_FLAG" ] \
-           || [ "$line" == "$END_FLAG" ];
+        # determines what flags to use when generating the sample
+        WRITE_PATH_DIR=""
+        if [ $i -eq 1 ]
         then
-            SHOULD_WRITE=0
+            # setup the serial communication variables
+            COMM_DESCRIPTION="$SERIAL_COMM_DESCRIPTION"
+            WRITE_PATH_DIR="${SAMPLES_PATH}/${WRITE_PROJ}"
+        elif [ $i -eq 2 ] && [ $GENERATE_YUN_SAMPLES -eq 1 ]
+        then
+            # setup the UDP communication variables
+            COMM_DESCRIPTION="$UDP_COMM_DESCRIPTION"
+            WRITE_PATH_DIR="${SAMPLES_PATH}/yun/${WRITE_PROJ}"
         fi
 
-        # check for placeholder special case
-        if [ "$line" == "$DESCRIPTION_PLACEHOLDER" ]
+        if [ "$WRITE_PATH_DIR" != "" ]
         then
-            echo "$3" >> $2
-        elif [ "$line" == "$COM_PLACEHOLDER" ]
-        then
-        	if [ $4 -eq 0 ];
-        	then
-        	    echo "$SERIAL_DESCRIPTION" >> $2
-        	else
-        	    echo "$UDP_DESCRIPTION" >> $2
-        	fi
-        # check if line belongs in sample code
-        elif [ $SHOULD_WRITE -eq 1 ];
-        then
-            echo "$line" >> $2
-        fi
-        
-        # write future lines if out of a preprocessor or in the proper preprocessor
-        if  [ "$line" == "$1" ] || [ "$line" == "$END_FLAG" ];
-        then
+
+            WRITE_PATH=${WRITE_PATH_DIR}/${WRITE_PROJ}.ino
+            rm -rf $WRITE_PATH_DIR                  # remove the old version of the sketch
+            mkdir $WRITE_PATH_DIR                   # remake the directory
             SHOULD_WRITE=1
-        fi
-        
-        # if its a yun sample, include yun code
-        if [ $4 -eq 1 ] && [ "$line" == "$YUN_FLAG" ];
-        then
-            SHOULD_WRITE=1
+            cat $PROJ_PATH.temp | while read line   # parse the master project line by line
+            do
+                #---------------------
+                # Set write flag, if needed
+                #---------------------
+                # check for any flags, don't write the actual line that contains them
+                # first it checks if line exists in the PROJECT_FLAG array, then it checks
+                # our special case variables.
+                if  [[ "${PROJECT_FLAG[@]}" =~ "$line" ]]  \
+                    || [ "$line" == "${YUN_FLAG}" ] \
+                    || [ "$line" == "${END_FLAG}" ];
+                then
+                    SHOULD_WRITE=0
+                fi
+
+                #---------------------
+                # Write Line, if write flag is set
+                #---------------------
+                # check for placeholder special case
+                if [ "$line" == "$DESCRIPTION_PLACEHOLDER" ]
+                then
+                    echo "${DESCRIPTION}" >> $WRITE_PATH
+                elif [ "$line" == "$COM_PLACEHOLDER" ]
+                then
+                    echo "$COMM_DESCRIPTION" >> $WRITE_PATH
+                # check if line belongs in sample code
+                elif [ "${SHOULD_WRITE}" -eq 1 ]
+                then
+                    echo "$line" >> $WRITE_PATH
+                fi
+
+                #---------------------
+                # Reset write flag, if needed
+                #---------------------
+                # write future lines if out of a preprocessor or in the proper preprocessor
+                if  [ "$line" == "$FLAG" ] || [ "$line" == "$END_FLAG" ];
+                then
+                    SHOULD_WRITE=1
+                fi
+
+                # if its a yun sample, include yun code
+                if [ "$COMM_DESCRIPTION" == "$UDP_COMM_DESCRIPTION" ] && [ "$line" == "$YUN_FLAG" ];
+                then
+                    SHOULD_WRITE=1
+                fi
+            done
         fi
     done
 }
 
+
 #----------------------------------------
-# Script
+# Script Body
 #----------------------------------------
+# This is the part of the script where setup is finished, and execution begins.
 
-# remove old sample code
-rm -rf $SAMPLES_PATH/$RAINBOWDUINO_PROJ
-rm -rf $SAMPLES_PATH/$NEOPIXELS_PROJ
-rm -rf $SAMPLES_PATH/$SINGLE_LED_PROJ
-rm -rf $SAMPLES_PATH/$CUSTOM_PROJ
-
-rm -rf $SAMPLES_PATH/yun/$RAINBOWDUINO_PROJ
-rm -rf $SAMPLES_PATH/yun/$NEOPIXELS_PROJ
-rm -rf $SAMPLES_PATH/yun/$SINGLE_LED_PROJ
-rm -rf $SAMPLES_PATH/$CUSTOM_PROJ
-rm -rf $SAMPLES_PATH/yun
-
-
-# make new directories
-mkdir $SAMPLES_PATH/$RAINBOWDUINO_PROJ
-mkdir $SAMPLES_PATH/$NEOPIXELS_PROJ
-mkdir $SAMPLES_PATH/$SINGLE_LED_PROJ
-mkdir $SAMPLES_PATH/$CUSTOM_PROJ
-
-mkdir $SAMPLES_PATH/yun
-mkdir $SAMPLES_PATH/yun/$RAINBOWDUINO_PROJ
-mkdir $SAMPLES_PATH/yun/$NEOPIXELS_PROJ
-mkdir $SAMPLES_PATH/yun/$SINGLE_LED_PROJ
-mkdir $SAMPLES_PATH/yun/$CUSTOM_PROJ
-
-IFS='' # preserves the leading whitespace
-
-# remove defines for debugging in IDE
+# remove defines during code generation
 sed '/#define/d' $PROJ_PATH > $PROJ_PATH.temp
 
-# create Rainbowduino sample sketch
-echo "Generating Rainbowduino sketches..."
-generate_hardware_specific_sample $RAINBOWDUINO_FLAG $SAMPLES_PATH/$RAINBOWDUINO_PROJ/$RAINBOWDUINO_PROJ.ino $RAINBOWDUINO_DESCRIPTION 0
-# create yun sample
-generate_hardware_specific_sample $RAINBOWDUINO_FLAG $SAMPLES_PATH/yun/$RAINBOWDUINO_PROJ/$RAINBOWDUINO_PROJ.ino $RAINBOWDUINO_DESCRIPTION 1
-
-# create NeoPixel sample project
-echo "Generating Neopixels sketches..."
-generate_hardware_specific_sample $NEOPIXELS_FLAG $SAMPLES_PATH/$NEOPIXELS_PROJ/$NEOPIXELS_PROJ.ino $NEOPIXELS_DESCRIPTION 0
-# create yun sample
-generate_hardware_specific_sample $NEOPIXELS_FLAG $SAMPLES_PATH/yun/$NEOPIXELS_PROJ/$NEOPIXELS_PROJ.ino $NEOPIXELS_DESCRIPTION 1
-
-# create Single LED sample project
-echo "Generating Single LED sketches..."
-generate_hardware_specific_sample $SINGLE_LED_FLAG $SAMPLES_PATH/$SINGLE_LED_PROJ/$SINGLE_LED_PROJ.ino $LED_DESCRIPTION 0
-# create yun sample
-generate_hardware_specific_sample $SINGLE_LED_FLAG $SAMPLES_PATH/yun/$SINGLE_LED_PROJ/$SINGLE_LED_PROJ.ino $LED_DESCRIPTION 1
-
-
-# This option allows you to set up your own light configuration into the build scripts
-# It is currently set up for a test system that uses two neopixel libraries and repeats
-# the commands it receives over serial.
-#
-# It is commented out and not distributed with the sample projects.
-#
-#echo "Generating custom sketches..."
-#generate_hardware_specific_sample $CUSTOM_FLAG $SAMPLES_PATH/$CUSTOM_PROJ/$CUSTOM_PROJ.ino $CUSTOM_DESCRIPTION 0
-# create yun version of custom
-#generate_hardware_specific_sample $CUSTOM_FLAG $SAMPLES_PATH/yun/$CUSTOM_PROJ/$CUSTOM_PROJ.ino $CUSTOM_DESCRIPTION 1
-
+IFS='' # preserves the leading whitespace
+# Generates both the standard and yun versions of the sketches
+# by calling the generate_hardware_specific_sample function
+project_num=0
+for project_id in "${PROJECT_NAME[@]}"
+do
+    echo "Generating ${project_id} sketches..."
+    generate_hardware_specific_sample $project_id $project_num
+    project_num=$(($project_num+1))
+done
 unset IFS # always unset IFS after you're done using it!
 
+
 #----------------------------------------
-# cleanup
+# Cleanup
 #----------------------------------------
+
+# Not really necessary, but useful for consistency. Reverts any testing done
+# on the main project and reset it so that its always set to NeoPixels
+line_num=1
+for project_id in "${PROJECT_NAME[@]}"
+do
+    # setup project name in preprocessor style
+    PROJECT=`echo ${project_id} | tr [a-z] [A-Z] | tr '-' '_'`
+    sed "${line_num}s/.*/#define IS_${PROJECT} 0 /" $PROJ_PATH > temp.txt ; mv temp.txt $PROJ_PATH
+    line_num=$(($line_num+1))
+done
+
+# reset the second line to be #define IS_NEOPIXELS 1 since thats the default testing environment
+sed "2s/.*/#define IS_NEOPIXELS 1 /" $PROJ_PATH > temp.txt ; mv temp.txt $PROJ_PATH
 
 # remove temporary data
 rm -rf $PROJ_PATH.temp
 
-# Not really necessary, but useful for consistency. Reverts any testing done 
-# on the main project and reset it so that its always set to NeoPixels
-sed "1s/.*/#define IS_RAINBOWDUINO 0/" $MASTER_PROJ.ino > temp.txt ; mv temp.txt $MASTER_PROJ.ino
-sed "2s/.*/#define IS_NEOPIXEL 1/" $MASTER_PROJ.ino > temp.txt ; mv temp.txt $MASTER_PROJ.ino
-sed "3s/.*/#define IS_SINGLE_LED 0/" $MASTER_PROJ.ino > temp.txt ; mv temp.txt $MASTER_PROJ.ino
-sed "4s/.*/#define IS_CUSTOM 0/" $MASTER_PROJ.ino > temp.txt ; mv temp.txt $MASTER_PROJ.ino
 
 

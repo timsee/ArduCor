@@ -14,33 +14,33 @@
 LightsSlider::LightsSlider(QWidget *parent) : QWidget(parent) {
     this->setAutoFillBackground(true);
     // init the slider
-    slider = new QSlider(Qt::Horizontal, this);
+    slider = std::shared_ptr<QSlider>(new QSlider(Qt::Horizontal, this));
     slider->setAutoFillBackground(true);
     slider->setGeometry(this->rect());
     setMinimumPossible(false, 0);
     setSnapToNearestTick(false);
     slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    connect(slider, SIGNAL(valueChanged(int)),
+    connect(slider.get(), SIGNAL(valueChanged(int)),
             this, SLOT(receivedValue(int)));
 }
 
 
-void LightsSlider::setSliderColorBackground(DataLayer::Color color) {
+void LightsSlider::setSliderColorBackground(QColor color) {
     // compute a darker version for our gradient
-    DataLayer::Color darkColor = {(uint8_t)(color.r / 5),
-                                  (uint8_t)(color.g / 5),
-                                  (uint8_t)(color.b / 5)};
+    QColor darkColor = QColor((uint8_t)(color.red() / 5),
+                              (uint8_t)(color.green() / 5),
+                              (uint8_t)(color.blue() / 5));
 
     // generate a stylesheet based off of the color with a gradient
     QString styleSheetString = QString("QSlider::sub-page:horizontal{ " \
                                        " background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(%1, %2, %3), stop: 1 rgb(%4, %5, %6));" \
                                        " background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1, stop: 0 rgb(%1, %2, %3), stop: 1 rgb(%4, %5, %6));" \
-                                       "}").arg(QString::number(darkColor.r),
-                                                QString::number(darkColor.g),
-                                                QString::number(darkColor.b),
-                                                QString::number(color.r),
-                                                QString::number(color.g),
-                                                QString::number(color.b));
+                                       "}").arg(QString::number(darkColor.red()),
+                                                QString::number(darkColor.green()),
+                                                QString::number(darkColor.blue()),
+                                                QString::number(color.red()),
+                                                QString::number(color.green()),
+                                                QString::number(color.blue()));
     slider->setStyleSheet(styleSheetString);
 }
 
@@ -55,7 +55,7 @@ void LightsSlider::receivedValue(int value) {
  * solution based on this stack overflow response:
  * http://stackoverflow.com/a/15321654
  */
-int LightsSlider::jumpSliderToPosition(QSlider *slider, int newPos) {
+int LightsSlider::jumpSliderToPosition(std::shared_ptr<QSlider> slider, int newPos) {
     Qt::MouseButtons btns = QApplication::mouseButtons();
     QPoint localMousePos = slider->mapFromGlobal(QCursor::pos());
     bool clickOnSlider = (btns & Qt::LeftButton)
@@ -89,7 +89,7 @@ int LightsSlider::jumpSliderToPosition(QSlider *slider, int newPos) {
 }
 
 
-int LightsSlider::snapSliderToNearestTick(QSlider *slider, int pos) {
+int LightsSlider::snapSliderToNearestTick(std::shared_ptr<QSlider> slider, int pos) {
     int numberOfFullTicks = pos / slider->tickInterval();
     int leftTick = slider->minimum() + numberOfFullTicks * slider->tickInterval();
     int rightTick = slider->minimum()  + (numberOfFullTicks + 1) * slider->tickInterval();

@@ -2,7 +2,7 @@
 #ifndef SETTINGSPAGE_H
 #define SETTINGSPAGE_H
 
-#include "lightscontrol.h"
+#include "lightingpage.h"
 #include "lightsslider.h"
 
 #include <QWidget>
@@ -27,14 +27,13 @@ class SettingsPage;
  * to it.
  *
  */
-class SettingsPage : public QWidget
+class SettingsPage : public QWidget, public LightingPage
 {
     Q_OBJECT
 
 public:
     explicit SettingsPage(QWidget *parent = 0);
     ~SettingsPage();
-    LightsControl *LEDs;
 
 /*!
  * used to update the settings of the LED system
@@ -49,10 +48,7 @@ protected:
 
 private:
     Ui::SettingsPage *ui;
-    int mSpeed;
-    int mTimeout;
     bool mFirstLoad;
-
 
     void updateSerialList();
 };

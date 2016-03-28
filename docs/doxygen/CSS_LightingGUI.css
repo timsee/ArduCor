@@ -22,8 +22,6 @@
 }
 .tableRightHandImage td:nth-child(odd) {
     vertical-align: text-top;
-    border-collapse: collapse;
-    border: 1px solid black;
 }
 
 

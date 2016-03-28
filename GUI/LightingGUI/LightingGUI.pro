@@ -20,7 +20,6 @@ SOURCES += main.cpp\
     commlayer.cpp \
     icondata.cpp \
     colorwheel.cpp \
-    lightscontrol.cpp \
     lightsslider.cpp \
     arraycolorspage.cpp
 
@@ -32,9 +31,9 @@ HEADERS  += mainwindow.h \
     commlayer.h \
     icondata.h \
     colorwheel.h \
-    lightscontrol.h \
     lightsslider.h \
-    arraycolorspage.h
+    arraycolorspage.h \
+    lightingpage.h
 
 FORMS    += mainwindow.ui \
     multicolorpage.ui \

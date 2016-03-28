@@ -21,12 +21,12 @@ ColorWheel::~ColorWheel() {
 
 }
 
-void ColorWheel::mouseMoveEvent(QMouseEvent* event) {
+void ColorWheel::mouseMoveEvent(QMouseEvent *event) {
     Q_UNUSED(event);
     //qDebug() << "mouse moved";
 }
 
-void ColorWheel::mousePressEvent(QMouseEvent* event) {
+void ColorWheel::mousePressEvent(QMouseEvent *event) {
     // solve for potential deadspace since the qLabel expands horizontally to fit in its
     // container if needed. So this enforces that mouse press events only trigger if they are
     // directly above the circle.
@@ -43,15 +43,15 @@ void ColorWheel::mousePressEvent(QMouseEvent* event) {
         // add deadzone in the center so turning off lights in possible with the center
         int centerDeadzone = 10;
         if (color.red() < centerDeadzone && color.green() < centerDeadzone && color.blue() < centerDeadzone) {
-            emit colorWheelUpdate(0, 0, 0);
+            emit colorWheelUpdate(color);
         } else {
             // if the values are outside of the deadzone, emit them
-            emit colorWheelUpdate(color.red(), color.green(), color.blue());
+            emit colorWheelUpdate(color);
         }
     }
 }
 
-void ColorWheel::mouseReleaseEvent(QMouseEvent* event)
+void ColorWheel::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
    // qDebug() << "mouse released";
