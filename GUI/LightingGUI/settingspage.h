@@ -39,9 +39,9 @@ public:
  * used to update the settings of the LED system
  */
 public slots:
-    void speedChanged(int newSpeed);
-    void timeoutChanged(int newTimeout);
-    void listClicked(QListWidgetItem* item);
+    void speedChanged(int);
+    void timeoutChanged(int);
+    void listClicked(QListWidgetItem *);
 
 protected:
     void showEvent(QShowEvent *);

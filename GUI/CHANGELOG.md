@@ -12,3 +12,11 @@
 #### Code Cleaning Update
 * Added in smart pointers, std::vectors, and QSignalMappers.
 * Fixed bugs in RGB sliders.
+
+### **v0.3.0** 
+#### ColorPicker Update
+* Added a Color Picker widget.
+* Removed ColorWheel in favor of ColorPicker.
+* Added more control on the ArrayColorsPage.
+* Fixed bugs in OS X support.
+* Fixed miscellaneous bugs.

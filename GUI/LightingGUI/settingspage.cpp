@@ -102,7 +102,7 @@ void SettingsPage::updateSerialList() {
         bool itemFound = false;
 
         for (int i = 0; i < ui->serialList->count(); i++) {
-            QListWidgetItem* item = ui->serialList->item(i);
+            QListWidgetItem *item = ui->serialList->item(i);
             if (!QString::compare(item->text(), port.portName())) {
                 itemFound = true;
             }

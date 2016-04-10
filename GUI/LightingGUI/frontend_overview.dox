@@ -59,12 +59,12 @@
 
 <div class="overviewSection">
   <div class="overviewTitle">
-    <h2>Color Wheel</h2>      
+    <h2>Color Picker</h2>      
   </div>
   <div class="overviewImage">
-    \image html colorWheelPreview.png 
+    \image html colorPickerPreview.png 
   </div>
-  \copydoc ColorWheel
+  \copydoc ColorPicker
 </div>
 
 

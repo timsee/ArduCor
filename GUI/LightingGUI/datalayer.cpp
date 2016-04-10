@@ -5,6 +5,7 @@
  */
 
 #include "datalayer.h"
+#include <QDebug>
 
 DataLayer::DataLayer() {
     resetToDefaults();
@@ -16,6 +17,7 @@ DataLayer::~DataLayer() {
 
 bool DataLayer::isOn(bool isOn) {
     mIsOn = isOn;
+    return true;
 }
 
 bool DataLayer::isOn() {
@@ -45,8 +47,24 @@ QColor DataLayer::color() {
     return mColor;
 }
 
+
+QColor DataLayer::colorsAverage() {
+    int r = 0;
+    int g = 0;
+    int b = 0;
+    for (int i = 0; i < mColorsUsed; ++i) {
+       r = r + colors[i].red();
+       g = g + colors[i].green();
+       b = b + colors[i].blue();
+    }
+    return QColor(r / mColorsUsed,
+                  g / mColorsUsed,
+                  b / mColorsUsed);
+}
+
+
 bool DataLayer::currentMode(ELightingMode mode) {
-    if ((int)mode >= 0 && (int)mode < 23) {
+    if ((int)mode >= 0 && (int)mode < (int)ELightingMode::eLightingMode_MAX) {
         mCurrentMode = mode;
         return true;
     } else {
@@ -107,11 +125,23 @@ bool DataLayer::colorCount(int count) {
     }
 }
 
-
 int DataLayer::colorCount() {
     return mColorCount;
 }
 
+
+bool DataLayer::colorsUsed(int colorsUsed) {
+    if ((colorsUsed >= 0) && (colorsUsed <= mColorCount)) {
+        mColorsUsed = colorsUsed;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+int DataLayer::colorsUsed() {
+    return mColorsUsed;
+}
 
 bool DataLayer::speed(int speed) {
     if (speed > 0) {
@@ -132,7 +162,8 @@ void DataLayer::resetToDefaults() {
     mCurrentMode = ELightingMode::eLightingModeSingleGlimmer;
     mTimeOut = 120;
     mBrightness = 50;
-    mColorCount = 5;
+    mColorCount = 10;
+    mColorsUsed = 2;
     mSpeed = 300;
     mColor = QColor(0,255,0);
     colors = std::vector<QColor>(mColorCount, QColor(0,0,0));

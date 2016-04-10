@@ -15,6 +15,51 @@ ArrayColorsPage::ArrayColorsPage(QWidget *parent) :
     ui(new Ui::ArrayColorsPage) {
     ui->setupUi(this);
 
+    // --------------
+    // Setup Array Count Slider
+    // --------------
+
+    const int COLOR_ARRAY_PRESET = 10;
+    connect(ui->arraySlider, SIGNAL(valueChanged(int)), this, SLOT(colorsUsedChanged(int)));
+    ui->arraySlider->setSliderColorBackground({0,255,0});
+    ui->arraySlider->slider->setMaximum(COLOR_ARRAY_PRESET * 10);
+    ui->arraySlider->slider->setTickInterval(10);
+    ui->arraySlider->slider->setTickPosition(QSlider::TicksBelow);
+    ui->arraySlider->setSnapToNearestTick(true);
+    ui->arraySlider->setMinimumPossible(true, 20);
+
+    // --------------
+    // Setup Color Array Array (array array  ... array array...)
+    // --------------
+
+    mArrayColorsButtons = std::shared_ptr<std::vector<QPushButton*> >(new std::vector<QPushButton*>(COLOR_ARRAY_PRESET, nullptr));
+    mArrayColorsIconData = std::shared_ptr<std::vector<IconData> >(new std::vector<IconData>(COLOR_ARRAY_PRESET));
+    QSignalMapper *arrayButtonsMapper = new QSignalMapper(this);
+    for (int i = 0; i < COLOR_ARRAY_PRESET; ++i) {
+        (*mArrayColorsButtons.get())[i] = new QPushButton;
+        (*mArrayColorsIconData.get())[i] = IconData(80,80);
+        (*mArrayColorsButtons.get())[i]->setIcon((*mArrayColorsIconData.get())[i].renderAsQPixmap());
+        ui->arrayColorsLayout->addWidget((*mArrayColorsButtons.get())[i], 0 , i);
+        connect((*mArrayColorsButtons.get())[i], SIGNAL(clicked(bool)), arrayButtonsMapper, SLOT(map()));
+        arrayButtonsMapper->setMapping((*mArrayColorsButtons.get())[i], i);
+    }
+    connect(arrayButtonsMapper, SIGNAL(mapped(int)), this, SLOT(selectArrayColor(int)));
+
+    mGreyIcon = IconData(80,80);
+    mGreyIcon.setSolidColor(QColor(140,140,140));
+
+    // --------------
+    // Setup Color Picker
+    // --------------
+
+    ui->colorPicker->chooseLayout(ELayoutColorPicker::eCondensedLayout);
+    connect(ui->colorPicker, SIGNAL(colorUpdate(QColor)), this, SLOT(colorChanged(QColor)));
+    mCurrentColorPickerIndex = 0;
+
+    // --------------
+    // Setup Mode Buttons
+    // --------------
+
     mPageButtons = std::shared_ptr<std::vector<QToolButton*> >(new std::vector<QToolButton*>(6, nullptr));
     (*mPageButtons.get())[0] = ui->glimmerButton;
     (*mPageButtons.get())[1] = ui->randomIndividualButton;
@@ -32,22 +77,14 @@ ArrayColorsPage::ArrayColorsPage(QWidget *parent) :
         connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
     }
 
-    signalMapper->setMapping(ui->glimmerButton, (int)ELightingMode::eLightingModeSavedGlimmer);
-    signalMapper->setMapping(ui->randomIndividualButton, (int)ELightingMode::eLightingModeSavedRandomIndividual);
-    signalMapper->setMapping(ui->randomSolidButton, (int)ELightingMode::eLightingModeSavedRandomSolid);
-    signalMapper->setMapping(ui->fadeButton, (int)ELightingMode::eLightingModeSavedFade);
-    signalMapper->setMapping(ui->barsSolidButton, (int)ELightingMode::eLightingModeSavedBarsSolid);
-    signalMapper->setMapping(ui->barsMovingButton, (int)ELightingMode::eLightingModeSavedBarsMoving);
+    signalMapper->setMapping(ui->glimmerButton, (int)ELightingMode::eLightingModeArrayGlimmer);
+    signalMapper->setMapping(ui->randomIndividualButton, (int)ELightingMode::eLightingModeArrayRandomIndividual);
+    signalMapper->setMapping(ui->randomSolidButton, (int)ELightingMode::eLightingModeArrayRandomSolid);
+    signalMapper->setMapping(ui->fadeButton, (int)ELightingMode::eLightingModeArrayFade);
+    signalMapper->setMapping(ui->barsSolidButton, (int)ELightingMode::eLightingModeArrayBarsSolid);
+    signalMapper->setMapping(ui->barsMovingButton, (int)ELightingMode::eLightingModeArrayBarsMoving);
 
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(modeChanged(int)));
-
-    connect(ui->arraySlider, SIGNAL(valueChanged(int)), this, SLOT(colorCountChanged(int)));
-    ui->arraySlider->setSliderColorBackground({0,255,0});
-    ui->arraySlider->slider->setMaximum(50);
-    ui->arraySlider->slider->setTickInterval(10);
-    ui->arraySlider->slider->setTickPosition(QSlider::TicksBelow);
-    ui->arraySlider->setSnapToNearestTick(true);
-    ui->arraySlider->setMinimumPossible(true, 20);
 }
 
 ArrayColorsPage::~ArrayColorsPage() {
@@ -55,47 +92,74 @@ ArrayColorsPage::~ArrayColorsPage() {
 }
 
 
-void ArrayColorsPage::highlightButton(ELightingMode lightingMode) {
+void ArrayColorsPage::highlightModeButton(ELightingMode lightingMode) {
 
     for (uint i = 0; i < mPageButtons->size(); i++) {
         QToolButton* button =(*mPageButtons.get())[i];
         button->setChecked(false);
     }
 
-    if (lightingMode == ELightingMode::eLightingModeSavedGlimmer) {
+    if (lightingMode == ELightingMode::eLightingModeArrayGlimmer) {
         ui->glimmerButton->setChecked(true);
-    } else if (lightingMode == ELightingMode::eLightingModeSavedRandomIndividual) {
+    } else if (lightingMode == ELightingMode::eLightingModeArrayRandomIndividual) {
         ui->randomIndividualButton->setChecked(true);
-    } else if (lightingMode == ELightingMode::eLightingModeSavedRandomSolid) {
+    } else if (lightingMode == ELightingMode::eLightingModeArrayRandomSolid) {
         ui->randomSolidButton->setChecked(true);
-    } else if (lightingMode == ELightingMode::eLightingModeSavedFade) {
+    } else if (lightingMode == ELightingMode::eLightingModeArrayFade) {
         ui->fadeButton->setChecked(true);
-    } else if (lightingMode == ELightingMode::eLightingModeSavedBarsSolid) {
+    } else if (lightingMode == ELightingMode::eLightingModeArrayBarsSolid) {
         ui->barsSolidButton->setChecked(true);
-    } else if (lightingMode == ELightingMode::eLightingModeSavedBarsMoving) {
+    } else if (lightingMode == ELightingMode::eLightingModeArrayBarsMoving) {
         ui->barsMovingButton->setChecked(true);
     }
 }
+
+void ArrayColorsPage::selectArrayColor(int index) {
+    mCurrentColorPickerIndex = index;
+    ui->colorPicker->chooseColor(mData->colors[mCurrentColorPickerIndex], false);
+    updateColorArray();
+    for (int i = 0; i < mData->colorCount(); ++i) {
+        (*mArrayColorsButtons.get())[i]->setChecked(false);
+        (*mArrayColorsButtons.get())[i]->setStyleSheet("border:none");
+    }
+
+    (*mArrayColorsButtons.get())[mCurrentColorPickerIndex]->setChecked(true);
+    (*mArrayColorsButtons.get())[mCurrentColorPickerIndex]->setStyleSheet("border: 2px solid white");
+}
+
+void ArrayColorsPage::updateColorArray() {
+    for (int i = 0; i < mData->colorCount(); ++i) {
+        (*mArrayColorsButtons.get())[i]->setEnabled(true);
+        (*mArrayColorsButtons.get())[i]->setIcon((*mArrayColorsIconData.get())[i].renderAsQPixmap());
+    }
+
+    for (int i = mData->colorsUsed(); i < mData->colorCount(); ++i) {
+        (*mArrayColorsButtons.get())[i]->setIcon(mGreyIcon.renderAsQPixmap());
+        (*mArrayColorsButtons.get())[i]->setEnabled(false);
+    }
+     ui->arraySlider->setSliderColorBackground(mData->colorsAverage());
+}
+
 
 // ----------------------------
 // Slots
 // ----------------------------
 
-void ArrayColorsPage::colorCountChanged(int newCount) {
-    int count = newCount / 10;
+void ArrayColorsPage::colorsUsedChanged(int newColorsUsed) {
+    int totalColorsUsed = newColorsUsed / 10;
     ELightingMode mode = mData->currentMode();
-    if (count != mData->colorCount()) {
-        mData->colorCount(count);
+    if (totalColorsUsed != mData->colorsUsed()) {
+        mData->colorsUsed(totalColorsUsed);
+        updateColorArray();
         updateIcons();
-
-        if (mode == ELightingMode::eLightingModeSavedBarsMoving
-            || mode == ELightingMode::eLightingModeSavedBarsSolid
-            || mode == ELightingMode::eLightingModeSavedFade
-            || mode == ELightingMode::eLightingModeSavedGlimmer
-            || mode == ELightingMode::eLightingModeSavedRandomIndividual
-            || mode == ELightingMode::eLightingModeSavedRandomSolid) {
+        if (mode == ELightingMode::eLightingModeArrayBarsMoving
+            || mode == ELightingMode::eLightingModeArrayBarsSolid
+            || mode == ELightingMode::eLightingModeArrayFade
+            || mode == ELightingMode::eLightingModeArrayGlimmer
+            || mode == ELightingMode::eLightingModeArrayRandomIndividual
+            || mode == ELightingMode::eLightingModeArrayRandomSolid) {
             mData->currentMode(mode);
-            mComm->sendArrayModeChange(mode, count);
+            mComm->sendArrayModeChange(mode, totalColorsUsed);
         }
 
     }
@@ -104,8 +168,18 @@ void ArrayColorsPage::colorCountChanged(int newCount) {
 
 void ArrayColorsPage::modeChanged(int newMode) {
     mData->currentMode((ELightingMode)newMode);
-    mComm->sendArrayModeChange(mData->currentMode(), mData->colorCount());
-    highlightButton(mData->currentMode());
+    mComm->sendArrayModeChange(mData->currentMode(), mData->colorsUsed());
+    highlightModeButton(mData->currentMode());
+    emit updateMainIcons();
+}
+
+void ArrayColorsPage::colorChanged(QColor color) {
+    mData->colors[mCurrentColorPickerIndex] = color;
+
+    mComm->sendArrayColorChange(mCurrentColorPickerIndex, color);
+    ui->arraySlider->setSliderColorBackground(mData->colorsAverage());
+
+    updateIcons();
     emit updateMainIcons();
 }
 
@@ -116,20 +190,37 @@ void ArrayColorsPage::modeChanged(int newMode) {
 
 void ArrayColorsPage::showEvent(QShowEvent *event) {
   Q_UNUSED(event);
+  // update all the mode icons to the current colors.
+  updateIcons();
 
-  highlightButton(mData->currentMode());
+  // highlight the current mode, if its in this page
+  highlightModeButton(mData->currentMode());
+  // fix an edge case
+  // TODO: revmoe this edge case
   if (ui->arraySlider->slider->value() < 20) {
     ui->arraySlider->slider->setValue(20);
   }
-  updateIcons();
-}
 
+  selectArrayColor(mCurrentColorPickerIndex);
+}
 
 // ----------------------------
 // Private
 // ----------------------------
 
 void ArrayColorsPage::updateIcons() {
+
+    for (int i = 0; i < mData->colorsUsed(); ++i) {
+        (*mArrayColorsIconData.get())[i].setSolidColor(mData->colors[i]);
+        (*mArrayColorsButtons.get())[i]->setEnabled(true);
+        (*mArrayColorsButtons.get())[i]->setIcon((*mArrayColorsIconData.get())[i].renderAsQPixmap());
+    }
+
+    for (int i = mData->colorsUsed(); i < mData->colorCount(); ++i) {
+        (*mArrayColorsButtons.get())[i]->setIcon(mGreyIcon.renderAsQPixmap());
+        (*mArrayColorsButtons.get())[i]->setEnabled(false);
+    }
+
     IconData buttonData = IconData(ui->glimmerButton->iconSize().width(),
                                    ui->glimmerButton->iconSize().height(),
                                    mData);

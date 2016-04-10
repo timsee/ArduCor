@@ -27,12 +27,13 @@ enum class ELightingMode {
     eLightingModeMultiRandomIndividual,
     eLightingModeMultiRandomSolid,
     eLightingModeMultiFade,
-    eLightingModeSavedGlimmer,
-    eLightingModeSavedRandomIndividual,
-    eLightingModeSavedRandomSolid,
-    eLightingModeSavedFade,
-    eLightingModeSavedBarsSolid,
-    eLightingModeSavedBarsMoving
+    eLightingModeArrayGlimmer,
+    eLightingModeArrayRandomIndividual,
+    eLightingModeArrayRandomSolid,
+    eLightingModeArrayFade,
+    eLightingModeArrayBarsSolid,
+    eLightingModeArrayBarsMoving,
+    eLightingMode_MAX
 };
 
 /*!
@@ -57,6 +58,11 @@ public:
      * \brief colors all saved colors sent to the arduino.
      */
     std::vector<QColor> colors;
+    /*!
+     * \brief creates a color based off of the average of all colors currently being used
+     * \return a QColor that represents the average of all colors up to `mColorsUsed` in `colors*`.
+     */
+    QColor colorsAverage();
 
     /*!
      * \brief the main saved color, used for single color routines.
@@ -118,6 +124,13 @@ public:
     int colorCount();
 
     /*!
+     * number of colors to use in the color array routines.
+     * Must be less than the color count.
+     */
+    bool colorsUsed(int colorsUsed);
+    int colorsUsed();
+
+    /*!
      * \brief resetToDefaults resets the GUI and the arduino to the default values, as defined at compile time.
      */
     void resetToDefaults();
@@ -163,6 +176,12 @@ private:
      * \brief mColorCount the number of colors saved in the color array.
      */
     int mColorCount;
+
+    /*!
+     * \brief mColorsUsed the number of colors used for array colors routines. Must be less
+     *        than colorCount.
+     */
+    int mColorsUsed;
 
     /*!
      * \brief mSpeed the current speed value of the arduino.

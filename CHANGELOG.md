@@ -29,3 +29,8 @@
 #### Code Cleaning Update
 * Rewrote sample generation script to be more reusable.
 * Cleaned code and fixed bugs in GUI project. 
+
+### **v1.8.5** 
+#### Color Picker Update
+* Added a ColorPicker widget for the GUI.
+* Cleaned code and fixed bugs in GUI project. 

@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "RoutinesRGB"
-PROJECT_NUMBER         = v1.8.3
+PROJECT_NUMBER         = v1.8.5
 PROJECT_BRIEF          = 
 PROJECT_LOGO           = resources/icon.png
 OUTPUT_DIRECTORY       = ../RoutinesRGB

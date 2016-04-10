@@ -74,7 +74,7 @@ bool CommLayer::connectSerialPort(QString serialPortName) {
         serial->setDataBits(QSerialPort::Data8);
         serial->setFlowControl(QSerialPort::NoFlowControl);
         // set up lights to the defaults
-        sendMainColorChange(0,255,0);
+        sendMainColorChange(QColor(0,255,0));
         sendModeChange(ELightingMode::eLightingModeSingleGlimmer);
         sendBrightness(50);
         sendTimeOut(120);
@@ -94,13 +94,18 @@ void CommLayer::closeSerialPort() {
     }
 }
 
-void CommLayer::sendMainColorChange(int r, int g, int b) {
-    QString message = QString("1,%1,%2,%3;").arg(QString::number(r), QString::number(g), QString::number(b));
+void CommLayer::sendMainColorChange(QColor color) {
+    QString message = QString("1,%1,%2,%3;").arg(QString::number(color.red()),
+                                                 QString::number(color.green()),
+                                                 QString::number(color.blue()));
     serial->write(message.toStdString().c_str());
 }
 
-void CommLayer::sendArrayColorChange(int color, int r, int g, int b) {
-    QString message = QString("2,%1,%2,%3,%4;").arg(QString::number(color), QString::number(r), QString::number(g), QString::number(b));
+void CommLayer::sendArrayColorChange(int index, QColor color) {
+    QString message = QString("2,%1,%2,%3,%4;").arg(QString::number(index),
+                                                    QString::number(color.red()),
+                                                    QString::number(color.green()),
+                                                    QString::number(color.blue()));
     serial->write(message.toStdString().c_str());
 }
 
@@ -110,12 +115,12 @@ void CommLayer::sendModeChange(ELightingMode mode) {
 }
 
 void CommLayer::sendArrayModeChange(ELightingMode mode, int count) {
-    if (mode == ELightingMode::eLightingModeSavedBarsMoving
-          || mode == ELightingMode::eLightingModeSavedBarsSolid
-          || mode == ELightingMode::eLightingModeSavedFade
-          || mode == ELightingMode::eLightingModeSavedGlimmer
-          || mode == ELightingMode::eLightingModeSavedRandomIndividual
-          || mode == ELightingMode::eLightingModeSavedRandomSolid) {
+    if (mode == ELightingMode::eLightingModeArrayBarsMoving
+          || mode == ELightingMode::eLightingModeArrayBarsSolid
+          || mode == ELightingMode::eLightingModeArrayFade
+          || mode == ELightingMode::eLightingModeArrayGlimmer
+          || mode == ELightingMode::eLightingModeArrayRandomIndividual
+          || mode == ELightingMode::eLightingModeArrayRandomSolid) {
         QString message = QString("0,%1,%2;").arg(QString::number((int)mode), QString::number(count));
         serial->write(message.toStdString().c_str());
     }

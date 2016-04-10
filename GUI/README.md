@@ -1,6 +1,6 @@
 # Qt Lighting GUI for RGB LED Routines
 
-The GUI interacts with the sample arduino sketches. It is built on Qt and requires version 5.1 or later for QSerialPort.
+The GUI interacts with the sample arduino sketches. It depends on Qt5 and C++11.
 
 ##<a name="documentation"></a>Documentation
 

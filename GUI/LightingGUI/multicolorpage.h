@@ -18,8 +18,8 @@ class MultiColorPage;
  *
  * \brief The MultiColorPage class contains preprogrammed lighting routines
  * that use a variety of colors. These routines require no parameters
- * or settings and because of this, its the simplest page in the
- * application: Its a grid of buttons.
+ * or settings and because of this, it's the simplest page in the
+ * application: It's a grid of buttons.
  *
  */
 class MultiColorPage : public QWidget, public LightingPage
@@ -29,7 +29,7 @@ class MultiColorPage : public QWidget, public LightingPage
 public:
     explicit MultiColorPage(QWidget *parent = 0);
     ~MultiColorPage();
-    void highlightButton(ELightingMode lightingMode);
+    void highlightModeButton(ELightingMode lightingMode);
 
 
 signals:

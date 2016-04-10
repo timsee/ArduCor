@@ -5,6 +5,7 @@
 #include "icondata.h"
 #include "lightsslider.h"
 #include "lightingpage.h"
+#include "colorpicker.h"
 
 #include <QWidget>
 #include <QSlider>
@@ -21,10 +22,10 @@ class SingleColorPage;
  * \brief The SingleColorPage class allows users to change
  * the main color of the LED system and to set it in single-color modes.
  *
- * The single color modes current supported are solid, blink, fade, and glimmer.
+ * The page contains a ColorPicker widget used to choose the color and a series of
+ * buttons that change the mode.
  *
- * The page provides a color wheel and RGB sliders to give the user multiple ways
- * to set the color.
+ * The single color modes current supported are solid, blink, fade, and glimmer.
  *
  */
 class SingleColorPage : public QWidget, public LightingPage
@@ -34,8 +35,8 @@ class SingleColorPage : public QWidget, public LightingPage
 public:
     explicit SingleColorPage(QWidget *parent = 0);
     ~SingleColorPage();
-    void highlightButton(ELightingMode lightingMode);
-    void updateColorPreview();
+    void highlightModeButton(ELightingMode lightingMode);
+    void chooseColor(QColor color);
 
 /*!
  * used to signal back to the main page that it should update its top-left icon
@@ -44,20 +45,14 @@ public:
 signals:
     void updateMainIcons();
 
+
 public slots:
     void modeChanged(int);
 
-    void setNewColor();
-    void colorWheelChanged(QColor);
-
-    void rChanged(int);
-    void gChanged(int);
-    void bChanged(int);
-
+    void colorChanged(QColor);
 
 protected:
     void showEvent(QShowEvent *);
-    void resizeEvent(QResizeEvent *event);
 
 private:
     Ui::SingleColorPage *ui;
@@ -76,7 +71,6 @@ private:
     IconData mGlimmerData;
 
     ELightingMode mCurrentMode;
-    void updateIcons();
 
 };
 

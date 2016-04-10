@@ -54,7 +54,7 @@ MultiColorPage::~MultiColorPage() {
     delete ui;
 }
 
-void MultiColorPage::highlightButton(ELightingMode lightingMode) {
+void MultiColorPage::highlightModeButton(ELightingMode lightingMode) {
     for (uint i = 0; i < mPageButtons->size(); i++) {
         QToolButton* button =(*mPageButtons.get())[i];
         button->setChecked(false);
@@ -78,7 +78,7 @@ void MultiColorPage::highlightButton(ELightingMode lightingMode) {
 void MultiColorPage::modeChanged(int newMode) {
     mData->currentMode((ELightingMode)newMode);
     mComm->sendModeChange(mData->currentMode());
-    highlightButton(mData->currentMode());
+    highlightModeButton(mData->currentMode());
     emit updateMainIcons();
 }
 
@@ -88,6 +88,6 @@ void MultiColorPage::modeChanged(int newMode) {
 // ----------------------------
 
 void MultiColorPage::showEvent(QShowEvent *) {
-    highlightButton(mData->currentMode());
+    highlightModeButton(mData->currentMode());
 }
 
