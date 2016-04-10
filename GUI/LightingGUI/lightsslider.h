@@ -6,7 +6,7 @@
 
 #include <QWidget>
 #include <QSlider>
-
+#include <QLabel>
 #include <memory>
 
 /*!
@@ -39,6 +39,10 @@ public:
      * \brief slider The actual and factual QSlider in this slider class
      */
     std::shared_ptr<QSlider> slider;
+    /*!
+     * \brief label label for the slider, allows you to label the slider, but by default its an empty value.
+     */
+    QLabel *label;
 
     /*!
      * \brief setSliderColorBackground Does a dark to light gradient on the color provided on the background
@@ -63,14 +67,15 @@ public:
     void setMinimumPossible(bool useMinimumPossible, int minimumPossible);
 
 
-/*!
- * Sends out the value that the slider has been set to after all the processing of snapping 
- * it to a tick or accounting for its minium value or any of that.
- */
+
 signals:
+    /*!
+     * Sends out the value that the slider has been set to after all the processing of snapping
+     * it to a tick or accounting for its minium value or any of that.
+     */
     void valueChanged(int);
 
-public slots:
+private slots:
     void receivedValue(int);
 
 protected:
@@ -80,7 +85,9 @@ protected:
 private:
     bool mShouldSnap;
     bool mUseMinimumPossible;
+    bool mShouldEmit;
     int mMinimumPossible;
+
     /*!
      * solution based on this stack overflow response:
      * http://stackoverflow.com/a/15321654

@@ -1,5 +1,8 @@
 #-------------------------------------------------
 #
+# LightingGUI
+# Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+#
 # Project created by QtCreator 2015-12-26T19:10:52
 #
 #-------------------------------------------------
@@ -19,9 +22,9 @@ SOURCES += main.cpp\
     datalayer.cpp \
     commlayer.cpp \
     icondata.cpp \
-    colorwheel.cpp \
     lightsslider.cpp \
-    arraycolorspage.cpp
+    arraycolorspage.cpp \
+    colorpicker.cpp
 
 HEADERS  += mainwindow.h \
     multicolorpage.h \
@@ -30,10 +33,10 @@ HEADERS  += mainwindow.h \
     datalayer.h \
     commlayer.h \
     icondata.h \
-    colorwheel.h \
     lightsslider.h \
     arraycolorspage.h \
-    lightingpage.h
+    lightingpage.h \
+    colorpicker.h
 
 FORMS    += mainwindow.ui \
     multicolorpage.ui \

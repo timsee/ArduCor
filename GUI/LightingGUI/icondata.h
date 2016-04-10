@@ -41,15 +41,12 @@ public:
      *
      * \param width the width
      * \param height the height
-     * \param data some more sutff
+     * \param data pointer to the data layer to access array data.
      */
-    IconData(int width, int height, std::shared_ptr<DataLayer>(data)); // necessary for array colors
+    IconData(int width, int height, std::shared_ptr<DataLayer> data);
 
     /*!
      * \brief setSolidColor sets the icon as a solid color
-     * \param r a value between 0-255
-     * \param g a value between 0-255
-     * \param b a value between 0-255
      */
     void setSolidColor(QColor color);
     /*!
@@ -99,7 +96,7 @@ public:
     void setArrayBarsSolid();
 
     /*!
-     * \brief setArrayBarsSolid draws the bars with region sizes of 2 but slightly offsetof
+     * \brief setArrayBarsSolid draws the bars with region sizes of 2 but slightly offset
      *        'cause its hard to show motion in a static icon.
      */
     void setArrayBarsMoving();
@@ -121,10 +118,10 @@ public:
     /*!
      * getters for private values
      */
-    uint getDataLength();
-    uint8_t *getData();
-    uint getWidth();
-    uint getHeight();
+    uint dataLength();
+    uint8_t *data();
+    uint width();
+    uint height();
 
     /*!
      * \brief renderAsQImage takes the data and outputs it as a QImage
@@ -147,7 +144,7 @@ private:
      * the full data used when rendering an image.
      * It matches in size the size of the image
      */
-    std::unique_ptr<std::vector<uint8_t> > mData;
+    QVector<uint8_t> mData;
     uint mWidth;
     uint mHeight;
     uint mDataLength;
@@ -157,7 +154,7 @@ private:
      * region of the mData. A function bufferToOutput() must
      * be called in any function to map mBuffer to mData.
      */
-    std::unique_ptr<std::vector<uint8_t> > mBuffer;
+    QVector<uint8_t> mBuffer;
     uint mBufferWidth;
     uint mBufferHeight;
     uint mBufferLength;

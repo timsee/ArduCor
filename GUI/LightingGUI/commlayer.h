@@ -26,6 +26,17 @@ public:
     ~CommLayer();
 
     /*!
+     * \brief serialList list of possible serial ports
+     * for connection
+     */
+    QList<QSerialPortInfo> serialList;
+
+    /*!
+     * \brief serial the serial port currently in use
+     */
+    std::shared_ptr<QSerialPort> serial;
+
+    /*!
      *  start up a serial port
      */
     bool connectSerialPort(QString serialPortName);
@@ -34,33 +45,20 @@ public:
      * \brief closeSerialPort cleans up after the serial port.
      */
     void closeSerialPort();
-    /*!
-     * \brief serialList list of possible serial ports
-     * for connection
-     */
-    QList<QSerialPortInfo> serialList;
-    /*!
-     * \brief serial the serial port currently in use
-     */
-    std::shared_ptr<QSerialPort> serial;
 
     /*!
      * \brief sendMainColorChange change the main color of the lighting settings
      *        in the GUI, this is the color displayed in the leftmost menu.
-     * \param r a value between 0-255
-     * \param g a value between 0-255
-     * \param b a value between 0-255
+     * \param color a QColor representation of the color being used for single LED Routines.
      */
-    void sendMainColorChange(int r, int g, int b);
+    void sendMainColorChange(QColor color);
 
     /*!
      * \brief sendColorChange change an array color in the lighting system
-     * \param color the index of the array color
-     * \param r a value between 0-255
-     * \param g a value between 0-255
-     * \param b a value between 0-255
+     * \param index index of array color
+     * \param color the color being sent for the given index
      */
-    void sendArrayColorChange(int color, int r, int g, int b);
+    void sendArrayColorChange(int index, QColor color);
 
     /*!
      * \brief sendModeChange change the mode of the lights. The mode changes

@@ -16,7 +16,8 @@ class LightingPage {
 public:
     virtual ~LightingPage(){}
 
-    void setup(std::shared_ptr<CommLayer> commLayer,std::shared_ptr<DataLayer> dataLayer) {
+    void setup(std::shared_ptr<CommLayer> commLayer,
+               std::shared_ptr<DataLayer> dataLayer) {
         mComm = commLayer;
         mData = dataLayer;
     }

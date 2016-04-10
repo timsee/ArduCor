@@ -82,10 +82,15 @@ private:
      */
     IconData mPreviewIcon;
     /*!
-     * \brief mSinglePageIcon the icon data used by the SinglePageButton. This mode
+     * \brief mSinglePageIcon the icon data used by the SinglePageButton. This icon
      * changes when a single LED routine changes hues.
      */
     IconData mSinglePageIcon;
+    /*!
+     * \brief mArrayColorsPageIcon the icon data used by the ArrayColorsPageButton. This icon
+     * changes when any of its colors change hue.
+     */
+    IconData mArrayColorsPageIcon;
 
 protected:
     /*!

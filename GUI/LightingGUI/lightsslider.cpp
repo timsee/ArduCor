@@ -13,15 +13,14 @@
 
 LightsSlider::LightsSlider(QWidget *parent) : QWidget(parent) {
     this->setAutoFillBackground(true);
-    // init the slider
     slider = std::shared_ptr<QSlider>(new QSlider(Qt::Horizontal, this));
     slider->setAutoFillBackground(true);
     slider->setGeometry(this->rect());
     setMinimumPossible(false, 0);
     setSnapToNearestTick(false);
     slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    connect(slider.get(), SIGNAL(valueChanged(int)),
-            this, SLOT(receivedValue(int)));
+    connect(slider.get(), SIGNAL(valueChanged(int)), this, SLOT(receivedValue(int)));
+    mShouldEmit = true;
 }
 
 
@@ -32,9 +31,9 @@ void LightsSlider::setSliderColorBackground(QColor color) {
                               (uint8_t)(color.blue() / 5));
 
     // generate a stylesheet based off of the color with a gradient
-    QString styleSheetString = QString("QSlider::sub-page:horizontal{ " \
-                                       " background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(%1, %2, %3), stop: 1 rgb(%4, %5, %6));" \
-                                       " background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1, stop: 0 rgb(%1, %2, %3), stop: 1 rgb(%4, %5, %6));" \
+    QString styleSheetString = QString("QSlider::sub-page:horizontal{ "
+                                       " background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(%1, %2, %3), stop: 1 rgb(%4, %5, %6));"
+                                       " background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1, stop: 0 rgb(%1, %2, %3), stop: 1 rgb(%4, %5, %6));"
                                        "}").arg(QString::number(darkColor.red()),
                                                 QString::number(darkColor.green()),
                                                 QString::number(darkColor.blue()),
@@ -47,9 +46,11 @@ void LightsSlider::setSliderColorBackground(QColor color) {
 
 void LightsSlider::receivedValue(int value) {
     value = jumpSliderToPosition(slider, value);
-    emit valueChanged(value);
-}
 
+    if (mShouldEmit) {
+        emit valueChanged(value);
+    }
+}
 
 /*!
  * solution based on this stack overflow response:
@@ -85,6 +86,7 @@ int LightsSlider::jumpSliderToPosition(std::shared_ptr<QSlider> slider, int newP
     if (mUseMinimumPossible && (newPos < mMinimumPossible)) {
         newPos = mMinimumPossible;
     }
+
     return newPos;
 }
 

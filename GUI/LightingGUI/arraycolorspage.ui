@@ -15,25 +15,26 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
+    <widget class="ColorPicker" name="colorPicker" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>80</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="arrayColorsLayout"/>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Count</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="LightsSlider" name="arraySlider" native="true">
        <property name="minimumSize">
@@ -42,7 +43,6 @@
          <height>50</height>
         </size>
        </property>
-       <zorder>label</zorder>
       </widget>
      </item>
     </layout>
@@ -228,6 +228,12 @@
    <class>LightsSlider</class>
    <extends>QWidget</extends>
    <header>lightsslider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ColorPicker</class>
+   <extends>QWidget</extends>
+   <header>colorpicker.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

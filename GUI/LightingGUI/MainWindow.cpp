@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
     ui->setupUi(this);
+    this->setWindowTitle("LightingGUI");
 
     // --------------
     // Setup Backend
@@ -62,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // --------------
     // Setup Buttons
     // --------------
+
     // add buttons to vector to make them easier to loop through
     mPageButtons = std::shared_ptr<std::vector<QPushButton*> >(new std::vector<QPushButton*>(4, nullptr));
     (*mPageButtons.get())[0] = ui->singleColorButton;
@@ -83,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // --------------
     // Setup Brightness Slider
     // --------------
+
     connect(ui->brightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(brightnessChanged(int)));
     // setup the slider that controls the LED's brightness
     ui->brightnessSlider->slider->setRange(0,100);
@@ -95,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // --------------
     // Setup Preview Button
     // --------------
+
     connect(ui->onOffButton, SIGNAL(clicked(bool)), this, SLOT(toggleOnOff()));
 
     // setup the icons
@@ -106,6 +110,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // --------------
     // Setup Remaining Page Button Icons
     // --------------
+
     mSinglePageIcon = IconData(64, 64, mData);
     mSinglePageIcon.setSolidColor(QColor(0,255,0));
     ui->singleColorButton->setIcon(mSinglePageIcon.renderAsQPixmap());
@@ -114,18 +119,18 @@ MainWindow::MainWindow(QWidget *parent) :
     multiIcon.setRandomColors();
     ui->multiColorButton->setIcon(multiIcon.renderAsQPixmap());
 
-    IconData arrayIcon = IconData(64, 64, mData);
-    arrayIcon.setArrayColors();
-    ui->arrayColorsButton->setIcon(arrayIcon.renderAsQPixmap());
+    mArrayColorsPageIcon = IconData(64, 64, mData);
+    mArrayColorsPageIcon.setArrayFade();
+    ui->arrayColorsButton->setIcon(mArrayColorsPageIcon.renderAsQPixmap());
 
 
     // --------------
     // Final setup
     // --------------
+
     // Start on SingleColorPage
     pageChanged((int)ELightingPage::ePageSingleLEDRoutines);
-    // update the SingleColorPage now that we have connected to the DataLayer
-    ui->singleColorPage->updateColorPreview();
+    ui->singleColorPage->chooseColor(mData->color());
 }
 
 MainWindow::~MainWindow() {
@@ -177,6 +182,8 @@ void MainWindow::updatePreviewIcon(int lightingPage) {
     } else if ((ELightingPage)lightingPage == ELightingPage::ePageArrayLEDRoutines) {
         mPreviewIcon.setSolidColor(QColor(0,0,0));
         mPreviewIcon.setArrayFade();
+        mArrayColorsPageIcon.setArrayFade();
+        ui->arrayColorsButton->setIcon(mArrayColorsPageIcon.renderAsQPixmap());
     } else if ((ELightingPage)lightingPage == ELightingPage::ePageMultiLEDRoutines) {
         mPreviewIcon.setSolidColor(QColor(0,0,0));
         mPreviewIcon.setRandomColors();
