@@ -10,9 +10,8 @@ provide an ASCII based serial interface to change the lighting routines, the bri
 
 * [Installation](#installation)
 * [Library Usage](#library-usage)
-    * [Single Color Routines](#single-color)
-    * [Multi Color Routines](#multi-colors)
-    * [Routines with Saved Colors](#saved-colors)
+    * [Single Color Routines](#single-routines)
+    * [Multi Color Routines](#multi-routines)
 * Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/class_routines_r_g_b.html)) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
 * [Sample Sketch Usage](samples)
 * [Qt Based GUI](GUI)
@@ -35,33 +34,26 @@ If there are compilation issues, make sure you have the library for your hardwar
 
 ## <a name="library-usage"></a>Library Usage
 
-### <a name="single-color"></a>Single Color Routines
+### <a name="single-routines"></a>Single Color Routines
 
 These routines use a single color:
 
-* Solid
-* Blink
-* Fade
-* Glimmer
+* Single Solid
+* Single Blink
+* Single Fade
+* Single Glimmer
 
-### <a name="multi-colors"></a>Multi Color Routines
+### <a name="multi-routines"></a>Multi Colors Routines
 
-These routines use all possible colors and require no additional parameters:
+These routines use the colors saved in an array to execute the routine. These have a parameter that 
+determines what type color set to use. A description of the different color sets is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/_lighting_protocols_8h.html). 
 
-* Random Solid
-* Random Individual 
-* Fade All Colors 
-
-### <a name="saved-colors"></a>Routines with the Array Colors
-
-These routines use the colors saved in an array to execute the routine. These routines take a parameter that determines how many colors from the array to use:
-
-* Array Glimmer
-* Array Random Individual
-* Array Random Solid
-* Array Fade
-* Array Bars Solid
-* Array Bars Moving
+* Multi Glimmer
+* Multi Random Individual
+* Multi Random Solid
+* Multi Fade
+* Multi Bars Solid
+* Multi Bars Moving
 
 
 ## <a name="contributing"></a>Contributing

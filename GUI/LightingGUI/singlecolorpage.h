@@ -48,7 +48,6 @@ signals:
 
 public slots:
     void modeChanged(int);
-
     void colorChanged(QColor);
 
 protected:

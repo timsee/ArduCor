@@ -75,7 +75,15 @@ public:
      * \param mode the array mode being sent to the LED system
      * \param count the number of colors from the array it will use.
      */
-    void sendArrayModeChange(ELightingMode mode, int count);
+    void sendArrayModeChange(ELightingMode mode, int presetUsed = 0);
+
+    /*!
+     * \brief sendCustomArrayCount sends a new custom array count to the LED array. This count determines
+     *        how many colors from the custom array should be used. It is different from the size of the custom array,
+     *        which provides a maximum possible amount of colors.
+     * \param count a value less than the size of the custom color array.
+     */
+    void sendCustomArrayCount(int count);
 
     /*!
      * \brief sendBrightness sends a brightness value between 0 and 100, with 100 being full brightness.
@@ -96,6 +104,11 @@ public:
      * \param timeOut a number greater than 0
      */
     void sendTimeOut(int timeOut);
+
+    /*!
+     * \brief sendReset resets the board to its default settings.
+     */
+    void sendReset();
 };
 
 #endif // COMMLAYER_H

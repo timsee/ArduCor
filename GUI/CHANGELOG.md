@@ -20,3 +20,9 @@
 * Added more control on the ArrayColorsPage.
 * Fixed bugs in OS X support.
 * Fixed miscellaneous bugs.
+
+### **v0.5.0** 
+#### Color Presets Update
+* Added 17 color presets. These can be used with multi color routines and are based around basic themes, such as *Fire* or *Snow*.
+* Refactored the GUI's PresetArrayPage to support all of the new color presets.
+* Fixed miscellaneous bugs.

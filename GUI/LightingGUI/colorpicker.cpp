@@ -49,16 +49,16 @@ ColorPicker::ColorPicker(QWidget *parent) :
     // --------------
 
     rSlider = new LightsSlider(this);
-    rSlider->setSliderColorBackground({255, 0, 0});
+    rSlider->setSliderColorBackground(QColor(255, 0, 0));
     rSlider->slider->setRange(0, 255);
 
     gSlider = new LightsSlider(this);
-    gSlider->setSliderColorBackground({0, 255, 0});
+    gSlider->setSliderColorBackground(QColor(0, 255, 0));
     gSlider->slider->setRange(0, 255);
 
     bSlider = new LightsSlider(this);
     bSlider->slider->setRange(0, 255);
-    bSlider->setSliderColorBackground({0, 0, 255});
+    bSlider->setSliderColorBackground(QColor(0, 0, 255));
 
     connect(rSlider, SIGNAL(valueChanged(int)), this, SLOT(rSliderChanged(int)));
     connect(rSlider->slider.get(), SIGNAL(sliderReleased()), this, SLOT(releasedSlider()));

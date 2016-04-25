@@ -1,7 +1,7 @@
 
 
-#ifndef ARRAYCOLORSPAGE_H
-#define ARRAYCOLORSPAGE_H
+#ifndef CUSTOMARRAYPAGE_H
+#define CUSTOMARRAYPAGE_H
 
 #include "lightingpage.h"
 #include "icondata.h"
@@ -13,14 +13,14 @@
 #include <QGridLayout>
 
 namespace Ui {
-class ArrayColorsPage;
+class CustomArrayPage;
 }
 
 /*!
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
- * \brief The ArrayColorsPage class uses the color array routines from the arduino's RoutinesRGB library.
+ * \brief The CustomArrayPage class uses the color array routines from the arduino's RoutinesRGB library.
  *
  * The page contains an interface to change the individual array colors and a series of buttons
  * that change the mode.
@@ -30,13 +30,13 @@ class ArrayColorsPage;
  * array preview. The LightsSlider below the preview is used to choose how many colors are active
  * while using an array mode.
  */
-class ArrayColorsPage : public QWidget, public LightingPage
+class CustomArrayPage : public QWidget, public LightingPage
 {
     Q_OBJECT
 
 public:
-    explicit ArrayColorsPage(QWidget *parent = 0);
-    ~ArrayColorsPage();
+    explicit CustomArrayPage(QWidget *parent = 0);
+    ~CustomArrayPage();
 
     void highlightModeButton(ELightingMode lightingMode);
 
@@ -61,9 +61,9 @@ protected:
     void showEvent(QShowEvent *event);
 
 private:
-    Ui::ArrayColorsPage *ui;
+    Ui::CustomArrayPage *ui;
 
-    std::shared_ptr<std::vector<QPushButton *> > mArrayColorsButtons;
+    std::shared_ptr<std::vector<QToolButton *> > mArrayColorsButtons;
     std::shared_ptr<std::vector<IconData> > mArrayColorsIconData;
 
     /*!
@@ -85,4 +85,4 @@ private:
     void updateIcons();
 };
 
-#endif // ARRAYCOLORSPAGE_H
+#endif // CUSTOMARRAYPAGE_H

@@ -34,3 +34,9 @@
 #### Color Picker Update
 * Added a ColorPicker widget for the GUI.
 * Cleaned code and fixed bugs in GUI project. 
+
+### **v1.9.0** 
+#### Color Presets Update
+* Added 17 color presets. These can be used with multi color routines and are based around basic themes, such as *Fire* or *Snow*.
+* Refactored GUI, sample code, and arduino library to support the color presets.
+* Cleaned code and fixed bugs across all projects.

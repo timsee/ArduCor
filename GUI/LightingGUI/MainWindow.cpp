@@ -39,10 +39,10 @@ MainWindow::MainWindow(QWidget *parent) :
     mData = std::shared_ptr<DataLayer>(new DataLayer());
     mComm =std::shared_ptr<CommLayer>(new CommLayer());
     ui->singleColorPage->setup(mComm, mData);
-    ui->arrayColorsPage->setup(mComm, mData);
-    ui->multiColorPage->setup(mComm, mData);
+    ui->customArrayPage->setup(mComm, mData);
+    ui->presetArrayPage->setup(mComm, mData);
     ui->settingsPage->setup(mComm, mData);
-
+    ui->presetArrayPage->setupPresets();
 
     // --------------
     // Setup Pages
@@ -50,12 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QSignalMapper* previewSignalMapper = new QSignalMapper(this);
 
     connect(ui->singleColorPage, SIGNAL(updateMainIcons()), previewSignalMapper, SLOT(map()));
-    connect(ui->arrayColorsPage, SIGNAL(updateMainIcons()), previewSignalMapper, SLOT(map()));
-    connect(ui->multiColorPage, SIGNAL(updateMainIcons()), previewSignalMapper, SLOT(map()));
+    connect(ui->customArrayPage, SIGNAL(updateMainIcons()), previewSignalMapper, SLOT(map()));
+    connect(ui->presetArrayPage, SIGNAL(updateMainIcons()), previewSignalMapper, SLOT(map()));
 
     previewSignalMapper->setMapping(ui->singleColorPage, (int)ELightingPage::ePageSingleLEDRoutines);
-    previewSignalMapper->setMapping(ui->arrayColorsPage, (int)ELightingPage::ePageArrayLEDRoutines);
-    previewSignalMapper->setMapping(ui->multiColorPage, (int)ELightingPage::ePageMultiLEDRoutines);
+    previewSignalMapper->setMapping(ui->customArrayPage, (int)ELightingPage::ePageArrayLEDRoutines);
+    previewSignalMapper->setMapping(ui->presetArrayPage, (int)ELightingPage::ePageMultiLEDRoutines);
 
     connect(previewSignalMapper, SIGNAL(mapped(int)), this, SLOT(updatePreviewIcon(int)));
 
@@ -67,8 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // add buttons to vector to make them easier to loop through
     mPageButtons = std::shared_ptr<std::vector<QPushButton*> >(new std::vector<QPushButton*>(4, nullptr));
     (*mPageButtons.get())[0] = ui->singleColorButton;
-    (*mPageButtons.get())[1] = ui->arrayColorsButton;
-    (*mPageButtons.get())[2] = ui->multiColorButton;
+    (*mPageButtons.get())[1] = ui->customArrayButton;
+    (*mPageButtons.get())[2] = ui->presetArrayButton;
     (*mPageButtons.get())[3] = ui->settingsButton;
 
     // loop through the buttons and set up their clicks to a mapper
@@ -115,22 +115,24 @@ MainWindow::MainWindow(QWidget *parent) :
     mSinglePageIcon.setSolidColor(QColor(0,255,0));
     ui->singleColorButton->setIcon(mSinglePageIcon.renderAsQPixmap());
 
-    IconData multiIcon = IconData(64, 64, mData);
-    multiIcon.setRandomColors();
-    ui->multiColorButton->setIcon(multiIcon.renderAsQPixmap());
+    mCustomArrayIcon = IconData(64, 64, mData);
+    mCustomArrayIcon.setArrayFade(EColorPreset::eCustom);
+    ui->customArrayButton->setIcon(mCustomArrayIcon.renderAsQPixmap());
 
-    mArrayColorsPageIcon = IconData(64, 64, mData);
-    mArrayColorsPageIcon.setArrayFade();
-    ui->arrayColorsButton->setIcon(mArrayColorsPageIcon.renderAsQPixmap());
-
+    mPresetArrayIcon = IconData(64, 64, mData);
+    mPresetArrayIcon.setArrayFade(EColorPreset::eSevenColor);
+    ui->presetArrayButton->setIcon(mPresetArrayIcon.renderAsQPixmap());
 
     // --------------
     // Final setup
     // --------------
 
+    // reset the LED array to defaults
+    mComm->sendReset();
     // Start on SingleColorPage
     pageChanged((int)ELightingPage::ePageSingleLEDRoutines);
-    ui->singleColorPage->chooseColor(mData->color());
+    // setup the SingleColorPage
+    ui->singleColorPage->chooseColor(mData->mainColor());
 }
 
 MainWindow::~MainWindow() {
@@ -175,18 +177,18 @@ void MainWindow::pageChanged(int pageIndex) {
 
 void MainWindow::updatePreviewIcon(int lightingPage) {
     if ((ELightingPage)lightingPage == ELightingPage::ePageSingleLEDRoutines) {
-        QColor color = mData->color();
+        QColor color = mData->mainColor();
         mPreviewIcon.setSolidColor(color);
         mSinglePageIcon.setSolidColor(color);
         ui->singleColorButton->setIcon(mSinglePageIcon.renderAsQPixmap());
     } else if ((ELightingPage)lightingPage == ELightingPage::ePageArrayLEDRoutines) {
         mPreviewIcon.setSolidColor(QColor(0,0,0));
-        mPreviewIcon.setArrayFade();
-        mArrayColorsPageIcon.setArrayFade();
-        ui->arrayColorsButton->setIcon(mArrayColorsPageIcon.renderAsQPixmap());
+        mPreviewIcon.setArrayFade(EColorPreset::eCustom);
+        mCustomArrayIcon.setArrayFade(EColorPreset::eCustom);
+        ui->customArrayButton->setIcon(mCustomArrayIcon.renderAsQPixmap());
     } else if ((ELightingPage)lightingPage == ELightingPage::ePageMultiLEDRoutines) {
         mPreviewIcon.setSolidColor(QColor(0,0,0));
-        mPreviewIcon.setRandomColors();
+        mPreviewIcon.setArrayFade(EColorPreset::eSevenColor);
     }
     ui->onOffButton->setIcon(mPreviewIcon.renderAsQPixmap());
     mData->isOn(true);

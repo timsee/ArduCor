@@ -107,100 +107,86 @@ void IconData::setSolidColor(QColor color) {
     bufferToOutput();
 }
 
-void IconData::setRandomColors() {
-    for (uint i = 0; i < mBufferLength; i++) {
-        int random = rand() % 256;
-        mBuffer[i] = (uchar)random;
-    }
-    bufferToOutput();
-}
 
-void IconData::setArrayColors() {
+void IconData::setArrayColors(EColorPreset preset) {
     if (mDataLayer == NULL) {
         qDebug() << "ERROR: the data layer is not set, cannot use the arary colors!";
     }
-    int colorCount = mDataLayer->colorsUsed();
+    int colorCount = mDataLayer->arraySize((int)preset);
+    QColor *color_array = mDataLayer->colorArray((int)preset);
+
     int j = 0;
     for (uint i = 0; i < mBufferLength; i = i + 3) {
-        mBuffer[i] = mDataLayer->colors[j].red();
-        mBuffer[i + 1] = mDataLayer->colors[j].green();
-        mBuffer[i + 2] = mDataLayer->colors[j].blue();
+        mBuffer[i] = color_array[j].red();
+        mBuffer[i + 1] = color_array[j].green();
+        mBuffer[i + 2] = color_array[j].blue();
         j = (j + 1) % colorCount;
     }
     bufferToOutput();
 }
 
 
-void IconData::setRandomSolid() {
-    for (uint i = 0; i < mBufferLength; i = i + 12) {
-        int r = rand() % 256;
-        int g = rand() % 256;
-        int b = rand() % 256;
-        for (int j = 0; j < 12; j = j + 3) {
-            mBuffer[i + j] = (uchar)r;
-            mBuffer[i + j + 1] = (uchar)g;
-            mBuffer[i + j + 2] = (uchar)b;
-        }
-    }
-    bufferToOutput();
-}
 
-void IconData::setFadeAllColors() {
-    //TODO: convert to QColor and use those instead of our struct
-    QColor RED = QColor(255, 0, 0);
-    QColor ORANGE = QColor(255, 60, 0);
-    QColor YELLOW = QColor(255, 255, 0);
-    QColor GREEN = QColor(0, 255, 0);
-    QColor TEAL = QColor(0, 255, 80);
-    QColor BLUE = QColor(0, 0, 255);
-    QColor PURPLE = QColor(80, 0, 255);
-    QColor PINK = QColor(255, 0, 255);
-
-    QColor *colors = setupFadeGroup(RED, ORANGE, YELLOW, GREEN,
-                                    TEAL, BLUE, PURPLE,  PINK);
-    int j = 0;
-    for (uint i = 0; i < mBufferLength; i = i + 3) {
-        mBuffer[i] = colors[j].red();
-        mBuffer[i + 1] = colors[j].green();
-        mBuffer[i + 2] = colors[j].blue();
-        j++;
-    }
-    bufferToOutput();
-}
-
-void IconData::setArrayGlimmer() {
+void IconData::setArrayGlimmer(EColorPreset preset) {
+    int colorCount = mDataLayer->arraySize((int)preset);
+    QColor *color_array = mDataLayer->colorArray((int)preset);
     for (uint i = 0; i < mBufferLength; i = i + 3) {
         int shouldChange = rand() % 100;
         if (shouldChange <= 20) {
-            int index = rand() % mDataLayer->colorsUsed();
-            mBuffer[i] = mDataLayer->colors[index].red();
-            mBuffer[i + 1] = mDataLayer->colors[index].green();
-            mBuffer[i + 2] = mDataLayer->colors[index].blue();
+            int index = rand() % colorCount;
+            mBuffer[i] = color_array[index].red();
+            mBuffer[i + 1] = color_array[index].green();
+            mBuffer[i + 2] = color_array[index].blue();
         } else {
-            mBuffer[i] = mDataLayer->colors[0].red();
-            mBuffer[i + 1] = mDataLayer->colors[0].green();
-            mBuffer[i + 2] = mDataLayer->colors[0].blue();
+            mBuffer[i] = color_array[0].red();
+            mBuffer[i + 1] = color_array[0].green();
+            mBuffer[i + 2] = color_array[0].blue();
         }
     }
     addGlimmer(); // this already draws to output.
 }
 
-void IconData::setArrayFade() {
-    QColor *colors = setupFadeGroup(mDataLayer->colors[0], mDataLayer->colors[1], mDataLayer->colors[2], mDataLayer->colors[3],
-                                    mDataLayer->colors[4], mDataLayer->colors[0], mDataLayer->colors[1],  mDataLayer->colors[2]);
+void IconData::setArrayFade(EColorPreset preset) {
+    int colorCount = mDataLayer->arraySize((int)preset);
+    QColor *color_array = mDataLayer->colorArray((int)preset);
+
+    int k = 0;
+    int tempIndex = 0;
+    int *arrayIndices = new int[8];
+    while (k < 8) {
+        tempIndex = (tempIndex + 1) % colorCount;
+        arrayIndices[k] = tempIndex;
+        k++;
+    }
+    int count = 16;
+    QColor *output = new QColor[count];
+    int colorIndex = 0;
+    for (int i = 0; i < count - 2; i = i + 2) {
+        output[i] = color_array[arrayIndices[colorIndex]];
+        output[i + 1] = getMiddleColor(color_array[arrayIndices[colorIndex]], color_array[arrayIndices[colorIndex + 1]]);
+        colorIndex++;
+    }
+    // wrap the last value around
+    output[count - 2] = color_array[arrayIndices[colorIndex]];
+    output[count - 1] = getMiddleColor(color_array[arrayIndices[colorIndex]], color_array[arrayIndices[0]]);
+
     int j = 0;
     for (uint i = 0; i < mBufferLength; i = i + 3) {
-        mBuffer[i] = colors[j].red();
-        mBuffer[i + 1] = colors[j].green();
-        mBuffer[i + 2] = colors[j].blue();
+        mBuffer[i] = output[j].red();
+        mBuffer[i + 1] = output[j].green();
+        mBuffer[i + 2] = output[j].blue();
         j++;
     }
+
     bufferToOutput();
 }
 
-void IconData::setArrayRandomSolid() {
+void IconData::setArrayRandomSolid(EColorPreset preset) {
+    int colorCount = mDataLayer->arraySize((int)preset);
+    QColor *color_array = mDataLayer->colorArray((int)preset);
+
     for (uint i = 0; i < mBufferLength; i = i + 12) {
-        QColor randomColor = mDataLayer->colors[rand() % mDataLayer->colorsUsed()];
+        QColor randomColor = color_array[rand() % colorCount];
         for (int j = 0; j < 12; j = j + 3) {
             mBuffer[i + j] = randomColor.red();
             mBuffer[i + j + 1] = randomColor.green();
@@ -210,47 +196,75 @@ void IconData::setArrayRandomSolid() {
     bufferToOutput();
 }
 
-void IconData::setArrayRandomIndividual() {
-    for (uint i = 0; i < mBufferLength; i = i + 3) {
-        int index = rand() % mDataLayer->colorsUsed();
-        mBuffer[i] = mDataLayer->colors[index].red();
-        mBuffer[i + 1] = mDataLayer->colors[index].green();
-        mBuffer[i + 2] = mDataLayer->colors[index].blue();
+void IconData::setArrayRandomIndividual(EColorPreset preset) {
+    if (preset == EColorPreset::eAll) {
+        for (uint i = 0; i < mBufferLength; i++) {
+            int random = rand() % 256;
+            mBuffer[i] = (uchar)random;
+        }
+    } else {
+        int colorCount = mDataLayer->arraySize((int)preset);
+        QColor *color_array = mDataLayer->colorArray((int)preset);
+        for (uint i = 0; i < mBufferLength; i = i + 3) {
+            int index = rand() % colorCount;
+            mBuffer[i] = color_array[index].red();
+            mBuffer[i + 1] = color_array[index].green();
+            mBuffer[i + 2] = color_array[index].blue();
+        }
     }
     bufferToOutput();
 }
 
-void IconData::setArrayBarsSolid() {
-    int colorIndex = 0;
-    for (uint i = 0; i < mBufferLength; i = i + 12) {
-        QColor color = mDataLayer->colors[colorIndex % mDataLayer->colorsUsed()];
-        for (int j = 0; j < 6; j = j + 3) {
-            mBuffer[i + j] = color.red();
-            mBuffer[i + j + 1] = color.green();
-            mBuffer[i + j + 2] = color.blue();
-        }
-        color = mDataLayer->colors[(colorIndex + 1) % mDataLayer->colorsUsed()];
-        for (int j = 6; j < 12; j = j + 3) {
-            mBuffer[i + j] = color.red();
-            mBuffer[i + j + 1] = color.green();
-            mBuffer[i + j + 2] = color.blue();
-        }
-        colorIndex = (colorIndex + 2) % mDataLayer->colorsUsed();
-    }
+void IconData::setArrayBarsSolid(EColorPreset preset) {
+     if (preset == EColorPreset::eAll) {
+         for (uint i = 0; i < mBufferLength; i = i + 12) {
+             int r = rand() % 256;
+             int g = rand() % 256;
+             int b = rand() % 256;
+             for (int j = 0; j < 12; j = j + 3) {
+                 mBuffer[i + j] = (uchar)r;
+                 mBuffer[i + j + 1] = (uchar)g;
+                 mBuffer[i + j + 2] = (uchar)b;
+             }
+         }
+     } else {
+         int colorCount = mDataLayer->arraySize((int)preset);
+         QColor *color_array = mDataLayer->colorArray((int)preset);
+
+         int colorIndex = 0;
+         for (uint i = 0; i < mBufferLength; i = i + 12) {
+             QColor color = color_array[colorIndex % colorCount];
+             for (int j = 0; j < 6; j = j + 3) {
+                 mBuffer[i + j] = color.red();
+                 mBuffer[i + j + 1] = color.green();
+                 mBuffer[i + j + 2] = color.blue();
+             }
+             color = color_array[(colorIndex + 1) % colorCount];
+             for (int j = 6; j < 12; j = j + 3) {
+                 mBuffer[i + j] = color.red();
+                 mBuffer[i + j + 1] = color.green();
+                 mBuffer[i + j + 2] = color.blue();
+             }
+             colorIndex = (colorIndex + 2) % colorCount;
+         }
+     }
     bufferToOutput();
 }
 
-void IconData::setArrayBarsMoving() {
+void IconData::setArrayBarsMoving(EColorPreset preset) {
+    int colorCount = mDataLayer->arraySize((int)preset);
+    QColor *color_array = mDataLayer->colorArray((int)preset);
+
     int colorIndex = 0;
     QColor color;
     for (uint i = 3; i < mBufferLength; i = i + 12) {
-        color = mDataLayer->colors[colorIndex % mDataLayer->colorsUsed()];
+        color = color_array[colorIndex % colorCount];
         for (int j = 0; j < 6; j = j + 3) {
             mBuffer[i + j] = color.red();
             mBuffer[i + j + 1] = color.green();
             mBuffer[i + j + 2] = color.blue();
         }
-        color = mDataLayer->colors[(colorIndex + 1) % mDataLayer->colorsUsed()];
+        color = color_array[(colorIndex + 1) % colorCount];
         for (int j = 6; j < 12; j = j + 3) {
             if (i + j + 2 < mBufferLength) {
                 mBuffer[i + j] = color.red();
@@ -258,9 +272,9 @@ void IconData::setArrayBarsMoving() {
                 mBuffer[i + j + 2] = color.blue();
             }
         }
-        colorIndex = (colorIndex + 2) % mDataLayer->colorsUsed();
+        colorIndex = (colorIndex + 2) % colorCount;
     }
-    color = mDataLayer->colors[colorIndex % mDataLayer->colorsUsed()];
+    color = color_array[colorIndex % colorCount];
     mBuffer[0] = color.red();
     mBuffer[1] = color.green();
     mBuffer[2] = color.blue();
@@ -329,31 +343,6 @@ QImage IconData::renderAsQImage() {
 
 QPixmap IconData::renderAsQPixmap() {
     return QPixmap::fromImage(renderAsQImage());
-}
-
-
-QColor *IconData::setupFadeGroup(QColor c_1, QColor c_2,
-                                 QColor c_3, QColor c_4,
-                                 QColor c_5, QColor c_6,
-                                 QColor c_7, QColor c_8) {
-    QColor *output = new QColor[16];
-    output[0] = c_1;
-    output[1] = getMiddleColor(c_1, c_2);
-    output[2] = c_2;
-    output[3] = getMiddleColor(c_2, c_3);
-    output[4] = c_3;
-    output[5] = getMiddleColor(c_3, c_4);
-    output[6] = c_4;
-    output[7] = getMiddleColor(c_4, c_5);
-    output[8] = c_5;
-    output[9] = getMiddleColor(c_5, c_6);
-    output[10] = c_6;
-    output[11] = getMiddleColor(c_6, c_7);
-    output[12] = c_7;
-    output[13] = getMiddleColor(c_7, c_8);
-    output[14] = c_8;
-    output[15] = getMiddleColor(c_8, c_1);
-    return output;
 }
 
 QColor IconData::getMiddleColor(QColor c_1,

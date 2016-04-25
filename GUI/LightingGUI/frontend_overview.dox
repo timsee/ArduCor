@@ -23,16 +23,25 @@
         \copydoc SingleColorPage 
     </td>
     <td>         
-        \image html singlePagePreview.png
+        \image html singleColorPagePreview.png
     </td>
   </tr>
   <tr>
     <td>
-        <h2>Array Colors Page</h2>        
-        \copydoc ArrayColorsPage  
+        <h2>Custom Array Page</h2>        
+        \copydoc CustomArrayPage  
     </td>
     <td> 
-        \image html arrayPagePreview.png
+        \image html customArrayPagePreview.png
+    </td>
+  </tr>
+  <tr>
+    <td>  
+       <h2>Preset Array Page</h2>
+       \copydoc PresetArrayPage
+    </td>
+    <td>     
+       \image html presetArrayPagePreview.png
     </td>
   </tr>
   <tr>
@@ -42,15 +51,6 @@
     </td>
     <td>         
         \image html settingsPagePreview.png
-    </td>
-  </tr>
-  <tr>
-    <td>  
-       <h2>Multi Color Page</h2>
-       \copydoc MultiColorPage
-    </td>
-    <td>     
-       \image html multiPagePreview.png
     </td>
   </tr>
 </table>
@@ -76,6 +76,16 @@
     \image html lightsSliderPreview.png 
   </div>
   \copydoc LightsSlider
+</div>
+
+<div class="overviewSection">
+  <div class="overviewTitle">
+    <h2>Lights Button</h2>      
+  </div>
+  <div class="overviewImage">
+    \image html lightsButtonPreview.png 
+  </div>
+  \copydoc LightsButton
 </div>
 
 
