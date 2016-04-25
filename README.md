@@ -12,7 +12,7 @@ provide an ASCII based serial interface to change the lighting routines, the bri
 * [Library Usage](#library-usage)
     * [Single Color Routines](#single-routines)
     * [Multi Color Routines](#multi-routines)
-* Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/class_routines_r_g_b.html)) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
+* Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00001.html) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
 * [Sample Sketch Usage](samples)
 * [Qt Based GUI](GUI)
     *  [Frontend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/front_overview.html)
@@ -46,7 +46,7 @@ These routines use a single color:
 ### <a name="multi-routines"></a>Multi Colors Routines
 
 These routines use the colors saved in an array to execute the routine. These have a parameter that 
-determines what type color set to use. A description of the different color sets is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/_lighting_protocols_8h.html). 
+determines what type color set to use. A description of the different color sets is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00002.html). 
 
 * Multi Glimmer
 * Multi Random Individual
