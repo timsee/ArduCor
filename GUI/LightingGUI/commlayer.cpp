@@ -75,7 +75,7 @@ bool CommLayer::connectSerialPort(QString serialPortName) {
         serial->setFlowControl(QSerialPort::NoFlowControl);
         // set up lights to the defaults
         sendMainColorChange(QColor(0,255,0));
-        sendModeChange(ELightingMode::eLightingModeSingleGlimmer);
+        sendModeChange(ELightingMode::eSingleGlimmer);
         sendBrightness(50);
         sendTimeOut(120);
         sendSpeed(300); // desired FPS * 100
@@ -114,16 +114,21 @@ void CommLayer::sendModeChange(ELightingMode mode) {
     serial->write(message.toStdString().c_str());
 }
 
-void CommLayer::sendArrayModeChange(ELightingMode mode, int count) {
-    if (mode == ELightingMode::eLightingModeArrayBarsMoving
-          || mode == ELightingMode::eLightingModeArrayBarsSolid
-          || mode == ELightingMode::eLightingModeArrayFade
-          || mode == ELightingMode::eLightingModeArrayGlimmer
-          || mode == ELightingMode::eLightingModeArrayRandomIndividual
-          || mode == ELightingMode::eLightingModeArrayRandomSolid) {
-        QString message = QString("0,%1,%2;").arg(QString::number((int)mode), QString::number(count));
+void CommLayer::sendArrayModeChange(ELightingMode mode, int preset) {
+    if (mode == ELightingMode::eMultiBarsMoving
+          || mode == ELightingMode::eMultiBarsSolid
+          || mode == ELightingMode::eMultiFade
+          || mode == ELightingMode::eMultiGlimmer
+          || mode == ELightingMode::eMultiRandomIndividual
+          || mode == ELightingMode::eMultiRandomSolid) {
+        QString message = QString("0,%1,%2;").arg(QString::number((int)mode),QString::number(preset));
         serial->write(message.toStdString().c_str());
     }
+}
+
+void CommLayer::sendCustomArrayCount(int count) {
+    QString message = QString("5,%1;").arg(QString::number(count));
+    serial->write(message.toStdString().c_str());
 }
 
 void CommLayer::sendBrightness(int brightness) {
@@ -138,5 +143,10 @@ void CommLayer::sendSpeed(int speed) {
 
 void CommLayer::sendTimeOut(int timeOut) {
     QString message = QString("5,%1;").arg(QString::number(timeOut));
+    serial->write(message.toStdString().c_str());
+}
+
+void CommLayer::sendReset() {
+    QString message = QString("6,42,71;");
     serial->write(message.toStdString().c_str());
 }

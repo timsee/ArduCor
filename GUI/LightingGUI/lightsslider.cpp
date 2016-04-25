@@ -126,9 +126,7 @@ void LightsSlider::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
 
     painter.setRenderHint(QPainter::Antialiasing);
-
     painter.setPen(QColor(255, 255, 255, 60));
-
     painter.fillRect(this->rect(), QBrush(QColor(48, 47, 47)));
 
     // draw tick marks
@@ -140,7 +138,7 @@ void LightsSlider::paintEvent(QPaintEvent *event) {
 
     if (slider->tickPosition() != QSlider::NoTicks) {
         for (int i = slider->minimum(); i <= slider->maximum(); i += interval) {
-            int x = round((double)((double)((double)(i - slider->minimum()) / (double)(slider->maximum() - slider->minimum())) * (double)(slider->width()))) - 1;
+            int x = round((double)(((double)(i - slider->minimum()) / (slider->maximum() - slider->minimum())) * (slider->width()))) - 1;
             int h = 2;
             if (slider->tickPosition() == QSlider::TicksBothSides || slider->tickPosition() == QSlider::TicksAbove) {
                 int y = slider->rect().top();

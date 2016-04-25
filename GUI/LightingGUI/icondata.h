@@ -20,7 +20,6 @@
  * computation. For display, this buffer gets upscaled to the desired icon size. This 
  * gives it the square pixel-y effect.
  *
- * \todo Clean up some of the messier data manipulations such as the fades.
  * \todo Clean up the icons that don't accurately represent their modes such as the "Bars Moving" icon.
  */
 class IconData
@@ -49,57 +48,43 @@ public:
      * \brief setSolidColor sets the icon as a solid color
      */
     void setSolidColor(QColor color);
-    /*!
-     * \brief setRandomColors sets every region to a random color.
-     */
-    void setRandomColors();
-
-    /*!
-     * \brief setRandomSolid draws 4 random colors on icon
-     */
-    void setRandomSolid();
 
     /*!
      * \brief setArrayColors shows all array colors, repeating if necessary
      */
-    void setArrayColors();
-
-    /*!
-     * \brief setFadeAllColors regions slowly fade from one color to another
-     */
-    void setFadeAllColors();
+    void setArrayColors(EColorPreset preset);
 
     /*!
      * \brief setArrayGlimmer sets as mostly mainColor, but adds random colors
      *        as a glimmer effect
      */
-    void setArrayGlimmer();
+    void setArrayGlimmer(EColorPreset preset);
 
     /*!
      * \brief setArrayFade regions slowly fade from one array color to another
      */
-    void setArrayFade();
+    void setArrayFade(EColorPreset preset);
 
     /*!
      * \brief setArrayRandomSolid sets icon as 4 colors from array
      */
-    void setArrayRandomSolid();
+    void setArrayRandomSolid(EColorPreset preset);
 
     /*!
      * \brief setArrayRandomIndividual sets each region a random color from the array
      */
-    void setArrayRandomIndividual();
+    void setArrayRandomIndividual(EColorPreset preset);
 
     /*!
      * \brief setArrayBarsSolid draws the bars with region sizes of 2
      */
-    void setArrayBarsSolid();
+    void setArrayBarsSolid(EColorPreset preset);
 
     /*!
      * \brief setArrayBarsSolid draws the bars with region sizes of 2 but slightly offset
      *        'cause its hard to show motion in a static icon.
      */
-    void setArrayBarsMoving();
+    void setArrayBarsMoving(EColorPreset preset);
 
     /*!
      * \brief addGlimmer adds glimmer lighting effect to the preexisting data
@@ -148,6 +133,7 @@ private:
     uint mWidth;
     uint mHeight;
     uint mDataLength;
+
     /*!
      * a buffer that is used when doing processing.
      * set of RGB values in the buffer represents an entire
@@ -167,11 +153,6 @@ private:
 
     QColor getMiddleColor(QColor c_1,
                           QColor c_2);
-
-    QColor *setupFadeGroup(QColor c_1, QColor c_2,
-                           QColor c_3, QColor c_4,
-                           QColor c_5, QColor c_6,
-                           QColor c_7, QColor c_8);
 
 };
 

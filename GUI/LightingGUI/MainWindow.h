@@ -87,10 +87,15 @@ private:
      */
     IconData mSinglePageIcon;
     /*!
-     * \brief mArrayColorsPageIcon the icon data used by the ArrayColorsPageButton. This icon
+     * \brief mCustomArrayIcon the icon data used by the customArrayPageButton. This icon
      * changes when any of its colors change hue.
      */
-    IconData mArrayColorsPageIcon;
+    IconData mCustomArrayIcon;
+    /*!
+     * \brief mPresetArrayIcon the icon data used by the presetArrayPageButton. This icon
+     * changes when any of its colors change hue.
+     */
+    IconData mPresetArrayIcon;
 
 protected:
     /*!

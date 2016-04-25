@@ -74,7 +74,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="arrayColorsButton">
+         <widget class="QPushButton" name="customArrayButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -104,7 +104,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="multiColorButton">
+         <widget class="QPushButton" name="presetArrayButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -178,11 +178,11 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="SingleColorPage" name="singleColorPage"/>
-        <widget class="ArrayColorsPage" name="arrayColorsPage"/>
-        <widget class="MultiColorPage" name="multiColorPage"/>
+        <widget class="CustomArrayPage" name="customArrayPage"/>
+        <widget class="PresetArrayPage" name="presetArrayPage"/>
         <widget class="SettingsPage" name="settingsPage"/>
        </widget>
       </item>
@@ -203,11 +203,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>MultiColorPage</class>
-   <extends>QWidget</extends>
-   <header>multicolorpage.h</header>
-  </customwidget>
-  <customwidget>
    <class>SingleColorPage</class>
    <extends>QWidget</extends>
    <header>singlecolorpage.h</header>
@@ -220,9 +215,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ArrayColorsPage</class>
+   <class>PresetArrayPage</class>
    <extends>QWidget</extends>
-   <header>arraycolorspage.h</header>
+   <header>presetarraypage.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CustomArrayPage</class>
+   <extends>QWidget</extends>
+   <header>customarraypage.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

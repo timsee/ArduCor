@@ -34,10 +34,10 @@ SingleColorPage::SingleColorPage(QWidget *parent) :
         connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
     }
 
-    signalMapper->setMapping(ui->solidButton, (int)ELightingMode::eLightingModeSingleConstant);
-    signalMapper->setMapping(ui->blinkButton, (int)ELightingMode::eLightingModeSingleBlink);
-    signalMapper->setMapping(ui->fadeButton, (int)ELightingMode::eLightingModeSingleFade);
-    signalMapper->setMapping(ui->glimmerButton, (int)ELightingMode::eLightingModeSingleGlimmer);
+    signalMapper->setMapping(ui->solidButton, (int)ELightingMode::eSingleSolid);
+    signalMapper->setMapping(ui->blinkButton, (int)ELightingMode::eSingleBlink);
+    signalMapper->setMapping(ui->fadeButton, (int)ELightingMode::eSingleFade);
+    signalMapper->setMapping(ui->glimmerButton, (int)ELightingMode::eSingleGlimmer);
 
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(modeChanged(int)));
 
@@ -60,13 +60,13 @@ void SingleColorPage::highlightModeButton(ELightingMode lightingMode) {
         button->setChecked(false);
     }
 
-    if (lightingMode == ELightingMode::eLightingModeSingleConstant) {
+    if (lightingMode == ELightingMode::eSingleSolid) {
         ui->solidButton->setChecked(true);
-    } else if (lightingMode == ELightingMode::eLightingModeSingleBlink) {
+    } else if (lightingMode == ELightingMode::eSingleBlink) {
         ui->blinkButton->setChecked(true);
-    } else if (lightingMode == ELightingMode::eLightingModeSingleFade) {
+    } else if (lightingMode == ELightingMode::eSingleFade) {
         ui->fadeButton->setChecked(true);
-    } else if (lightingMode == ELightingMode::eLightingModeSingleGlimmer) {
+    } else if (lightingMode == ELightingMode::eSingleGlimmer) {
         ui->glimmerButton->setChecked(true);
     }
 }
@@ -83,15 +83,16 @@ void SingleColorPage::modeChanged(int newMode) {
 }
 
 void SingleColorPage::colorChanged(QColor color) {
-    mData->color(color);
+    mData->mainColor(color);
 
-    mComm->sendMainColorChange(mData->color());
-    if (!(mData->currentMode() == ELightingMode::eLightingModeSingleBlink
-            || mData->currentMode() == ELightingMode::eLightingModeSingleConstant
-            || mData->currentMode() == ELightingMode::eLightingModeSingleFade
-            || mData->currentMode() == ELightingMode::eLightingModeSingleGlimmer)) {
-        mData->currentMode(ELightingMode::eLightingModeSingleGlimmer);
-        mComm->sendModeChange(ELightingMode::eLightingModeSingleGlimmer);
+    mComm->sendMainColorChange(mData->mainColor());
+    //TODO: is this right?
+    if (!(mData->currentMode() == ELightingMode::eSingleBlink
+            || mData->currentMode() == ELightingMode::eSingleSolid
+            || mData->currentMode() == ELightingMode::eSingleFade
+            || mData->currentMode() == ELightingMode::eSingleGlimmer)) {
+        mData->currentMode(ELightingMode::eSingleGlimmer);
+        mComm->sendModeChange(ELightingMode::eSingleGlimmer);
     }
 
     mSolidData.setSolidColor(color);

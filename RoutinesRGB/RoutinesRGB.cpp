@@ -1,13 +1,14 @@
 /*!
- * @version v1.8.3
- * @date March 27, 2016
- * @author Tim Seemann
- * @copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
+ * \version v1.9.0
+ * \date April 24, 2016
+ * \author Tim Seemann
+ * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
  *            </a>
  *
  *
- * @brief An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware.
+ * \brief An Arduino library that provides a set of RGB lighting routines for compatible
+ * LED array hardware.
  *
  */
  
@@ -18,29 +19,7 @@ const uint16_t DEFAULT_BRIGHTNESS  = 50;
 const uint8_t  DEFAULT_FADE_SPEED  = 10;
 const uint8_t  DEFAULT_BLINK_SPEED = 3;
 
-
-/*!
- * The different states that the library can be ran in. These get changed by
- * using different API calls. 
- */
-enum ELightingState
-{
-  eSolid,
-  eBlink,
-  eFade,
-  eGlimmer,
-  eRandomIndividual,
-  eRandomSolid,
-  eFadeAllColors,
-  eArrayGlimmer,
-  eArrayRandomIndividual,
-  eArrayRandomSolid,
-  eArrayFade,
-  eArrayBarSolid,
-  eArrayBarMoving
-};
-
-
+   
 //================================================================================
 // Constructors
 //================================================================================
@@ -75,17 +54,347 @@ RoutinesRGB::RoutinesRGB(uint16_t ledCount, uint16_t colorCount)
     if((m_temp_buffer = (uint8_t*)malloc(ledCount))) {
         memset(m_temp_buffer, 0, ledCount);
     }
+    
+    
+    //=================================
+    // allocate and set up the presets
+    //=================================        
+        
+    m_preset_total = 19;
+    int i = 0;
+    
+    //==========
+    // allocate array of arrays
+    //==========
+    if ((m_colors =(Color**)malloc(m_preset_total * sizeof(Color*)))) {
+        memset(m_colors, 0, ledCount);
+    }
+      
+    //==========
+    // Allocate array of array sizes
+    //==========  
+    if((m_preset_count = (uint8_t*)malloc(m_preset_total))) {
+        memset(m_preset_count, 0, m_preset_total);
+    }    
+    
+    //==========
+    // Custom Colors
+    //==========
+    m_preset_count[i] = colorCount;
 
     uint16_t byteCount = colorCount * 3; 
-    if((colors = (Color*)malloc(byteCount))) {
-        memset(colors, 0, ledCount);
-    } 
+    if((m_colors[i] = (Color*)malloc(byteCount))) {
+        memset(m_colors[i], 0, ledCount);
+    }
+    i++;
     
+    //==========
+    // Water Colors
+    //==========
+    m_preset_count[i] = 5;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {0,   0,   255};
+    m_colors[i][1] = {0,   25,  225};
+    m_colors[i][2] = {0,   0,   127};
+    m_colors[i][3] = {0,   127, 127};
+    m_colors[i][4] = {120, 120, 255};
+
+    i++;
+    
+    //==========
+    // Frozen Colors
+    //==========
+    m_preset_count[i] = 6;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {0,   127, 255};
+    m_colors[i][1] = {0,   127, 127};
+    m_colors[i][2] = {200, 0,   255};
+    m_colors[i][3] = {40,  127, 40};
+    m_colors[i][4] = {127, 127, 127};
+    m_colors[i][5] = {127, 127, 255};
+
+    i++;
+
+    //==========
+    // Snow Colors
+    //==========
+    m_preset_count[i] = 6;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {255, 255, 255};
+    m_colors[i][1] = {127, 127, 127};
+    m_colors[i][2] = {200, 200, 200};
+    m_colors[i][3] = {0,   0,   255};
+    m_colors[i][4] = {0,  255,  255};
+    m_colors[i][5] = {0,  180,   180};
+    
+    i++;
+        
+    //==========
+    // Cool Colors
+    //==========
+    m_preset_count[i] = 5;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {0,   255, 0};
+    m_colors[i][1] = {125, 0,   255};
+    m_colors[i][2] = {0,   0,   255};
+    m_colors[i][3] = {40,  127, 40};
+    m_colors[i][4] = {60,  0,   160};
+     
+    i++;
+
+    //==========
+    // Warm Colors
+    //==========
+    m_preset_count[i] = 5;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {255, 255, 0};
+    m_colors[i][1] = {255, 0,   0};
+    m_colors[i][2] = {255, 45,  0};
+    m_colors[i][3] = {255, 200, 0};
+    m_colors[i][4] = {255, 127, 0};
+    
+    i++;
+
+    //==========
+    // Fire Colors
+    //==========
+    m_preset_count[i] = 9;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {255, 75, 0};
+    m_colors[i][1] = {255, 20, 0};
+    m_colors[i][2] = {255, 80, 0};
+    m_colors[i][3] = {255, 5,  0};
+    m_colors[i][4] = {0,   0,  0};
+    m_colors[i][5] = {127, 127,0};
+    m_colors[i][6] = {255, 60, 0};
+    m_colors[i][7] = {255, 45,0};
+    m_colors[i][8] = {127, 127,0};
+
+    i++;
+    
+    //==========
+    // Evil Colors
+    //==========
+    m_preset_count[i] = 7;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {255, 0, 0};
+    m_colors[i][1] = {200, 0, 0};
+    m_colors[i][2] = {127, 0, 0};
+    m_colors[i][3] = {20,  0, 0};
+    m_colors[i][4] = {30,  0, 40};
+    m_colors[i][5] = {0,   0, 0};
+    m_colors[i][6] = {80,  0, 0};
+
+    i++;
+    
+    //==========
+    // Corrosive Colors
+    //==========
+    m_preset_count[i] = 5;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {0,   255, 0};
+    m_colors[i][1] = {0,   200, 0};
+    m_colors[i][2] = {60,  180, 60};
+    m_colors[i][3] = {127, 135, 127};
+    m_colors[i][4] = {10,  255, 10};
+    
+    i++;
+    
+    //==========
+    // Poison Colors
+    //==========
+    m_preset_count[i] = 9;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    
+    m_colors[i][0] = {80, 0, 180};
+    m_colors[i][1] = {120, 0, 255};
+    m_colors[i][2] = {10, 0,   20};
+    m_colors[i][3] = {25, 0,  25};
+    m_colors[i][4] = {60, 40,  60};
+    m_colors[i][5] = {120, 0, 255};
+    m_colors[i][6] = {80, 0, 180};
+    m_colors[i][7] = {40, 0, 90};
+    m_colors[i][8] = {80, 0, 180};
+
+    i++;
+   
+    //==========
+    // Rose
+    //==========
+    m_preset_count[i] = 6;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+        
+    m_colors[i][0] = {216, 30, 100};
+    m_colors[i][1] = {156, 62, 72};
+    m_colors[i][2] = {255, 245, 251};
+    m_colors[i][3] = {127, 127, 127};
+    m_colors[i][4] = {194, 30,  86};
+    m_colors[i][5] = {194, 30,  30};
+
+    i++;
+    
+    //==========
+    // Pink Green
+    //==========
+    m_preset_count[i] = 4;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }   
+    
+    m_colors[i][0]  = {255, 20,  147};
+    m_colors[i][1]  = {0,   255, 0};
+    m_colors[i][2]  = {0,   200, 0};
+    m_colors[i][3]  = {255, 105, 180};
+        
+    i++;     
+
+    //==========
+    // Red White Blue
+    //==========
+    m_preset_count[i] = 4;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }        
+        
+        
+    m_colors[i][0]  = {255, 255, 255};
+    m_colors[i][1]  = {255, 0,   0};
+    m_colors[i][2]  = {0,   0,   255};
+    m_colors[i][3]  = {255, 255, 255};
+    
+    i++;
+
+    //==========
+    // All Colors
+    //==========
+    m_preset_count[i] = 8;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }
+    i++;
+
+    //==========
+    // RGB
+    //==========
+    m_preset_count[i] = 3;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }    
+    
+    m_colors[i][0] = {255, 0,   0};
+    m_colors[i][1] = {0,   255, 0};
+    m_colors[i][2] = {0,   0,   255};
+
+    i++;
+    
+    //==========
+    // CMY
+    //==========
+    m_preset_count[i] = 3;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    } 
+        
+    m_colors[i][0] = {255, 255, 0};
+    m_colors[i][1] = {0,   255, 255};
+    m_colors[i][2] = {255,   0, 255};
+
+    i++;   
+    
+    //==========
+    // Six Color
+    //==========
+    m_preset_count[i] = 6;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }   
+              
+    m_colors[i][0] = {255, 0,   0};
+    m_colors[i][1] = {255, 255, 0};
+    m_colors[i][2] = {0,   255, 0};
+    m_colors[i][3] = {0,   255, 255};
+    m_colors[i][4] = {0,   0,   255};
+    m_colors[i][5] = {255, 0,   255};
+
+    i++;   
+
+    //==========
+    // Seven Color
+    //==========
+    m_preset_count[i] = 7;
+    
+    if((m_colors[i] = (Color*)malloc((uint16_t)(m_preset_count[i] * 3)))) {
+        memset(m_colors[i], 0, (uint16_t)(m_preset_count[i] * 3));
+    }        
+    
+    m_colors[i][0] = {255, 0,   0};
+    m_colors[i][1] = {255, 255, 0};
+    m_colors[i][2] = {0,   255, 0};
+    m_colors[i][3] = {0,   255, 255};
+    m_colors[i][4] = {0,   0,   255};
+    m_colors[i][5] = {255, 0,   255};
+    m_colors[i][6] = {255, 255, 255};
+
+    i++;   
+    
+    // all colors gets set before use since it changes each times
+    resetToDefaults(); 
+}
+
+void RoutinesRGB::resetToDefaults()
+{
     m_bright_level = DEFAULT_BRIGHTNESS;
     m_fade_speed   = DEFAULT_FADE_SPEED;
     m_blink_speed  = DEFAULT_BLINK_SPEED;
     m_bar_size = 0;
     m_bar_count = 0;
+    
+    m_current_preset = eCustom;
+    m_current_mode = eSingleGlimmer;
     
     m_temp_index = 0;
     m_temp_counter = 0;
@@ -105,9 +414,20 @@ RoutinesRGB::RoutinesRGB(uint16_t ledCount, uint16_t colorCount)
     
     // counters for routines
     m_fade_counter  = 0;
-    m_fade_array_counter = 0;  
+    m_fade_array_counter = 0;
+    
+    for (int i = 0; i < m_color_count; i++) {
+        m_colors[0][i] = {0, 0, 0};
+    }  
+    
+    // All LEDs buffer
+    for (int i = 0; i < m_preset_count[(int)eAll]; i++) {
+         m_colors[(int)eAll][i] =  {(uint8_t)random(0, 256),
+                                    (uint8_t)random(0, 256),
+                                    (uint8_t)random(0, 256)};
+    }
+    
 }
-
 
 //================================================================================
 // Getters and Setters
@@ -123,12 +443,27 @@ void
 RoutinesRGB::setColor(uint16_t colorIndex, uint8_t r, uint8_t g, uint8_t b)
 {
     if (colorIndex < m_color_count) {
-        colors[colorIndex] = (RoutinesRGB::Color){r, g, b};
+        m_colors[0][colorIndex] = (RoutinesRGB::Color){r, g, b};
     }
 }
 
+
 void 
-RoutinesRGB::setBrightness(uint8_t brightness)
+RoutinesRGB::setColorCount(uint8_t count)
+{
+    if (count != 0) {
+        m_preset_count[0] = count;
+    }
+}
+
+uint8_t 
+RoutinesRGB::colorCount()
+{
+    return m_preset_count[0];
+}
+
+void 
+RoutinesRGB::brightness(uint8_t brightness)
 {
     if (brightness <= 100) {
         m_bright_level = brightness;
@@ -137,7 +472,7 @@ RoutinesRGB::setBrightness(uint8_t brightness)
 
 
 void 
-RoutinesRGB::setFadeSpeed(uint8_t fadeSpeed)
+RoutinesRGB::fadeSpeed(uint8_t fadeSpeed)
 {
     if (fadeSpeed != 0) {
         m_fade_speed = fadeSpeed;
@@ -146,7 +481,7 @@ RoutinesRGB::setFadeSpeed(uint8_t fadeSpeed)
 
 
 void 
-RoutinesRGB::setBlinkSpeed(uint8_t blinkSpeed)
+RoutinesRGB::blinkSpeed(uint8_t blinkSpeed)
 {
     if (blinkSpeed != 0) {
         m_blink_speed = blinkSpeed;
@@ -155,17 +490,17 @@ RoutinesRGB::setBlinkSpeed(uint8_t blinkSpeed)
 
 
 RoutinesRGB::Color
-RoutinesRGB::getMainColor()
+RoutinesRGB::mainColor()
 {  
     return m_main_color;
 }
 
 
 RoutinesRGB::Color
-RoutinesRGB::getColor(uint16_t i)
+RoutinesRGB::color(uint16_t i)
 {
     if (i < m_color_count) {
-        return colors[i];
+        return m_colors[0][i];
     } else {
         return (Color){0,0,0};
     }
@@ -173,7 +508,7 @@ RoutinesRGB::getColor(uint16_t i)
 
 
 uint8_t
-RoutinesRGB::getR(uint16_t i)
+RoutinesRGB::red(uint16_t i)
 {
     if (i < m_LED_count) {
         return r_buffer[i];
@@ -183,7 +518,7 @@ RoutinesRGB::getR(uint16_t i)
 }
 
 uint8_t
-RoutinesRGB::getG(uint16_t i)
+RoutinesRGB::green(uint16_t i)
 {
     if (i < m_LED_count) {
         return g_buffer[i];
@@ -193,7 +528,7 @@ RoutinesRGB::getG(uint16_t i)
 }
 
 uint8_t
-RoutinesRGB::getB(uint16_t i)
+RoutinesRGB::blue(uint16_t i)
 {
     if (i < m_LED_count) {
         return b_buffer[i];
@@ -209,26 +544,82 @@ RoutinesRGB::getB(uint16_t i)
 //================================================================================
  
 void
-RoutinesRGB::preProcess(uint16_t state)
+RoutinesRGB::preProcess(ELightingMode newState, EColorPreset newPreset)
 {
-    ELightingState new_state = (ELightingState)state;
-    if (new_state != m_current_state) {
+    m_preprocess_flag = false;
+    
+    // prevent illegal values
+    if (newPreset >= m_preset_total) {
+        newPreset = (EColorPreset)(m_preset_total - 1);
+    }
+    if (newPreset < 0) {
+        newPreset = (EColorPreset)0;
+    }
+    
+    //---------
+    // Either State or Preset Has Changed
+    //---------
+    if ( m_current_mode != newState
+        || m_current_preset != newPreset) { 
+        // setup the temp values with the preset.
+        if (newState == eMultiGlimmer
+            || newState == eMultiFade
+            || newState == eMultiBarsSolid
+            || newState == eMultiBarsMoving
+            || newState == eMultiRandomSolid
+            || newState == eMultiRandomIndividual) {
+            m_temp_array =  m_colors[newPreset];
+            m_temp_size =  m_preset_count[newPreset];
+        }
+        // setup the buffer to do a moving array.
+        if (newState == eMultiBarsMoving
+            || newState == eMultiBarsSolid) {
+            movingBufferSetup(m_temp_size, m_bar_size);
+        }
+    }
+        
+    //---------
+    // State Has Changed
+    //---------
+    if (m_current_mode != newState) {
         // change the current state
-        m_current_state = new_state;
+        m_current_mode = newState;
         // reset the temps
         m_temp_index = 0;
         m_temp_counter = 0;
         m_temp_bool = true;
         m_temp_color = {0,0,0};
-        // apply state specific changes
-         if (m_current_state == eBlink) {
-           m_temp_counter = 0;
-           m_temp_bool = true;
-         }
-         else if (m_current_state == eRandomSolid) {
-           m_temp_counter = 0;
-           m_temp_index = 1;
-         } 
+        
+        // always reset blink
+        if (m_current_mode == eSingleBlink) {
+            m_temp_counter = 0;
+            m_temp_bool = true;
+        }
+        m_preprocess_flag = true;
+    }
+    
+    //---------
+    // Preset Has Changed
+    //---------
+    if (((m_current_preset != newPreset) 
+        || m_preprocess_flag)
+        && (newPreset != -1)) {
+
+        // reset fades, even when only the preset changes
+        if (m_current_mode == eMultiFade) {
+            m_start_next_fade = true;
+            m_fade_array_counter = 0;
+        }
+        
+        // for "all" color routines, generate random colors for the array.
+        if (newPreset == eAll) {
+            for (int i = 0; i < m_preset_count[(int)10]; i++) {
+                 m_colors[(int)eAll][i] =  {(uint8_t)random(0, 256),
+                                            (uint8_t)random(0, 256),
+                                            (uint8_t)random(0, 256)};
+            }
+        }
+        m_current_preset = newPreset;
     }
 }
 
@@ -265,7 +656,7 @@ RoutinesRGB::applyBrightness(uint8_t value)
 void
 RoutinesRGB::solid(uint8_t red, uint8_t green, uint8_t blue)
 {
-    preProcess(eSolid);
+    preProcess(eSingleSolid, m_current_preset);
     for (uint16_t x = 0; x < m_LED_count; x++) {
         r_buffer[x] = red;
         g_buffer[x] = green;
@@ -278,7 +669,7 @@ RoutinesRGB::solid(uint8_t red, uint8_t green, uint8_t blue)
 void
 RoutinesRGB::blink(uint8_t red, uint8_t green, uint8_t blue)
 {
-    preProcess(eBlink);
+    preProcess(eSingleBlink, m_current_preset);
     if (!(m_temp_counter % m_blink_speed)) {
         if (m_temp_bool) {
             for (uint16_t x = 0; x < m_LED_count; x++) {
@@ -304,7 +695,7 @@ RoutinesRGB::blink(uint8_t red, uint8_t green, uint8_t blue)
 void
 RoutinesRGB::fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)
 {
-    preProcess(eFade);
+    preProcess(eSingleFade, m_current_preset);
     if (shouldUpdate) {
         // catch illegal argument and fix it
         if (fadeSpeed == 0) fadeSpeed = 1;
@@ -332,7 +723,7 @@ RoutinesRGB::fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, b
 void
 RoutinesRGB::glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate)
 {
-    preProcess(eGlimmer);
+    preProcess(eSingleGlimmer, m_current_preset);
     for (uint16_t x = 0; x < m_LED_count; x++) {
         // a random number is generated. If its less than the percent,
         // treat this as an LED that gets a glimmer effect
@@ -357,195 +748,154 @@ RoutinesRGB::glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boo
 }
 
 
-
-
-//================================================================================
-// Multi Color Routines
-//================================================================================
-
-
-void
-RoutinesRGB::randomIndividual()
-{
-    preProcess(eRandomIndividual);
-    for (uint16_t x = 0; x < m_LED_count; x++) {
-        r_buffer[x] = (uint8_t)random(0, 256);
-        g_buffer[x] = (uint8_t)random(0, 256);
-        b_buffer[x] = (uint8_t)random(0, 256);
-    }
-    postProcess();
-}
-
-
-void
-RoutinesRGB::randomSolid()
-{
-    preProcess(eRandomSolid);
-    if (!(m_temp_counter % m_blink_speed)) {
-        byte r = (uint8_t)random(0, 256);
-        byte g = (uint8_t)random(0, 256);
-        byte b = (uint8_t)random(0, 256);
-        for (uint16_t x = 0; x < m_LED_count; x++) {
-            r_buffer[x] = r;
-            g_buffer[x] = g;
-            b_buffer[x] = b;
-        }
-        postProcess();
-    }
-    m_temp_counter++;
-}
-
-void
-RoutinesRGB::fadeBetweenAllColors()
-{
-    preProcess(eFadeAllColors);
-    fadeAllColorsIncrement();
-    for (uint16_t x = 0; x < m_LED_count; x++) {
-        r_buffer[x] = m_fade_color.r;
-        g_buffer[x] = m_fade_color.g;
-        b_buffer[x] = m_fade_color.b;
-    }
-    postProcess();
-}
-
-
-
 //================================================================================
 // Routines With The Color Array
 //================================================================================
 
 void
-RoutinesRGB::arrayGlimmer(uint16_t colorCount, long percent)
+RoutinesRGB::arrayGlimmer(EColorPreset preset, long percent)
 {
-    // protect from illegal arguments
-    colorCount = constrain(colorCount, 1, m_color_count);
+    preProcess(eMultiGlimmer, preset);
     
-    preProcess(eArrayGlimmer);
     for (uint16_t x = 0; x < m_LED_count; x++) {
-        m_temp_color = colors[0];
+        m_temp_color = m_temp_array[0];
         if (random(1,101) < percent && percent != 0) {
             // m_temp_color is set in chooseRandomFromArray
-            chooseRandomFromArray(colorCount, true);
+            chooseRandomFromArray(m_temp_array, m_temp_size, true);
         }
-        
+
         // a random number is generated, if its less than the percent,
         // treat this as an LED that gets a glimmer effect
         if (random(1,101) < percent && percent != 0) {
             // chooses how much to divide the input by
             byte scaleFactor = (byte)random(2,6);
-            
-            byte rScaled = m_temp_color.r / scaleFactor;
-            byte gScaled = m_temp_color.g / scaleFactor;
-            byte bScaled = m_temp_color.b / scaleFactor;
-            
+
+            byte rScaled = m_temp_color.red / scaleFactor;
+            byte gScaled = m_temp_color.green / scaleFactor;
+            byte bScaled = m_temp_color.blue / scaleFactor;
+
             r_buffer[x] = rScaled;
             g_buffer[x] = gScaled;
             b_buffer[x] = bScaled;
         } else {
-            r_buffer[x] = m_temp_color.r;
-            g_buffer[x] = m_temp_color.g;
-            b_buffer[x] = m_temp_color.b;
-        }  
+            r_buffer[x] = m_temp_color.red;
+            g_buffer[x] = m_temp_color.green;
+            b_buffer[x] = m_temp_color.blue;
+        }
     }
     postProcess();
 }
 
 
 void
-RoutinesRGB::arrayRandomSolid(uint16_t colorCount)
-{
-    preProcess(eArrayRandomSolid);
-    if (!(m_temp_counter % m_blink_speed)) {
-        // protect from illegal arguments
-        colorCount = constrain(colorCount, 1, m_color_count);
-        
-        chooseRandomFromArray(colorCount, false);
-        for (uint16_t x = 0; x < m_LED_count; x++) {
-            r_buffer[x] = m_temp_color.r;
-            g_buffer[x] = m_temp_color.g;
-            b_buffer[x] = m_temp_color.b;
+RoutinesRGB::arrayFade(EColorPreset preset)
+{   
+    preProcess(eMultiFade, preset);  
+
+    if (m_start_next_fade) {
+        m_start_next_fade = false;
+        if (m_temp_size > 1) {
+            m_fade_array_counter = (m_fade_array_counter + 1) % m_temp_size;
+            m_temp_color = m_temp_array[m_fade_array_counter];
+            m_goal_color = m_temp_array[(m_fade_array_counter + 1) % m_temp_size];
+        } else {
+            m_fade_array_counter = 0;
+            m_goal_color = m_temp_array[0];
+            m_temp_color = m_temp_array[0];
         }
-        postProcess();
     }
+
+    m_temp_bool = true;
+    m_temp_color.red = fadeBetweenValues(m_temp_color.red, m_goal_color.red);
+    m_temp_color.green = fadeBetweenValues(m_temp_color.green, m_goal_color.green);
+    m_temp_color.blue = fadeBetweenValues(m_temp_color.blue, m_goal_color.blue);
+    m_start_next_fade = m_temp_bool;
+
+    for (uint16_t x = 0; x < m_LED_count; x++) {
+        r_buffer[x] = m_temp_color.red;
+        g_buffer[x] = m_temp_color.green;
+        b_buffer[x] = m_temp_color.blue;
+    }
+    postProcess();
+}
+
+
+void
+RoutinesRGB::arrayRandomSolid(EColorPreset preset)
+{
+    preProcess(eMultiRandomSolid, preset); 
+      
+    if (!(m_temp_counter % m_blink_speed)) {
+        switch ((EColorPreset)preset) {
+            case eAll:
+                m_temp_color = {(uint8_t)random(0, 256),
+                                (uint8_t)random(0, 256),
+                                (uint8_t)random(0, 256)};
+                for (uint16_t x = 0; x < m_LED_count; x++) {
+                    r_buffer[x] = m_temp_color.red;
+                    g_buffer[x] = m_temp_color.green;
+                    b_buffer[x] = m_temp_color.blue;
+                }
+                break;
+            default:
+                chooseRandomFromArray(m_temp_array, m_temp_size, true);
+                for (uint16_t x = 0; x < m_LED_count; x++) {
+                    r_buffer[x] = m_temp_color.red;
+                    g_buffer[x] = m_temp_color.green;
+                    b_buffer[x] = m_temp_color.blue;
+                }
+                break;
+            }
+         postProcess();
+    }   
     m_temp_counter++;
 }
 
 void
-RoutinesRGB::arrayRandomIndividual(uint16_t colorCount)
-{
-    preProcess(eArrayRandomIndividual);
-    for (uint16_t x = 0; x < m_LED_count; x++) {
-        // protect from illegal arguments
-        colorCount = constrain(colorCount, 1, m_color_count);
-        
-        chooseRandomFromArray(colorCount, true);
-        r_buffer[x] = m_temp_color.r;
-        g_buffer[x] = m_temp_color.g;
-        b_buffer[x] = m_temp_color.b;
+RoutinesRGB::arrayRandomIndividual(EColorPreset preset)
+{   
+    preProcess(eMultiRandomIndividual, preset);  
+
+    switch ((EColorPreset)preset) {
+        case eAll:
+            for (uint16_t x = 0; x < m_LED_count; x++) {
+                chooseRandomFromArray(m_temp_array, m_temp_size, true);
+                r_buffer[x] = (uint8_t)random(0, 256);
+                g_buffer[x] = (uint8_t)random(0, 256);
+                b_buffer[x] = (uint8_t)random(0, 256);
+            }
+            break;
+        default:
+            for (uint16_t x = 0; x < m_LED_count; x++) {
+                chooseRandomFromArray(m_temp_array, m_temp_size, true);
+                r_buffer[x] = m_temp_color.red;
+                g_buffer[x] = m_temp_color.green;
+                b_buffer[x] = m_temp_color.blue;
+            }
+            break;
     }
     postProcess();
 }
 
 
-void
-RoutinesRGB::arrayFade(uint16_t colorCount)
-{
-    preProcess(eArrayFade);
-    
-    // protect from illegal arguments
-    colorCount = constrain(colorCount, 1, m_color_count);
-    
-    if (m_start_next_fade) {
-        m_start_next_fade = false;
-        if (colorCount > 1) {
-            m_fade_array_counter = (m_fade_array_counter + 1) % colorCount;
-            m_temp_color = colors[m_fade_array_counter];
-            m_goal_color = colors[(m_fade_array_counter + 1) % colorCount];
-        } else {
-            m_fade_array_counter = 0;
-            m_goal_color = colors[0];
-            m_temp_color = colors[0];
-        }
-    }
-    
-    m_temp_bool = true;
-    m_temp_color.r = fadeBetweenValues(m_temp_color.r, m_goal_color.r);
-    m_temp_color.g = fadeBetweenValues(m_temp_color.g, m_goal_color.g);
-    m_temp_color.b = fadeBetweenValues(m_temp_color.b, m_goal_color.b);
-    m_start_next_fade = m_temp_bool;
-    
-    for (uint16_t x = 0; x < m_LED_count; x++) {
-        r_buffer[x] = m_temp_color.r;
-        g_buffer[x] = m_temp_color.g;
-        b_buffer[x] = m_temp_color.b;
-    }
-    postProcess();
-}
-
 
 void
-RoutinesRGB::arrayBarSolid(uint16_t colorCount, uint8_t barSize)
-{
-    // protect from illegal arguments
-    colorCount = constrain(colorCount, 1, m_color_count);
-    // if theres a change, set up the buffer differently.
-    if (colorCount != m_bar_count || barSize != m_bar_size) {
-        movingBufferSetup(colorCount, barSize);
-    }
-    
-    preProcess(eArrayBarSolid);
-    
+RoutinesRGB::arrayBarsSolid(EColorPreset preset, uint8_t barSize)
+{   
+    m_bar_size =  barSize;
+    preProcess(eMultiBarsSolid, preset);  
+     
     m_temp_counter = 0;
     m_temp_index = 0;
     // set up the buffers
     for(uint16_t x = 0; x < m_LED_count; x++) {
-        r_buffer[x] = colors[m_temp_index].r;
-        g_buffer[x] = colors[m_temp_index].g;
-        b_buffer[x] = colors[m_temp_index].b;
+        r_buffer[x] = m_temp_array[m_temp_index].red;
+        g_buffer[x] = m_temp_array[m_temp_index].green;
+        b_buffer[x] = m_temp_array[m_temp_index].blue;
         m_temp_counter++;
         if (m_temp_counter == barSize) {
             m_temp_counter = 0;
-            m_temp_index = (m_temp_index + 1) % colorCount;
+            m_temp_index = (m_temp_index + 1) % m_temp_size;
         }
     }
     postProcess();
@@ -553,29 +903,24 @@ RoutinesRGB::arrayBarSolid(uint16_t colorCount, uint8_t barSize)
 
 
 void
-RoutinesRGB::arrayBarMoving(uint16_t colorCount, uint8_t barSize)
-{
-    // protect from illegal arguments
-    colorCount = constrain(colorCount, 1, m_color_count);
-    // if theres a change, set up the buffer differently.
-    if (colorCount != m_bar_count || barSize != m_bar_size) {
-        movingBufferSetup(colorCount, barSize);
-    }
-    preProcess(eArrayBarMoving);
+RoutinesRGB::arrayBarsMoving(EColorPreset preset, uint8_t barSize)
+{   
+    m_bar_size =  barSize;
+    preProcess(eMultiBarsMoving, preset);
     
     for(uint16_t x = 0; x < m_LED_count - m_temp_index; x++) {
-        r_buffer[x] = colors[m_temp_buffer[x + m_temp_index]].r;
-        g_buffer[x] = colors[m_temp_buffer[x + m_temp_index]].g;
-        b_buffer[x] = colors[m_temp_buffer[x + m_temp_index]].b; 
+        r_buffer[x] = m_temp_array[m_temp_buffer[x + m_temp_index]].red;
+        g_buffer[x] = m_temp_array[m_temp_buffer[x + m_temp_index]].green;
+        b_buffer[x] = m_temp_array[m_temp_buffer[x + m_temp_index]].blue;
     }
     int z = 0;
     for (uint16_t x = m_LED_count - m_temp_index; x < m_LED_count; x++) {
-        r_buffer[x] = colors[m_temp_buffer[z]].r;
-        g_buffer[x] = colors[m_temp_buffer[z]].g;
-        b_buffer[x] = colors[m_temp_buffer[z]].b;
+        r_buffer[x] = m_temp_array[m_temp_buffer[z]].red;
+        g_buffer[x] = m_temp_array[m_temp_buffer[z]].green;
+        b_buffer[x] = m_temp_array[m_temp_buffer[z]].blue;
         z++;
     }
-    m_temp_index = (m_temp_index + 1) % m_LED_count;
+    m_temp_index = (m_temp_index + 1) % m_temp_size;
     postProcess();
 }
 
@@ -583,28 +928,6 @@ RoutinesRGB::arrayBarMoving(uint16_t colorCount, uint8_t barSize)
 //================================================================================
 // Helper Functions
 //================================================================================
-
-
-void
-RoutinesRGB::fadeAllColorsIncrement()
-{
-    if (m_fade_counter < 255 / m_fade_speed) {
-        m_fade_color.g = m_fade_color.g + m_fade_speed;
-    } else if (m_fade_counter < 255 / m_fade_speed * 2) {
-        m_fade_color.r = m_fade_color.r - m_fade_speed;
-    } else if (m_fade_counter < 255 / m_fade_speed * 3) {
-        m_fade_color.b = m_fade_color.b + m_fade_speed;
-    } else if (m_fade_counter < 255 / m_fade_speed * 4) {
-        m_fade_color.g = m_fade_color.g - m_fade_speed;
-    } else if (m_fade_counter < 255 / m_fade_speed * 5) {
-        m_fade_color.r = m_fade_color.r + m_fade_speed;
-    } else if (m_fade_counter < 255 / m_fade_speed * 6) {
-        m_fade_color.b = m_fade_color.b - m_fade_speed;
-    } else {
-        m_fade_counter = -1;
-    }
-    m_fade_counter++;
-}
 
 
 uint16_t
@@ -635,7 +958,6 @@ void
 RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t barSize)
 {
     m_bar_count = colorCount;
-    m_bar_size =  barSize;
     uint8_t index = 0;
     uint8_t counter = 0;
     for (uint16_t x = 0; x < m_LED_count; x++) {
@@ -652,16 +974,15 @@ RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t barSize)
 }
 
 void
-RoutinesRGB::chooseRandomFromArray(uint16_t colorCount, boolean canRepeat)
+RoutinesRGB::chooseRandomFromArray(Color* array, uint8_t max_index, boolean canRepeat)
 {   
-    uint16_t possible_array_color = random(0, colorCount);
-    if (!canRepeat && colorCount > 2) {
+    uint16_t possible_array_color = random(0, max_index);
+    if (!canRepeat && max_index > 2) {
       while (possible_array_color == m_temp_index) {
-         possible_array_color = random(0, colorCount);
+         possible_array_color = random(0, max_index);
       }
     }
     m_temp_index = possible_array_color;
-    m_temp_color = colors[m_temp_index];
+    m_temp_color = array[m_temp_index];
 }
-
 

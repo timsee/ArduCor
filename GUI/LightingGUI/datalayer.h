@@ -5,47 +5,19 @@
 #include <QApplication>
 #include <QColor>
 
-/*!
- * \brief The ELightingMode enum Lighting modes in the arduino library.
- */
-enum class ELightingMode {
-    eLightingModeOff,
-    eLightingModeSingleConstant,
-    eLightingModeSingleBlink,
-    eLightingModeSingleFade,
-    eLightingModeSingleGlimmer,
-    eLightingModeSingleRed,
-    eLightingModeSingleOrange,
-    eLightingModeSingleYellow,
-    eLightingModeSingleGreen,
-    eLightingModeSingleTeal,
-    eLightingModeSingleBlue,
-    eLightingModeSinglePurple,
-    eLightingModeSingleLightBlue,
-    eLightingModeSinglePink,
-    eLightingModeSingleWhite,
-    eLightingModeMultiRandomIndividual,
-    eLightingModeMultiRandomSolid,
-    eLightingModeMultiFade,
-    eLightingModeArrayGlimmer,
-    eLightingModeArrayRandomIndividual,
-    eLightingModeArrayRandomSolid,
-    eLightingModeArrayFade,
-    eLightingModeArrayBarsSolid,
-    eLightingModeArrayBarsMoving,
-    eLightingMode_MAX
-};
-
+#include "LightingProtocols.h"
 /*!
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ */
+
+/*!
  *
  * \brief The DataLayer class contains all the saved data
  * about the state and settings of the LEDs array. It saves
  * things such as the current brightness and the current mode.
  *
  * \todo Make this class save its data between sessions.
- * \todo Remove the Color struct and use QColor instead.
  */
 class DataLayer
 {
@@ -55,10 +27,6 @@ public:
     ~DataLayer();
 
     /*!
-     * \brief colors all saved colors sent to the arduino.
-     */
-    std::vector<QColor> colors;
-    /*!
      * \brief creates a color based off of the average of all colors currently being used
      * \return a QColor that represents the average of all colors up to `mColorsUsed` in `colors*`.
      */
@@ -67,8 +35,27 @@ public:
     /*!
      * \brief the main saved color, used for single color routines.
      */
-    bool color(QColor newColor);
-    QColor color();
+    bool mainColor(QColor newColor);
+    QColor mainColor();
+
+    /*!
+     * \brief arraySize size of the color array at the given index.
+     * \return the size of the color array at the given index.
+     */
+    uint8_t arraySize(int);
+
+    /*!
+     * \brief colorArray the color array at the given index. Can be used
+     *        to access the custom color array or any of the presets.
+     * \return the color array at the given index.
+     */
+    QColor* colorArray(int);
+
+    /*!
+     * \brief customArray convenience function to access the custom color array
+     * \return the custom color array.
+     */
+    QColor* customArray();
 
     /*!
      * \brief isUsingSerial true if using serial, false if using UDP
@@ -111,6 +98,13 @@ public:
     int timeOut();
 
     /*!
+     * The EColorPreset currently in use by the LEDs. This is used
+     * for multi color routines.
+     */
+    bool preset(EColorPreset preset);
+    EColorPreset preset();
+
+    /*!
      *  Time between LED updates as FPS * 100. For example,
      *  a FPS of 5 is 500.
      */
@@ -136,12 +130,28 @@ public:
     void resetToDefaults();
 
 private:
-    QColor mColor;
+
+    /*!
+     * \brief mArraySizes the array that holds the sizes color arrays.
+     */
+    uint8_t mArraySizes[(int)EColorPreset::eColorPreset_MAX];
+
+    /*!
+     * \brief mColors the color arrays used for routines. This contains
+     *        the custom color array and all of the presets.
+     */
+    QColor *mColors[(int)EColorPreset::eColorPreset_MAX];
+
+    /*!
+     * The color used for single color routines.
+     */
+    QColor mMainColor;
 
     /*!
      * \brief true if lights are on, false otherwise
      */
     bool mIsOn;
+
     /*!
      * \brief currentMode the mode of the LEDs
      */
@@ -158,6 +168,11 @@ private:
     int mBrightness;
 
     /*!
+     * \brief mPreset the current preset being used for multi color routines.
+     */
+    EColorPreset mPreset;
+
+    /*!
      * \brief serialPort the name of the serial port, used only if isUsingSerial is true.
      */
     QString mSerialPort;
@@ -171,11 +186,6 @@ private:
      * \brief port the port for the UDP connection, only used if isUSingSerial is false.
      */
     int mUDPPort;
-
-    /*!
-     * \brief mColorCount the number of colors saved in the color array.
-     */
-    int mColorCount;
 
     /*!
      * \brief mColorsUsed the number of colors used for array colors routines. Must be less

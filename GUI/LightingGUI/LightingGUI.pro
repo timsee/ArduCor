@@ -16,33 +16,36 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     mainwindow.cpp \
-    multicolorpage.cpp \
     singlecolorpage.cpp \
     settingspage.cpp \
     datalayer.cpp \
     commlayer.cpp \
     icondata.cpp \
     lightsslider.cpp \
-    arraycolorspage.cpp \
-    colorpicker.cpp
+    colorpicker.cpp \
+    presetarraypage.cpp \
+    customarraypage.cpp \
+    lightsbutton.cpp
 
 HEADERS  += mainwindow.h \
-    multicolorpage.h \
     singlecolorpage.h \
     settingspage.h \
     datalayer.h \
     commlayer.h \
     icondata.h \
     lightsslider.h \
-    arraycolorspage.h \
     lightingpage.h \
-    colorpicker.h
+    colorpicker.h \
+    presetarraypage.h \
+    customarraypage.h \
+    lightsbutton.h \
+    lightingprotocols.h
 
 FORMS    += mainwindow.ui \
-    multicolorpage.ui \
     singlecolorpage.ui \
     settingspage.ui \
-    arraycolorspage.ui
+    presetarraypage.ui \
+    customarraypage.ui
 
 RESOURCES     = qdarkstyle/style.qrc \
     extraresources.qrc
