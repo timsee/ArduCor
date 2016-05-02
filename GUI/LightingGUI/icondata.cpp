@@ -332,11 +332,6 @@ uint IconData::height() {
     return mHeight;
 }
 
-uint8_t* IconData::data() {
-    return  mData.data();
-}
-
-
 QImage IconData::renderAsQImage() {
     return QImage(mData.data(), mWidth, mHeight, QImage::Format_RGB888);
 }
@@ -345,11 +340,9 @@ QPixmap IconData::renderAsQPixmap() {
     return QPixmap::fromImage(renderAsQImage());
 }
 
-QColor IconData::getMiddleColor(QColor c_1,
-                                QColor c_2) {
-    QColor output = {0, 0, 0};
-    output.setRed(abs(c_1.red() - c_2.red()) / 2 + std::min(c_1.red(), c_2.red()));
-    output.setGreen(abs(c_1.green() - c_2.green()) / 2 + std::min(c_1.green(), c_2.green()));
-    output.setBlue(abs(c_1.blue() - c_2.blue()) / 2 + std::min(c_1.blue(), c_2.blue()));
-    return output;
+QColor IconData::getMiddleColor(QColor first,
+                                QColor second) {
+    return QColor(abs(first.red() - second.red()) / 2 + std::min(first.red(), second.red()),
+                  abs(first.green() - second.green()) / 2 + std::min(first.green(), second.green()),
+                  abs(first.blue() - second.blue()) / 2 + std::min(first.blue(), second.blue()));
 }

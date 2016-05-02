@@ -26,8 +26,8 @@ PresetArrayPage::~PresetArrayPage() {
 void
 PresetArrayPage::setupPresets()
 {
-    mPresetMax = (int)EColorPreset::eColorPreset_MAX - 1;
-    mButtonCount = mPresetMax * ((int)ELightingMode::eLightingMode_MAX - (int)ELightingMode::eMultiGlimmer);
+    int presetMax = (int)EColorPreset::eColorPreset_MAX - 1;
+    mButtonCount = presetMax * ((int)ELightingMode::eLightingMode_MAX - (int)ELightingMode::eMultiGlimmer);
     std::vector<std::string> labels = {"Water",
                                        "Frozen",
                                        "Snow",
@@ -40,15 +40,15 @@ PresetArrayPage::setupPresets()
                                        "Rose",
                                        "PinkGreen",
                                        "RedWhiteBlue",
-                                       "All",
                                        "RGB",
                                        "CMY",
                                        "SixColor",
-                                       "SevenColor"};
+                                       "SevenColor",
+                                       "All"};
 
     mButtonLayout = new QGridLayout;
     mPresetButtons = std::vector<LightsButton *>(mButtonCount, nullptr);
-    mPresetLabels = std::vector<QLabel *>(mPresetMax, nullptr);
+    mPresetLabels = std::vector<QLabel *>(presetMax, nullptr);
 
     int modeIndex = 0;
     int presetIndex = 0;

@@ -17,6 +17,7 @@ provide an ASCII based serial interface to change the lighting routines, the bri
 * [Qt Based GUI](GUI)
     *  [Frontend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/front_overview.html)
     *  [Backend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/backend_overview.html)
+* [Memory Usage](docs/MemoryUsage.md)
 * [Contributing](#contributing)
 * [License](#license)
 * [Version Notes](CHANGELOG.md)
@@ -46,7 +47,7 @@ These routines use a single color:
 ### <a name="multi-routines"></a>Multi Colors Routines
 
 These routines use the colors saved in an array to execute the routine. These have a parameter that 
-determines what type color set to use. A description of the different color sets is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00002.html). 
+determines what type color set to use. A description of the different color sets is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). 
 
 * Multi Glimmer
 * Multi Random Individual
@@ -54,7 +55,6 @@ determines what type color set to use. A description of the different color sets
 * Multi Fade
 * Multi Bars Solid
 * Multi Bars Moving
-
 
 ## <a name="contributing"></a>Contributing
 

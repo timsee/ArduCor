@@ -13,9 +13,10 @@
 
 /*!
  *
- * \brief The DataLayer class contains all the saved data
- * about the state and settings of the LEDs array. It saves
- * things such as the current brightness and the current mode.
+ * \brief The DataLayer class stores and maintains the data
+ * about the state and settings of the application. It also saves
+ * the settings sent to the LED hardware, such as the current brightness
+ * and current lighting routine.
  *
  * \todo Make this class save its data between sessions.
  */
@@ -23,7 +24,13 @@ class DataLayer
 {
 
 public:
+    /*!
+     * \brief Constructor
+     */
     DataLayer();
+    /*!
+     * \brief Deconstructor
+     */
     ~DataLayer();
 
     /*!
@@ -36,6 +43,10 @@ public:
      * \brief the main saved color, used for single color routines.
      */
     bool mainColor(QColor newColor);
+    /*!
+     * \brief mainColor getter for mainColor, used for single color routines.
+     * \return the mainColor, used for single color routines.
+     */
     QColor mainColor();
 
     /*!
@@ -66,35 +77,73 @@ public:
      * serial port maintence
      */
     bool setupSerial(QString serial);
+    /*!
+     * \brief serialPort getter for the string of the current serial port.
+     * \return string representation of the current serial port.
+     */
     QString serialPort();
 
-    // NYI: UDP
+    /*!
+     * NYI
+     * \brief setupUDP sets up the UDP client to talk to the LED array.
+     * \param ip ip address of hte LED array
+     * \param port port for connection to the LED array
+     * \return true if client is set up properly, false otherwise.
+     */
     bool setupUDP(QString ip, int port);
+    /*!
+     * NYI
+     * \brief IP getter for the IP Address of the current UDP connection.
+     * \return IP Address for the UDP connection.
+     */
     QString IP();
+    /*!
+     * NYI
+     * \brief UDPPort getter for the port of the current UDP connection.
+     * \return port for the UDP connection.
+     */
     int UDPPort();
 
     /*!
      * true if lights are on, false otherwise
      */
     bool isOn(bool isOn);
+    /*!
+     * \brief isOn getter which checks if the lights are currently on.
+     * \return true if the lights are on, false otherwise.
+     */
     bool isOn();
 
     /*!
      * mode of LEDs
      */
     bool currentMode(ELightingMode mode);
+    /*!
+     * \brief currentMode getter for the current ELightingMode.
+     * \return the current lighting mode getting displayed on the LED array.
+     */
     ELightingMode currentMode();
 
     /*!
      * value between 0-100 that represents how bright the LEDs shine
      */
     bool brightness(int brightness);
+    /*!
+     * \brief brightness getter for the current brightness.
+     * \return a value between 0 and 100 that represents the current brightness.
+     */
     int brightness();
 
     /*!
      * Time it takes the LEDs to turn off in minutes.
      */
     bool timeOut(int timeOut);
+    /*!
+     * \brief timeOut getter for the amount of minutes it takes for the LEDs
+     *        to "time out." When this happens, they turn off, saving you
+     *        electricity!
+     * \return the time it'll take for the LEDs to time out.
+     */
     int timeOut();
 
     /*!
@@ -102,6 +151,11 @@ public:
      * for multi color routines.
      */
     bool preset(EColorPreset preset);
+    /*!
+     * \brief preset getter for the current color preset.
+     * \return the EColorPreset that represents the colors being displayed on
+     *         the LED array.
+     */
     EColorPreset preset();
 
     /*!
@@ -109,23 +163,38 @@ public:
      *  a FPS of 5 is 500.
      */
     bool speed(int speed);
+    /*!
+     * \brief speed getter for the speed the LED's update.
+     * \return the speed the LEDs update.
+     */
     int speed();
 
     /*!
      * number of colors in the color array
      */
-    bool colorCount(int count);
-    int colorCount();
+    bool customColorCount(int count);
+    /*!
+     * \brief colorCount getter for the number of colors usd by
+     *        the by the custom color routines. Will always be less
+     *        than the total number of colors in the custom color array.
+     * \return the number of colors used for a custom color routine.
+     */
+    int customColorCount();
 
     /*!
      * number of colors to use in the color array routines.
      * Must be less than the color count.
      */
     bool colorsUsed(int colorsUsed);
+    /*!
+     * \brief colorsUsed getted for the number of colors used
+     * \return the number of colors used by the current color preset.
+     */
     int colorsUsed();
 
     /*!
-     * \brief resetToDefaults resets the GUI and the arduino to the default values, as defined at compile time.
+     * \brief resetToDefaults resets the GUI and the arduino to the default values,
+     * as defined at compile time.
      */
     void resetToDefaults();
 
@@ -158,7 +227,8 @@ private:
     ELightingMode mCurrentMode;
 
     /*!
-     * \brief timeOut the amount of minutes before the lights turn off. If 0, then the   lights never turn off.
+     * \brief timeOut the amount of minutes before the lights turn off. If 0, then the
+     *  lights never turn off.
      */
     int mTimeOut;
 

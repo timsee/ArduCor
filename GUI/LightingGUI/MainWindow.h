@@ -17,8 +17,8 @@ class MainWindow;
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
  * \brief The MainWindow class is the only window in this application.
- * It contains a QStackedWidget which shows 4 pages: SingleColorPage, ArrayColorsPage,
- * MultiColorPage, and the SettingsPage.
+ * It contains a QStackedWidget which shows 4 pages: SingleColorPage, CustomArrayPage,
+ * PresetArrayPage, and the SettingsPage.
  *
  * On the top of the MainWindow, there is an on/off button in the far left. This button
  * will reflect the current mode when on, and will be black when off. There is
@@ -30,7 +30,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    /*!
+     * \brief Constructor
+     */
     explicit MainWindow(QWidget *parent = 0);
+    /*!
+     * \brief Deconstructor
+     */
     ~MainWindow();
 
 public slots:
@@ -56,6 +62,9 @@ public slots:
     void updatePreviewIcon(int);
 
 private:
+    /*!
+     * \brief ui pointer to Qt UI form.
+     */
     Ui::MainWindow *ui;
 
     /*!

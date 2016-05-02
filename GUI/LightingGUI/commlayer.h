@@ -22,7 +22,13 @@
 class CommLayer
 {
 public:
+    /*!
+     * \brief Constructor
+     */
     CommLayer();
+    /*!
+     * \brief Deconstructor
+     */
     ~CommLayer();
 
     /*!

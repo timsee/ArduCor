@@ -23,6 +23,9 @@ class LightsButton : public QWidget
 {
     Q_OBJECT
 public:
+    /*!
+     * \brief Constructor
+     */
     explicit LightsButton(QWidget *parent = 0);
 
     /*!
@@ -71,12 +74,36 @@ protected:
    virtual void resizeEvent(QResizeEvent *);
 
 private:
+    /*!
+     * \brief mLayout layout of a lights button
+     */
     QHBoxLayout *mLayout;
-    IconData mIconData;
-    ELightingMode mLightingMode;
-    EColorPreset mColorPreset;
 
+    /*!
+     * \brief mIconData icon data used by the button's
+     *        icon.
+     */
+    IconData mIconData;
+
+    /*!
+     * \brief mIsPresetButton true if setupAsPresetButton() is called, false otherwise.
+     */
     bool mIsPresetButton;
+
+    /*!
+     * \brief mLightingMode stored lighting mode. can only be
+     *        used if the button is set up as a presetButton.
+     *        If it is a preset button, this will be emitted
+     *        as a signal whenever the button is clicked.
+     */
+    ELightingMode mLightingMode;
+    /*!
+     * \brief mColorPreset stored color preset. can only be
+     *        used if the button is set up as a presetButton.
+     *        If it is a preset button, this will be emitted
+     *        as a signal whenever the button is clicked.
+     */
+    EColorPreset mColorPreset;
 
 };
 

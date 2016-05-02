@@ -10,7 +10,7 @@ Provides a set of sample sketches for Adafruit NeoPixels products, SeeedStudio R
     * [Single RGB LED](#RGBLED-hardware)
 * [Sample Sketch Usage](#sample-usage)
     * [ASCII Communication](#ascii-communication)
-    * [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00002.html)
+    * [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html)
 * [Generating Samples](#generated-samples)
 
 ## <a name="hardware"></a>Supported Hardware
@@ -51,7 +51,7 @@ Header,param1,param2,param3,param4;
 **Example:** `0,1;` *(Header 0, New Mode 1)*
  `0,4,6;` *(Header 0, New Mode 4, New Mode 6)* 
 
-*Note: If a preset is provided, it changes the color array being used with multi color routines. To find a description and number representation of ELightingMode and EColorPreset, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00002.html). *
+*Note: If a preset is provided, it changes the color array being used with multi color routines. To find a description and number representation of ELightingMode and EColorPreset, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). *
 
 #### Set Main Color
 

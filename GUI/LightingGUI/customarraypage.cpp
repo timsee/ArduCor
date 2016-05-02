@@ -118,7 +118,7 @@ void CustomArrayPage::selectArrayColor(int index) {
     mCurrentColorPickerIndex = index;
     ui->colorPicker->chooseColor(mData->customArray()[mCurrentColorPickerIndex], false);
     updateColorArray();
-    for (int i = 0; i < mData->colorCount(); ++i) {
+    for (int i = 0; i < mData->customColorCount(); ++i) {
         (*mArrayColorsButtons.get())[i]->setChecked(false);
         (*mArrayColorsButtons.get())[i]->setStyleSheet("border:none");
     }
@@ -128,12 +128,12 @@ void CustomArrayPage::selectArrayColor(int index) {
 }
 
 void CustomArrayPage::updateColorArray() {
-    for (int i = 0; i < mData->colorCount(); ++i) {
+    for (int i = 0; i < mData->customColorCount(); ++i) {
         (*mArrayColorsButtons.get())[i]->setEnabled(true);
         (*mArrayColorsButtons.get())[i]->setIcon((*mArrayColorsIconData.get())[i].renderAsQPixmap());
     }
 
-    for (int i = mData->colorsUsed(); i < mData->colorCount(); ++i) {
+    for (int i = mData->colorsUsed(); i < mData->customColorCount(); ++i) {
         (*mArrayColorsButtons.get())[i]->setIcon(mGreyIcon.renderAsQPixmap());
         (*mArrayColorsButtons.get())[i]->setEnabled(false);
     }
@@ -207,7 +207,7 @@ void CustomArrayPage::updateIcons() {
         (*mArrayColorsButtons.get())[i]->setIcon((*mArrayColorsIconData.get())[i].renderAsQPixmap());
     }
 
-    for (int i = mData->colorsUsed(); i < mData->colorCount(); ++i) {
+    for (int i = mData->colorsUsed(); i < mData->customColorCount(); ++i) {
         (*mArrayColorsButtons.get())[i]->setIcon(mGreyIcon.renderAsQPixmap());
         (*mArrayColorsButtons.get())[i]->setEnabled(false);
     }

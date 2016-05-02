@@ -14,8 +14,19 @@
 class LightingPage {
 
 public:
+    /*!
+     * \brief ~LightingPage Deconstructor
+     */
     virtual ~LightingPage(){}
 
+    /*!
+     * \brief setup called by the MainWindow after the commLayer and dataLayer
+     *        of the application are set up. This connects these layers to
+     *        all the other pages.
+     * \param commLayer the object that handles the commmunication to the LED array.
+     * \param dataLayer the object that handles storing data about the application
+     *                  and the LED array's state.
+     */
     void setup(std::shared_ptr<CommLayer> commLayer,
                std::shared_ptr<DataLayer> dataLayer) {
         mComm = commLayer;

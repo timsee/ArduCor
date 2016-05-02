@@ -177,16 +177,6 @@ DataLayer::DataLayer() {
     i++;
 
     //==========
-    // All Colors
-    //==========
-    mArraySizes[i] = 12;
-    mColors[i] = new QColor[mArraySizes[i]];
-    for (int j = 0; j < mArraySizes[i]; j++) {
-        mColors[i][j] = QColor(rand() % 256, rand() % 256, rand() % 256);
-    }
-    i++;
-
-    //==========
     // RGB
     //==========
     mArraySizes[i] = 3;
@@ -235,6 +225,17 @@ DataLayer::DataLayer() {
     mColors[i][6] = QColor(255, 255, 255);
 
     i++;
+
+    //==========
+    // All Colors
+    //==========
+    mArraySizes[i] = 12;
+    mColors[i] = new QColor[mArraySizes[i]];
+    for (int j = 0; j < mArraySizes[i]; j++) {
+        mColors[i][j] = QColor(rand() % 256, rand() % 256, rand() % 256);
+    }
+    i++;
+
 
     resetToDefaults();
 }
@@ -379,7 +380,7 @@ QString DataLayer::IP() {
 }
 
 
-bool DataLayer::colorCount(int count) {
+bool DataLayer::customColorCount(int count) {
     if (count > 0) {
         mArraySizes[0] = count;
         return true;
@@ -388,7 +389,7 @@ bool DataLayer::colorCount(int count) {
     }
 }
 
-int DataLayer::colorCount() {
+int DataLayer::customColorCount() {
     return mArraySizes[0];
 }
 
