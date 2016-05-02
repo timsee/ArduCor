@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.5.0</span>
+   &#160;<span id="projectnumber">v0.6.0</span>
    </div>
   </td>
  </tr>
@@ -45,13 +45,13 @@
 </div></div></div><div class="frontendOverview"><div class="overviewSection"><div class="overviewTitle"> </div> <div class="overviewImage"> <div class="image">
 <img src="mainWindowPreview.png" alt="mainWindowPreview.png"/>
 </div>
- </div><p> The <a class="el" href="class_main_window.html" title="The MainWindow class is the only window in this application. It contains a QStackedWidget which shows...">MainWindow</a> class is the only window in this application. It contains a QStackedWidget which shows 4 pages: <a class="el" href="class_single_color_page.html" title="The SingleColorPage class allows users to change the main color of the LED system and to set it in si...">SingleColorPage</a>, ArrayColorsPage, MultiColorPage, and the <a class="el" href="class_settings_page.html" title="The SettingsPage class provides a way to configure the application settings. ">SettingsPage</a>. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
+ </div><p> The <a class="el" href="class_main_window.html" title="The MainWindow class is the only window in this application. It contains a QStackedWidget which shows...">MainWindow</a> class is the only window in this application. It contains a QStackedWidget which shows 4 pages: <a class="el" href="class_single_color_page.html" title="The SingleColorPage provides a way to change the main color of the LED system and to set it in single...">SingleColorPage</a>, <a class="el" href="class_custom_array_page.html" title="The CustomArrayPage provides a way to use the Custom Color Array from the arduino&#39;s RoutinesRGB libra...">CustomArrayPage</a>, <a class="el" href="class_preset_array_page.html" title="The PresetArrayPage provides a way to use the Color Presets from the arduino&#39;s RoutineRGB library...">PresetArrayPage</a>, and the <a class="el" href="class_settings_page.html" title="The SettingsPage provides a way to configure the application settings. ">SettingsPage</a>. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
 <p>On the top of the <a class="el" href="class_main_window.html" title="The MainWindow class is the only window in this application. It contains a QStackedWidget which shows...">MainWindow</a>, there is an on/off button in the far left. This button will reflect the current mode when on, and will be black when off. There is also a slider to control the overall brightness of the LEDs. </div></div><div class="frontendOverview"></div><h1><a class="anchor" id="sec_1_frontend"></a>
 Page Classes</h1>
 <div class="frontendOverview"> <table  class="tableRightHandImage">
 <tr>
 <td><h2>Single Color Page</h2>
-<p>The <a class="el" href="class_single_color_page.html" title="The SingleColorPage class allows users to change the main color of the LED system and to set it in si...">SingleColorPage</a> class allows users to change the main color of the LED system and to set it in single-color modes. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
+<p>The <a class="el" href="class_single_color_page.html" title="The SingleColorPage provides a way to change the main color of the LED system and to set it in single...">SingleColorPage</a> provides a way to change the main color of the LED system and to set it in single-color modes. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
 <p>The page contains a <a class="el" href="class_color_picker.html" title="The ColorPicker class is an object that combines three LightsSliders and a color wheel to giver an in...">ColorPicker</a> widget used to choose the color and a series of buttons that change the mode.</p>
 <p class="endtd">The single color modes current supported are solid, blink, fade, and glimmer.  </p>
 </td><td><div class="image">
@@ -60,7 +60,7 @@ Page Classes</h1>
    </td></tr>
 <tr>
 <td><h2>Custom Array Page</h2>
-<p>The <a class="el" href="class_custom_array_page.html" title="The CustomArrayPage class uses the color array routines from the arduino&#39;s RoutinesRGB library...">CustomArrayPage</a> class uses the color array routines from the arduino's RoutinesRGB library. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
+<p>The <a class="el" href="class_custom_array_page.html" title="The CustomArrayPage provides a way to use the Custom Color Array from the arduino&#39;s RoutinesRGB libra...">CustomArrayPage</a> provides a way to use the Custom Color Array from the arduino's RoutinesRGB library. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
 <p>The page contains an interface to change the individual array colors and a series of buttons that change the mode.</p>
 <p class="endtd">The top interface is split into three parts: a <a class="el" href="class_color_picker.html" title="The ColorPicker class is an object that combines three LightsSliders and a color wheel to giver an in...">ColorPicker</a>, a color array preview, and a <a class="el" href="class_lights_slider.html" title="The LightsSlider class provides a slider with behaviors similiar to sliders on mobile devices...">LightsSlider</a>. The <a class="el" href="class_color_picker.html" title="The ColorPicker class is an object that combines three LightsSliders and a color wheel to giver an in...">ColorPicker</a> chooses the color that is currently selected from the color array preview. The <a class="el" href="class_lights_slider.html" title="The LightsSlider class provides a slider with behaviors similiar to sliders on mobile devices...">LightsSlider</a> below the preview is used to choose how many colors are active while using an array mode.  </p>
 </td><td><div class="image">
@@ -69,14 +69,15 @@ Page Classes</h1>
    </td></tr>
 <tr>
 <td><h2>Preset Array Page</h2>
-<p class="endtd">The <a class="el" href="class_preset_array_page.html" title="The PresetArrayPage class contains a grid of buttons that map color presets to lighting modes...">PresetArrayPage</a> class contains a grid of buttons that map color presets to lighting modes. The list expands horizontally into a QScrollArea. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.  </dd></dl>
+<p class="endtd">The <a class="el" href="class_preset_array_page.html" title="The PresetArrayPage provides a way to use the Color Presets from the arduino&#39;s RoutineRGB library...">PresetArrayPage</a> provides a way to use the Color Presets from the arduino's RoutineRGB library. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
+<p>It contains a grid of buttons that map color presets to lighting modes. The list expands horizontally into a QScrollArea.  </p>
 </td><td><div class="image">
 <img src="presetArrayPagePreview.png" alt="presetArrayPagePreview.png"/>
 </div>
    </td></tr>
 <tr>
 <td><h2>Settings Page</h2>
-<p>The <a class="el" href="class_settings_page.html" title="The SettingsPage class provides a way to configure the application settings. ">SettingsPage</a> class provides a way to configure the application settings. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
+<p>The <a class="el" href="class_settings_page.html" title="The SettingsPage provides a way to configure the application settings. ">SettingsPage</a> provides a way to configure the application settings. </p><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
 <p>It currently provides the ability to change the speed the LEDs update and the amount of minutes it takes for the LEDs to timeout.</p>
 <p class="endtd">It also shows a list of the available serial connections and clicking on a serial connection will attempt to connect to it.  </p>
 </td><td><div class="image">
@@ -116,7 +117,7 @@ Custom UI Elements</h1>
     <td>
       <p align="right">
       <small>
-          &nbsp; &nbsp;  Generated by doxygen 1.8.9.1  &nbsp; &nbsp;
+          &nbsp; &nbsp;  Generated by doxygen 1.8.11  &nbsp; &nbsp;
        </small>
        </p>
     </td>

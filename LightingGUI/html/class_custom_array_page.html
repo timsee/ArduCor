@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.5.0</span>
+   &#160;<span id="projectnumber">v0.6.0</span>
    </div>
   </td>
  </tr>
@@ -48,13 +48,14 @@
 <a href="class_custom_array_page-members.html">List of all members</a> &#124;
 <a href="#pub-slots">Public Slots</a> &#124;
 <a href="#signals">Signals</a> &#124;
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">CustomArrayPage Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_custom_array_page.html" title="The CustomArrayPage class uses the color array routines from the arduino&#39;s RoutinesRGB library...">CustomArrayPage</a> class uses the color array routines from the arduino's RoutinesRGB library.  
+<p>The <a class="el" href="class_custom_array_page.html" title="The CustomArrayPage provides a way to use the Custom Color Array from the arduino&#39;s RoutinesRGB libra...">CustomArrayPage</a> provides a way to use the Custom Color Array from the arduino's RoutinesRGB library.  
  <a href="class_custom_array_page.html#details">More...</a></p>
 
 <p><code>#include &quot;<a class="el" href="customarraypage_8h_source.html">customarraypage.h</a>&quot;</code></p>
@@ -63,8 +64,22 @@
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-slots"></a>
 Public Slots</h2></td></tr>
-<tr class="memitem:a903e41f03f35d9020dfd9892b7dd75a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#a903e41f03f35d9020dfd9892b7dd75a1">modeChanged</a> (int)</td></tr>
+<tr class="memitem:a903e41f03f35d9020dfd9892b7dd75a1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a903e41f03f35d9020dfd9892b7dd75a1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#a903e41f03f35d9020dfd9892b7dd75a1">modeChanged</a> (int)</td></tr>
+<tr class="memdesc:a903e41f03f35d9020dfd9892b7dd75a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">modeChanged called whenever a mode button is pressed. <br /></td></tr>
 <tr class="separator:a903e41f03f35d9020dfd9892b7dd75a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4bbaaac1142c062915b24d67d877947"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac4bbaaac1142c062915b24d67d877947"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#ac4bbaaac1142c062915b24d67d877947">colorsUsedChanged</a> (int)</td></tr>
+<tr class="memdesc:ac4bbaaac1142c062915b24d67d877947"><td class="mdescLeft">&#160;</td><td class="mdescRight">colorsUsedChanged called whenever the colors used slider (the slider above the mode buttons) changes its value. <br /></td></tr>
+<tr class="separator:ac4bbaaac1142c062915b24d67d877947"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69e5f60458abf6e8f63ce07414aea7c2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a69e5f60458abf6e8f63ce07414aea7c2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#a69e5f60458abf6e8f63ce07414aea7c2">colorChanged</a> (QColor)</td></tr>
+<tr class="memdesc:a69e5f60458abf6e8f63ce07414aea7c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">colorChanged called whenever the color picker is used. <br /></td></tr>
+<tr class="separator:a69e5f60458abf6e8f63ce07414aea7c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1b2b4d789b118da821b43bbb1cdb679"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae1b2b4d789b118da821b43bbb1cdb679"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#ae1b2b4d789b118da821b43bbb1cdb679">selectArrayColor</a> (int)</td></tr>
+<tr class="memdesc:ae1b2b4d789b118da821b43bbb1cdb679"><td class="mdescLeft">&#160;</td><td class="mdescRight">selectArrayColor called whenever a color array icon is clicked. This sets the that index of the color array as the color you can change with the color picker. <br /></td></tr>
+<tr class="separator:ae1b2b4d789b118da821b43bbb1cdb679"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
 Signals</h2></td></tr>
@@ -74,7 +89,30 @@ Signals</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac62a311cb2a0071fb745ee03801e1791"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#ac62a311cb2a0071fb745ee03801e1791">CustomArrayPage</a> (QWidget *parent=0)</td></tr>
+<tr class="memdesc:ac62a311cb2a0071fb745ee03801e1791"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ac62a311cb2a0071fb745ee03801e1791">More...</a><br /></td></tr>
 <tr class="separator:ac62a311cb2a0071fb745ee03801e1791"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06b81398d6644f6934eee9646d586468"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06b81398d6644f6934eee9646d586468"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#a06b81398d6644f6934eee9646d586468">~CustomArrayPage</a> ()</td></tr>
+<tr class="memdesc:a06b81398d6644f6934eee9646d586468"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deconstructor. <br /></td></tr>
+<tr class="separator:a06b81398d6644f6934eee9646d586468"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa948626dade88a109d8790da1aa05bf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#afa948626dade88a109d8790da1aa05bf">highlightModeButton</a> (ELightingMode lightingMode)</td></tr>
+<tr class="memdesc:afa948626dade88a109d8790da1aa05bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">highlightModeButton highlights the button that implements the lightingMode parameter. If it can't find a button that implements lightingMode, then all buttons are unhighlighted  <a href="#afa948626dade88a109d8790da1aa05bf">More...</a><br /></td></tr>
+<tr class="separator:afa948626dade88a109d8790da1aa05bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_class_lighting_page"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_lighting_page')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_lighting_page.html">LightingPage</a></td></tr>
+<tr class="memitem:afcd456d0f20296ac63c5d336b085f37b inherit pub_methods_class_lighting_page"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcd456d0f20296ac63c5d336b085f37b"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lighting_page.html#afcd456d0f20296ac63c5d336b085f37b">~LightingPage</a> ()</td></tr>
+<tr class="memdesc:afcd456d0f20296ac63c5d336b085f37b inherit pub_methods_class_lighting_page"><td class="mdescLeft">&#160;</td><td class="mdescRight">~LightingPage Deconstructor <br /></td></tr>
+<tr class="separator:afcd456d0f20296ac63c5d336b085f37b inherit pub_methods_class_lighting_page"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c273e2376b010ef7193d3ad7d02669a inherit pub_methods_class_lighting_page"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lighting_page.html#a1c273e2376b010ef7193d3ad7d02669a">setup</a> (std::shared_ptr&lt; <a class="el" href="class_comm_layer.html">CommLayer</a> &gt; commLayer, std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt; dataLayer)</td></tr>
+<tr class="memdesc:a1c273e2376b010ef7193d3ad7d02669a inherit pub_methods_class_lighting_page"><td class="mdescLeft">&#160;</td><td class="mdescRight">setup called by the <a class="el" href="class_main_window.html" title="The MainWindow class is the only window in this application. It contains a QStackedWidget which shows...">MainWindow</a> after the commLayer and dataLayer of the application are set up. This connects these layers to all the other pages.  <a href="#a1c273e2376b010ef7193d3ad7d02669a">More...</a><br /></td></tr>
+<tr class="separator:a1c273e2376b010ef7193d3ad7d02669a inherit pub_methods_class_lighting_page"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a0109c1904de5134030c9b3594e84561b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0109c1904de5134030c9b3594e84561b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_custom_array_page.html#a0109c1904de5134030c9b3594e84561b">showEvent</a> (QShowEvent *)</td></tr>
+<tr class="memdesc:a0109c1904de5134030c9b3594e84561b"><td class="mdescLeft">&#160;</td><td class="mdescRight">showEvent used to check for edge cases and to sync up the page to recent state changes before displaying the page <br /></td></tr>
+<tr class="separator:a0109c1904de5134030c9b3594e84561b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -119,28 +157,25 @@ std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a903e41f03f35d9020dfd9892b7dd75a1"></a>
+<a class="anchor" id="afa948626dade88a109d8790da1aa05bf"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void CustomArrayPage::modeChanged </td>
+          <td class="memname">void CustomArrayPage::highlightModeButton </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>newMode</em></td><td>)</td>
+          <td class="paramtype">ELightingMode&#160;</td>
+          <td class="paramname"><em>lightingMode</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
-<p>slots used to change the mode of the lights or to change the settings of the different modes </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lightingMode</td><td>the mode that the highlighted button implements. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -188,7 +223,7 @@ std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt
     <td>
       <p align="right">
       <small>
-          &nbsp; &nbsp;  Generated by doxygen 1.8.9.1  &nbsp; &nbsp;
+          &nbsp; &nbsp;  Generated by doxygen 1.8.11  &nbsp; &nbsp;
        </small>
        </p>
     </td>

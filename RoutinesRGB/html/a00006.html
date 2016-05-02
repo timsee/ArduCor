@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>RoutinesRGB: Single Color Routines</title>
+<title>RoutinesRGB: Getters and Setters</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.0</span>
+   &#160;<span id="projectnumber">v1.9.1</span>
    </div>
   </td>
  </tr>
@@ -77,195 +77,224 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Single Color Routines</div>  </div>
+<div class="title">Getters and Setters</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gaf22a214d6d505571af0a3034b43ed86f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gaf22a214d6d505571af0a3034b43ed86f">RoutinesRGB::solid</a> (uint8_t red, uint8_t green, uint8_t blue)</td></tr>
-<tr class="separator:gaf22a214d6d505571af0a3034b43ed86f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaab5527843c8924464f1ead1d646e7685"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gaab5527843c8924464f1ead1d646e7685">RoutinesRGB::blink</a> (uint8_t red, uint8_t green, uint8_t blue)</td></tr>
-<tr class="separator:gaab5527843c8924464f1ead1d646e7685"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga31c6135841267ab589f4145c0cf4019e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga31c6135841267ab589f4145c0cf4019e">RoutinesRGB::fade</a> (uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)</td></tr>
-<tr class="separator:ga31c6135841267ab589f4145c0cf4019e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga153290b3f02e529504a3945d37771535"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga153290b3f02e529504a3945d37771535">RoutinesRGB::glimmer</a> (uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate)</td></tr>
-<tr class="separator:ga153290b3f02e529504a3945d37771535"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae780a47936a2411639a14bfccb8afd7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gae780a47936a2411639a14bfccb8afd7c">RoutinesRGB::setMainColor</a> (byte r, byte g, byte b)</td></tr>
+<tr class="separator:gae780a47936a2411639a14bfccb8afd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0c4936c51b267619e3ca8e14fd6c926b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga0c4936c51b267619e3ca8e14fd6c926b">RoutinesRGB::setColor</a> (uint16_t colorIndex, byte r, byte g, byte b)</td></tr>
+<tr class="separator:ga0c4936c51b267619e3ca8e14fd6c926b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab3e3e895e19dcb54bda890511f44093a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gab3e3e895e19dcb54bda890511f44093a">RoutinesRGB::setColorCount</a> (uint8_t count)</td></tr>
+<tr class="separator:gab3e3e895e19dcb54bda890511f44093a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga98cd8085491ee6c33c728998af65e631"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga98cd8085491ee6c33c728998af65e631">RoutinesRGB::colorCount</a> ()</td></tr>
+<tr class="separator:ga98cd8085491ee6c33c728998af65e631"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga06861d759557dec5efd6a334cce25aa0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga06861d759557dec5efd6a334cce25aa0">RoutinesRGB::brightness</a> (uint8_t brightness)</td></tr>
+<tr class="separator:ga06861d759557dec5efd6a334cce25aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gacbbb97f67e668e7a639c52a07496c03d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gacbbb97f67e668e7a639c52a07496c03d">RoutinesRGB::fadeSpeed</a> (uint8_t fadeSpeed)</td></tr>
+<tr class="separator:gacbbb97f67e668e7a639c52a07496c03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaae31d0ae306f854b99b10efd87a3d9c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gaae31d0ae306f854b99b10efd87a3d9c0">RoutinesRGB::blinkSpeed</a> (uint8_t blinkSpeed)</td></tr>
+<tr class="separator:gaae31d0ae306f854b99b10efd87a3d9c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7ff0f29a3b5e37f0c2f52284382f459f"><td class="memItemLeft" align="right" valign="top">Color&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga7ff0f29a3b5e37f0c2f52284382f459f">RoutinesRGB::mainColor</a> ()</td></tr>
+<tr class="separator:ga7ff0f29a3b5e37f0c2f52284382f459f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga531ab764e3ebb8285b74b5b113084ca6"><td class="memItemLeft" align="right" valign="top">Color&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga531ab764e3ebb8285b74b5b113084ca6">RoutinesRGB::color</a> (uint16_t i)</td></tr>
+<tr class="separator:ga531ab764e3ebb8285b74b5b113084ca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad48fd862e9444d709bd6de96b6f22bd1"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gad48fd862e9444d709bd6de96b6f22bd1">RoutinesRGB::red</a> (uint16_t i)</td></tr>
+<tr class="separator:gad48fd862e9444d709bd6de96b6f22bd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga4927718ce72ca077cbe62e4c84e1c015"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga4927718ce72ca077cbe62e4c84e1c015">RoutinesRGB::green</a> (uint16_t i)</td></tr>
+<tr class="separator:ga4927718ce72ca077cbe62e4c84e1c015"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf1866df58e05ea30f3979d8c6f89e94b"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gaf1866df58e05ea30f3979d8c6f89e94b">RoutinesRGB::blue</a> (uint16_t i)</td></tr>
+<tr class="separator:gaf1866df58e05ea30f3979d8c6f89e94b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>These routines each take a R, G, and B value as parameters to generate a color. This color is the only color used by the routine.</p>
-<p>Blink, fade, and glimmer, should be called repeatedly on a loop for their full effect. The speed of the loop determines how fast the LEDs update. </p>
+<p>These are the getters and setters for <a class="el" href="a00001.html" title="An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware...">RoutinesRGB</a> that are used to control the settings and the colors. </p>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="gaab5527843c8924464f1ead1d646e7685"></a>
+<a class="anchor" id="gaae31d0ae306f854b99b10efd87a3d9c0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::blink </td>
+          <td class="memname">void RoutinesRGB::blinkSpeed </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>red</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>blinkSpeed</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>green</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>blue</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Switches between ON and OFF states using the provided color.</p>
+<p>Sets how many updates to wait before changing the light state in the blink routine and in routines that switch between solid colors.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">blinkSpeed</td><td>a value between 1 and 255 representing how fast to blink. A value of 1 will make it blink on every frame, which may be too fast when used with other routines. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="ga31c6135841267ab589f4145c0cf4019e"></a>
+<a class="anchor" id="gaf1866df58e05ea30f3979d8c6f89e94b"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::fade </td>
+          <td class="memname">uint8_t RoutinesRGB::blue </td>
           <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>red</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>green</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>blue</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>fadeSpeed</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>shouldUpdate</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Fades the LEDs on and off based on the provided color. Uses the parameter fadeSpeed to determine how fast to fade. A larger number leads to a slower fade.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">fadeSpeed</td><td>how many ticks it takes to fade. Higher numbers are slower. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Retrieve the b value at a given index in the buffer. </p>
 
 </div>
 </div>
-<a class="anchor" id="ga153290b3f02e529504a3945d37771535"></a>
+<a class="anchor" id="ga06861d759557dec5efd6a334cce25aa0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::glimmer </td>
+          <td class="memname">void RoutinesRGB::brightness </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>red</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>brightness</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>green</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>blue</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>percent</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>shouldUpdate</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Set every LED to the provided color. A subset of the LEDs based on the percent parameter will be less bright than the rest of the LEDs.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">percent</td><td>determines how many LEDs will be slightly dimmer than the rest </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Set the brightness between 0 and 100. 0 is off, 100 is full power. </p>
 
 </div>
 </div>
-<a class="anchor" id="gaf22a214d6d505571af0a3034b43ed86f"></a>
+<a class="anchor" id="ga531ab764e3ebb8285b74b5b113084ca6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::solid </td>
+          <td class="memname">RoutinesRGB::Color RoutinesRGB::color </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Retrieve the color at the given index. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga98cd8085491ee6c33c728998af65e631"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t RoutinesRGB::colorCount </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Retrieve the amount of colors that are used from the custom array. </p>
+
+</div>
+</div>
+<a class="anchor" id="gacbbb97f67e668e7a639c52a07496c03d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RoutinesRGB::fadeSpeed </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>red</em>, </td>
+          <td class="paramname"><em>fadeSpeed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sets the speed of routines that fade between colors between 1 and 100. A fade speed of 1 is the slowest possible fade. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga4927718ce72ca077cbe62e4c84e1c015"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t RoutinesRGB::green </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Retrieve the g value at a given index in the buffer. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga7ff0f29a3b5e37f0c2f52284382f459f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">RoutinesRGB::Color RoutinesRGB::mainColor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Retrieve the main color, which is used for single color routines. </p>
+
+</div>
+</div>
+<a class="anchor" id="gad48fd862e9444d709bd6de96b6f22bd1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t RoutinesRGB::red </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Retrieve the r value at a given index in the buffer. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga0c4936c51b267619e3ca8e14fd6c926b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RoutinesRGB::setColor </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>colorIndex</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>green</em>, </td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>blue</em>&#160;</td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -274,15 +303,57 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Set every LED to the provided color.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Set the color at a given index with the RGB values provided. colorIndex must be less than the colorCount provided to the constructor or else it will not have any effect. </p>
+
+</div>
+</div>
+<a class="anchor" id="gab3e3e895e19dcb54bda890511f44093a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RoutinesRGB::setColorCount </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>count</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sets the amount of colors used in custom array routines. This is useful when you want to use a subset of the custom array. The value given must be less than the size of the custom array or else it will be set to use the entire array. </p>
+
+</div>
+</div>
+<a class="anchor" id="gae780a47936a2411639a14bfccb8afd7c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RoutinesRGB::setMainColor </td>
+          <td>(</td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>r</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>g</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sets the color used for single color routines. </p>
 
 </div>
 </div>
@@ -302,7 +373,7 @@ Functions</h2></td></tr>
     <td>
       <p align="right">
       <small>
-          &nbsp; &nbsp;  Generated by doxygen 1.8.9.1  &nbsp; &nbsp;
+          &nbsp; &nbsp;  Generated by doxygen 1.8.11  &nbsp; &nbsp;
        </small>
        </p>
     </td>

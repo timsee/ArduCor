@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>RoutinesRGB: Multi Colors Routines</title>
+<title>RoutinesRGB: Single Color Routines</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.0</span>
+   &#160;<span id="projectnumber">v1.9.1</span>
    </div>
   </td>
  </tr>
@@ -77,44 +77,46 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
-<div class="title">Multi Colors Routines</div>  </div>
+<div class="title">Single Color Routines</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga90ee87b6fa935cba00bbd75c11b53b7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#ga90ee87b6fa935cba00bbd75c11b53b7c">RoutinesRGB::arrayGlimmer</a> (<a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a> preset, long percent)</td></tr>
-<tr class="separator:ga90ee87b6fa935cba00bbd75c11b53b7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa17407e4efd7959f179ca0eb99ca155b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#gaa17407e4efd7959f179ca0eb99ca155b">RoutinesRGB::arrayFade</a> (<a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a> preset)</td></tr>
-<tr class="separator:gaa17407e4efd7959f179ca0eb99ca155b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaed9839330337f6d3865ec94db34cacb5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#gaed9839330337f6d3865ec94db34cacb5">RoutinesRGB::arrayRandomIndividual</a> (<a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a> preset)</td></tr>
-<tr class="separator:gaed9839330337f6d3865ec94db34cacb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gabef987b5053b09d60a0a4c22af53c221"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#gabef987b5053b09d60a0a4c22af53c221">RoutinesRGB::arrayRandomSolid</a> (<a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a> preset)</td></tr>
-<tr class="separator:gabef987b5053b09d60a0a4c22af53c221"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga73efa9d1a26f9c6c1bcaf18ebb547780"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#ga73efa9d1a26f9c6c1bcaf18ebb547780">RoutinesRGB::arrayBarsSolid</a> (<a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a> preset, byte barSize)</td></tr>
-<tr class="separator:ga73efa9d1a26f9c6c1bcaf18ebb547780"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga0fa2f039f067dced5f76031dcd3988af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#ga0fa2f039f067dced5f76031dcd3988af">RoutinesRGB::arrayBarsMoving</a> (<a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a> preset, byte barSize)</td></tr>
-<tr class="separator:ga0fa2f039f067dced5f76031dcd3988af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf22a214d6d505571af0a3034b43ed86f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#gaf22a214d6d505571af0a3034b43ed86f">RoutinesRGB::solid</a> (uint8_t red, uint8_t green, uint8_t blue)</td></tr>
+<tr class="separator:gaf22a214d6d505571af0a3034b43ed86f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaab5527843c8924464f1ead1d646e7685"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#gaab5527843c8924464f1ead1d646e7685">RoutinesRGB::blink</a> (uint8_t red, uint8_t green, uint8_t blue)</td></tr>
+<tr class="separator:gaab5527843c8924464f1ead1d646e7685"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga31c6135841267ab589f4145c0cf4019e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#ga31c6135841267ab589f4145c0cf4019e">RoutinesRGB::fade</a> (uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)</td></tr>
+<tr class="separator:ga31c6135841267ab589f4145c0cf4019e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga153290b3f02e529504a3945d37771535"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#ga153290b3f02e529504a3945d37771535">RoutinesRGB::glimmer</a> (uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate)</td></tr>
+<tr class="separator:ga153290b3f02e529504a3945d37771535"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<p>These routines use multiple colors. They all take the parameter of <code>preset</code> which is used to determine which set of colors to use. The custom color array is eCustom, all other values for <code>preset</code> come from predefined color groups. Go to the project's github for a full list of the presets and their corresponding values.</p>
-<p>All routines except eArrayBarsSolid should be called repeatedly on a loop for their full effect. The speed of the loop determines how fast the LEDs update. </p>
+<p>These routines each take a R, G, and B value as parameters to generate a color. This color is the only color used by the routine.</p>
+<p>Blink, fade, and glimmer, should be called repeatedly on a loop for their full effect. The speed of the loop determines how fast the LEDs update. </p>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga0fa2f039f067dced5f76031dcd3988af"></a>
+<a class="anchor" id="gaab5527843c8924464f1ead1d646e7685"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::arrayBarsMoving </td>
+          <td class="memname">void RoutinesRGB::blink </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a>&#160;</td>
-          <td class="paramname"><em>preset</em>, </td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>red</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">byte&#160;</td>
-          <td class="paramname"><em>barSize</em>&#160;</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>green</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>blue</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -123,32 +125,51 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Provides a similar effect as arrayBarSolid, but the alternating patches move up one LED index on each frame update to create a "scrolling" effect.</p>
+<p>Switches between ON and OFF states using the provided color.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">preset</td><td>the color array to use for the routine. eCustom is the custom array, all other values are preset arrays. </td></tr>
-    <tr><td class="paramname">barSize</td><td>how many LEDs before switching to the other bar. </td></tr>
+    <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="ga73efa9d1a26f9c6c1bcaf18ebb547780"></a>
+<a class="anchor" id="ga31c6135841267ab589f4145c0cf4019e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::arrayBarsSolid </td>
+          <td class="memname">void RoutinesRGB::fade </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a>&#160;</td>
-          <td class="paramname"><em>preset</em>, </td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>red</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">byte&#160;</td>
-          <td class="paramname"><em>barSize</em>&#160;</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>green</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>blue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>fadeSpeed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>shouldUpdate</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -157,55 +178,52 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Uses the chosen color array to set the LEDs in alternating patches with a size of barSize.</p>
+<p>Fades the LEDs on and off based on the provided color. Uses the parameter fadeSpeed to determine how fast to fade. A larger number leads to a slower fade.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">preset</td><td>the color array to use for the routine. eCustom is the custom array, all other values are preset arrays. </td></tr>
-    <tr><td class="paramname">barSize</td><td>how many LEDs before switching to the other bar. </td></tr>
+    <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">fadeSpeed</td><td>how many ticks it takes to fade. Higher numbers are slower. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="gaa17407e4efd7959f179ca0eb99ca155b"></a>
+<a class="anchor" id="ga153290b3f02e529504a3945d37771535"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::arrayFade </td>
+          <td class="memname">void RoutinesRGB::glimmer </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a>&#160;</td>
-          <td class="paramname"><em>preset</em></td><td>)</td>
-          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>red</em>, </td>
         </tr>
-      </table>
-</div><div class="memdoc">
-<p>Fades between the number of colors in the array.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">preset</td><td>the color array to use for the routine. eCustom is the custom array, all other values are preset arrays. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ga90ee87b6fa935cba00bbd75c11b53b7c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::arrayGlimmer </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a>&#160;</td>
-          <td class="paramname"><em>preset</em>, </td>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>green</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>blue</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>percent</em>&#160;</td>
+          <td class="paramname"><em>percent</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>shouldUpdate</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -214,57 +232,54 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>This method uses its percent parameter to dim LEDs randomly, similar to the standard glimmer mode. It also uses the percent to randomly change the color of select LEDs to a color in the chosen array. The base color is the first from the chosen array.</p>
+<p>Set every LED to the provided color. A subset of the LEDs based on the percent parameter will be less bright than the rest of the LEDs.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">preset</td><td>the color array to use for the routine. eCustom is the custom array, all other values are preset arrays. </td></tr>
-    <tr><td class="paramname">percent</td><td>percent of LEDs that will get the glimmer applied </td></tr>
+    <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">percent</td><td>determines how many LEDs will be slightly dimmer than the rest </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a class="anchor" id="gaed9839330337f6d3865ec94db34cacb5"></a>
+<a class="anchor" id="gaf22a214d6d505571af0a3034b43ed86f"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::arrayRandomIndividual </td>
+          <td class="memname">void RoutinesRGB::solid </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a>&#160;</td>
-          <td class="paramname"><em>preset</em></td><td>)</td>
-          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>red</em>, </td>
         </tr>
-      </table>
-</div><div class="memdoc">
-<p>sets each individual LED as a random color from the chosen color array.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">preset</td><td>the color array to use for the routine. eCustom is the custom array, all other values are preset arrays </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="gabef987b5053b09d60a0a4c22af53c221"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::arrayRandomSolid </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="a00002.html#ae5ceb28dfc849661e95802feff9b49e7">EColorPreset</a>&#160;</td>
-          <td class="paramname"><em>preset</em></td><td>)</td>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>green</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>blue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>A random color is chosen from the chosen color array and applied to each LED.</p>
+<p>Set every LED to the provided color.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">preset</td><td>the color array to use for the routine. eCustom is the custom array, all other values are preset arrays. </td></tr>
+    <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
+    <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
   </table>
   </dd>
 </dl>
@@ -287,7 +302,7 @@ Functions</h2></td></tr>
     <td>
       <p align="right">
       <small>
-          &nbsp; &nbsp;  Generated by doxygen 1.8.9.1  &nbsp; &nbsp;
+          &nbsp; &nbsp;  Generated by doxygen 1.8.11  &nbsp; &nbsp;
        </small>
        </p>
     </td>

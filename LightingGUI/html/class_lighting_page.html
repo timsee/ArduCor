@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.5.0</span>
+   &#160;<span id="projectnumber">v0.6.0</span>
    </div>
   </td>
  </tr>
@@ -46,6 +46,7 @@
 <div class="header">
   <div class="summary">
 <a href="class_lighting_page-members.html">List of all members</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">LightingPage Class Reference</div>  </div>
@@ -59,6 +60,16 @@
 
 <p>Inherited by <a class="el" href="class_custom_array_page.html">CustomArrayPage</a>, <a class="el" href="class_preset_array_page.html">PresetArrayPage</a>, <a class="el" href="class_settings_page.html">SettingsPage</a>, and <a class="el" href="class_single_color_page.html">SingleColorPage</a>.</p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:afcd456d0f20296ac63c5d336b085f37b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcd456d0f20296ac63c5d336b085f37b"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lighting_page.html#afcd456d0f20296ac63c5d336b085f37b">~LightingPage</a> ()</td></tr>
+<tr class="memdesc:afcd456d0f20296ac63c5d336b085f37b"><td class="mdescLeft">&#160;</td><td class="mdescRight">~LightingPage Deconstructor <br /></td></tr>
+<tr class="separator:afcd456d0f20296ac63c5d336b085f37b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c273e2376b010ef7193d3ad7d02669a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lighting_page.html#a1c273e2376b010ef7193d3ad7d02669a">setup</a> (std::shared_ptr&lt; <a class="el" href="class_comm_layer.html">CommLayer</a> &gt; commLayer, std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt; dataLayer)</td></tr>
+<tr class="memdesc:a1c273e2376b010ef7193d3ad7d02669a"><td class="mdescLeft">&#160;</td><td class="mdescRight">setup called by the <a class="el" href="class_main_window.html" title="The MainWindow class is the only window in this application. It contains a QStackedWidget which shows...">MainWindow</a> after the commLayer and dataLayer of the application are set up. This connects these layers to all the other pages.  <a href="#a1c273e2376b010ef7193d3ad7d02669a">More...</a><br /></td></tr>
+<tr class="separator:a1c273e2376b010ef7193d3ad7d02669a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:aadc018619c454431965ea91774e29f37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aadc018619c454431965ea91774e29f37"></a>
@@ -72,7 +83,49 @@ std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed. </dd></dl>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a1c273e2376b010ef7193d3ad7d02669a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LightingPage::setup </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_comm_layer.html">CommLayer</a> &gt;&#160;</td>
+          <td class="paramname"><em>commLayer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt;&#160;</td>
+          <td class="paramname"><em>dataLayer</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">commLayer</td><td>the object that handles the commmunication to the LED array. </td></tr>
+    <tr><td class="paramname">dataLayer</td><td>the object that handles storing data about the application and the LED array's state. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="lightingpage_8h_source.html">lightingpage.h</a></li>
 </ul>
 </div><!-- contents -->
@@ -91,7 +144,7 @@ std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt
     <td>
       <p align="right">
       <small>
-          &nbsp; &nbsp;  Generated by doxygen 1.8.9.1  &nbsp; &nbsp;
+          &nbsp; &nbsp;  Generated by doxygen 1.8.11  &nbsp; &nbsp;
        </small>
        </p>
     </td>

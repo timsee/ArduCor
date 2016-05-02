@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.5.0</span>
+   &#160;<span id="projectnumber">v0.6.0</span>
    </div>
   </td>
  </tr>
@@ -53,7 +53,7 @@
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_data_layer.html" title="The DataLayer class contains all the saved data about the state and settings of the LEDs array...">DataLayer</a> class contains all the saved data about the state and settings of the LEDs array. It saves things such as the current brightness and the current mode.  
+<p>The <a class="el" href="class_data_layer.html" title="The DataLayer class stores and maintains the data about the state and settings of the application...">DataLayer</a> class stores and maintains the data about the state and settings of the application. It also saves the settings sent to the LED hardware, such as the current brightness and current lighting routine.  
  <a href="class_data_layer.html#details">More...</a></p>
 
 <p><code>#include &quot;<a class="el" href="datalayer_8h_source.html">datalayer.h</a>&quot;</code></p>
@@ -61,7 +61,12 @@
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a7e3fb24a879cc915e437d41e94a4d959"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a7e3fb24a879cc915e437d41e94a4d959">DataLayer</a> ()</td></tr>
+<tr class="memdesc:a7e3fb24a879cc915e437d41e94a4d959"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a7e3fb24a879cc915e437d41e94a4d959">More...</a><br /></td></tr>
 <tr class="separator:a7e3fb24a879cc915e437d41e94a4d959"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa879ff7dc8dbb52fbaee5479e7a620a6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa879ff7dc8dbb52fbaee5479e7a620a6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#aa879ff7dc8dbb52fbaee5479e7a620a6">~DataLayer</a> ()</td></tr>
+<tr class="memdesc:aa879ff7dc8dbb52fbaee5479e7a620a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deconstructor. <br /></td></tr>
+<tr class="separator:aa879ff7dc8dbb52fbaee5479e7a620a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a936db41c381e08d7f5ba2dec6e92af73"><td class="memItemLeft" align="right" valign="top">QColor&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a936db41c381e08d7f5ba2dec6e92af73">colorsAverage</a> ()</td></tr>
 <tr class="memdesc:a936db41c381e08d7f5ba2dec6e92af73"><td class="mdescLeft">&#160;</td><td class="mdescRight">creates a color based off of the average of all colors currently being used  <a href="#a936db41c381e08d7f5ba2dec6e92af73">More...</a><br /></td></tr>
 <tr class="separator:a936db41c381e08d7f5ba2dec6e92af73"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -69,6 +74,9 @@ Public Member Functions</h2></td></tr>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a3c33857e7ecd22402619d8d733fa36a8">mainColor</a> (QColor newColor)</td></tr>
 <tr class="memdesc:a3c33857e7ecd22402619d8d733fa36a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">the main saved color, used for single color routines. <br /></td></tr>
 <tr class="separator:a3c33857e7ecd22402619d8d733fa36a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a442919b8782e7bd35ba20eddf1b913dd"><td class="memItemLeft" align="right" valign="top">QColor&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a442919b8782e7bd35ba20eddf1b913dd">mainColor</a> ()</td></tr>
+<tr class="memdesc:a442919b8782e7bd35ba20eddf1b913dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">mainColor getter for mainColor, used for single color routines.  <a href="#a442919b8782e7bd35ba20eddf1b913dd">More...</a><br /></td></tr>
+<tr class="separator:a442919b8782e7bd35ba20eddf1b913dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add4713b972e2703ae212b9c074fff6a1"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#add4713b972e2703ae212b9c074fff6a1">arraySize</a> (int)</td></tr>
 <tr class="memdesc:add4713b972e2703ae212b9c074fff6a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">arraySize size of the color array at the given index.  <a href="#add4713b972e2703ae212b9c074fff6a1">More...</a><br /></td></tr>
 <tr class="separator:add4713b972e2703ae212b9c074fff6a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -80,22 +88,58 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:ab0e93132fa025053ec038948d3c4e7ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7cc5a7fc2b29d563df27d6328aed0035"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a7cc5a7fc2b29d563df27d6328aed0035">setupSerial</a> (QString serial)</td></tr>
 <tr class="separator:a7cc5a7fc2b29d563df27d6328aed0035"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d57497b197f58b9544e942d7778b6d6"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a8d57497b197f58b9544e942d7778b6d6">serialPort</a> ()</td></tr>
+<tr class="memdesc:a8d57497b197f58b9544e942d7778b6d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">serialPort getter for the string of the current serial port.  <a href="#a8d57497b197f58b9544e942d7778b6d6">More...</a><br /></td></tr>
+<tr class="separator:a8d57497b197f58b9544e942d7778b6d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a736a2ec156619b2021a3d67047a100d6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a736a2ec156619b2021a3d67047a100d6">setupUDP</a> (QString ip, int port)</td></tr>
+<tr class="memdesc:a736a2ec156619b2021a3d67047a100d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">setupUDP sets up the UDP client to talk to the LED array.  <a href="#a736a2ec156619b2021a3d67047a100d6">More...</a><br /></td></tr>
+<tr class="separator:a736a2ec156619b2021a3d67047a100d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb16ae9fd4907f580e4fbede0fa58c89"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#afb16ae9fd4907f580e4fbede0fa58c89">IP</a> ()</td></tr>
+<tr class="memdesc:afb16ae9fd4907f580e4fbede0fa58c89"><td class="mdescLeft">&#160;</td><td class="mdescRight">IP getter for the IP Address of the current UDP connection.  <a href="#afb16ae9fd4907f580e4fbede0fa58c89">More...</a><br /></td></tr>
+<tr class="separator:afb16ae9fd4907f580e4fbede0fa58c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad981414a2f4ef7dde7a17c7c656b1ba4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#ad981414a2f4ef7dde7a17c7c656b1ba4">UDPPort</a> ()</td></tr>
+<tr class="memdesc:ad981414a2f4ef7dde7a17c7c656b1ba4"><td class="mdescLeft">&#160;</td><td class="mdescRight">UDPPort getter for the port of the current UDP connection.  <a href="#ad981414a2f4ef7dde7a17c7c656b1ba4">More...</a><br /></td></tr>
+<tr class="separator:ad981414a2f4ef7dde7a17c7c656b1ba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04d233bfc6e8cfd80388853148aeb82c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a04d233bfc6e8cfd80388853148aeb82c">isOn</a> (bool isOn)</td></tr>
 <tr class="separator:a04d233bfc6e8cfd80388853148aeb82c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a383a0bd23b394e1b4a8df5df92bbb4b0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a383a0bd23b394e1b4a8df5df92bbb4b0">isOn</a> ()</td></tr>
+<tr class="memdesc:a383a0bd23b394e1b4a8df5df92bbb4b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">isOn getter which checks if the lights are currently on.  <a href="#a383a0bd23b394e1b4a8df5df92bbb4b0">More...</a><br /></td></tr>
+<tr class="separator:a383a0bd23b394e1b4a8df5df92bbb4b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae26a38147ad26b9bf4363ec9d6cb7c3d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#ae26a38147ad26b9bf4363ec9d6cb7c3d">currentMode</a> (ELightingMode mode)</td></tr>
 <tr class="separator:ae26a38147ad26b9bf4363ec9d6cb7c3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbdad72ab699d94c323facf3990d05a9"><td class="memItemLeft" align="right" valign="top">ELightingMode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#acbdad72ab699d94c323facf3990d05a9">currentMode</a> ()</td></tr>
+<tr class="memdesc:acbdad72ab699d94c323facf3990d05a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">currentMode getter for the current ELightingMode.  <a href="#acbdad72ab699d94c323facf3990d05a9">More...</a><br /></td></tr>
+<tr class="separator:acbdad72ab699d94c323facf3990d05a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22f4111a4a158e904187ecfc365cdf3a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a22f4111a4a158e904187ecfc365cdf3a">brightness</a> (int brightness)</td></tr>
 <tr class="separator:a22f4111a4a158e904187ecfc365cdf3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2b5821cbab5dd98b644c3f7577cf27e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#af2b5821cbab5dd98b644c3f7577cf27e">brightness</a> ()</td></tr>
+<tr class="memdesc:af2b5821cbab5dd98b644c3f7577cf27e"><td class="mdescLeft">&#160;</td><td class="mdescRight">brightness getter for the current brightness.  <a href="#af2b5821cbab5dd98b644c3f7577cf27e">More...</a><br /></td></tr>
+<tr class="separator:af2b5821cbab5dd98b644c3f7577cf27e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeae02a308b537bb1ce4000278c7d6e28"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#aeae02a308b537bb1ce4000278c7d6e28">timeOut</a> (int timeOut)</td></tr>
 <tr class="separator:aeae02a308b537bb1ce4000278c7d6e28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afffef45e84053c65c23e3ecb3934f91c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#afffef45e84053c65c23e3ecb3934f91c">timeOut</a> ()</td></tr>
+<tr class="memdesc:afffef45e84053c65c23e3ecb3934f91c"><td class="mdescLeft">&#160;</td><td class="mdescRight">timeOut getter for the amount of minutes it takes for the LEDs to "time out." When this happens, they turn off, saving you electricity!  <a href="#afffef45e84053c65c23e3ecb3934f91c">More...</a><br /></td></tr>
+<tr class="separator:afffef45e84053c65c23e3ecb3934f91c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba19ebb51a5eb697911a4fd7d1c976e3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#aba19ebb51a5eb697911a4fd7d1c976e3">preset</a> (EColorPreset preset)</td></tr>
 <tr class="separator:aba19ebb51a5eb697911a4fd7d1c976e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02173cf0fe4654e3b27eee0b6aaf3396"><td class="memItemLeft" align="right" valign="top">EColorPreset&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a02173cf0fe4654e3b27eee0b6aaf3396">preset</a> ()</td></tr>
+<tr class="memdesc:a02173cf0fe4654e3b27eee0b6aaf3396"><td class="mdescLeft">&#160;</td><td class="mdescRight">preset getter for the current color preset.  <a href="#a02173cf0fe4654e3b27eee0b6aaf3396">More...</a><br /></td></tr>
+<tr class="separator:a02173cf0fe4654e3b27eee0b6aaf3396"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3ca545b6b1dfdb8148f95ae364d8f183"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a3ca545b6b1dfdb8148f95ae364d8f183">speed</a> (int speed)</td></tr>
 <tr class="separator:a3ca545b6b1dfdb8148f95ae364d8f183"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c0a46ba9ab222c83de41f25a48919ff"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a5c0a46ba9ab222c83de41f25a48919ff">colorCount</a> (int count)</td></tr>
-<tr class="separator:a5c0a46ba9ab222c83de41f25a48919ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a878df79749e4c8e9b2d3872d271da680"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a878df79749e4c8e9b2d3872d271da680">speed</a> ()</td></tr>
+<tr class="memdesc:a878df79749e4c8e9b2d3872d271da680"><td class="mdescLeft">&#160;</td><td class="mdescRight">speed getter for the speed the LED's update.  <a href="#a878df79749e4c8e9b2d3872d271da680">More...</a><br /></td></tr>
+<tr class="separator:a878df79749e4c8e9b2d3872d271da680"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1be8cf7a495d124db3bd8d1486ccb598"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a1be8cf7a495d124db3bd8d1486ccb598">customColorCount</a> (int count)</td></tr>
+<tr class="separator:a1be8cf7a495d124db3bd8d1486ccb598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e1a496069be493dec6f1aecd41eeca8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a7e1a496069be493dec6f1aecd41eeca8">customColorCount</a> ()</td></tr>
+<tr class="memdesc:a7e1a496069be493dec6f1aecd41eeca8"><td class="mdescLeft">&#160;</td><td class="mdescRight">colorCount getter for the number of colors usd by the by the custom color routines. Will always be less than the total number of colors in the custom color array.  <a href="#a7e1a496069be493dec6f1aecd41eeca8">More...</a><br /></td></tr>
+<tr class="separator:a7e1a496069be493dec6f1aecd41eeca8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa715eaeb86c60641c9482ea8b2a6985d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#aa715eaeb86c60641c9482ea8b2a6985d">colorsUsed</a> (int colorsUsed)</td></tr>
 <tr class="separator:aa715eaeb86c60641c9482ea8b2a6985d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9ad24b04a810f2c1f267849957ec4ee"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#ab9ad24b04a810f2c1f267849957ec4ee">colorsUsed</a> ()</td></tr>
+<tr class="memdesc:ab9ad24b04a810f2c1f267849957ec4ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">colorsUsed getted for the number of colors used  <a href="#ab9ad24b04a810f2c1f267849957ec4ee">More...</a><br /></td></tr>
+<tr class="separator:ab9ad24b04a810f2c1f267849957ec4ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0716275f4a79ee910f5ae7b20a0deb90"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0716275f4a79ee910f5ae7b20a0deb90"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a0716275f4a79ee910f5ae7b20a0deb90">resetToDefaults</a> ()</td></tr>
 <tr class="memdesc:a0716275f4a79ee910f5ae7b20a0deb90"><td class="mdescLeft">&#160;</td><td class="mdescRight">resetToDefaults resets the GUI and the arduino to the default values, as defined at compile time. <br /></td></tr>
@@ -163,6 +207,22 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="af2b5821cbab5dd98b644c3f7577cf27e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int DataLayer::brightness </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>a value between 0 and 100 that represents the current brightness. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a63573de16bcb13353cfc1ba8cbbb4992"></a>
 <div class="memitem">
 <div class="memproto">
@@ -177,23 +237,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the color array at the given index. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a5c0a46ba9ab222c83de41f25a48919ff"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool DataLayer::colorCount </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>count</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>number of colors in the color array </p>
 
 </div>
 </div>
@@ -230,6 +273,22 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="ab9ad24b04a810f2c1f267849957ec4ee"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int DataLayer::colorsUsed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the number of colors used by the current color preset. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ae26a38147ad26b9bf4363ec9d6cb7c3d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -247,6 +306,22 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="acbdad72ab699d94c323facf3990d05a9"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ELightingMode DataLayer::currentMode </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the current lighting mode getting displayed on the LED array. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ab0e93132fa025053ec038948d3c4e7ef"></a>
 <div class="memitem">
 <div class="memproto">
@@ -260,6 +335,55 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the custom color array. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1be8cf7a495d124db3bd8d1486ccb598"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DataLayer::customColorCount </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>number of colors in the color array </p>
+
+</div>
+</div>
+<a class="anchor" id="a7e1a496069be493dec6f1aecd41eeca8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int DataLayer::customColorCount </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the number of colors used for a custom color routine. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="afb16ae9fd4907f580e4fbede0fa58c89"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString DataLayer::IP </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>NYI </p><dl class="section return"><dt>Returns</dt><dd>IP Address for the UDP connection. </dd></dl>
 
 </div>
 </div>
@@ -280,6 +404,38 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="a383a0bd23b394e1b4a8df5df92bbb4b0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DataLayer::isOn </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>true if the lights are on, false otherwise. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a442919b8782e7bd35ba20eddf1b913dd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QColor DataLayer::mainColor </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the mainColor, used for single color routines. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="aba19ebb51a5eb697911a4fd7d1c976e3"></a>
 <div class="memitem">
 <div class="memproto">
@@ -294,6 +450,38 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div><div class="memdoc">
 <p>The EColorPreset currently in use by the LEDs. This is used for multi color routines. </p>
+
+</div>
+</div>
+<a class="anchor" id="a02173cf0fe4654e3b27eee0b6aaf3396"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">EColorPreset DataLayer::preset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the EColorPreset that represents the colors being displayed on the LED array. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a8d57497b197f58b9544e942d7778b6d6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString DataLayer::serialPort </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>string representation of the current serial port. </dd></dl>
 
 </div>
 </div>
@@ -314,6 +502,40 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="a736a2ec156619b2021a3d67047a100d6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DataLayer::setupUDP </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>ip</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>port</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>NYI </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ip</td><td>ip address of hte LED array </td></tr>
+    <tr><td class="paramname">port</td><td>port for connection to the LED array </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if client is set up properly, false otherwise. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a3ca545b6b1dfdb8148f95ae364d8f183"></a>
 <div class="memitem">
 <div class="memproto">
@@ -331,6 +553,22 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a class="anchor" id="a878df79749e4c8e9b2d3872d271da680"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int DataLayer::speed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the speed the LEDs update. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="aeae02a308b537bb1ce4000278c7d6e28"></a>
 <div class="memitem">
 <div class="memproto">
@@ -345,6 +583,38 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div><div class="memdoc">
 <p>Time it takes the LEDs to turn off in minutes. </p>
+
+</div>
+</div>
+<a class="anchor" id="afffef45e84053c65c23e3ecb3934f91c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int DataLayer::timeOut </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the time it'll take for the LEDs to time out. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad981414a2f4ef7dde7a17c7c656b1ba4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int DataLayer::UDPPort </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>NYI </p><dl class="section return"><dt>Returns</dt><dd>port for the UDP connection. </dd></dl>
 
 </div>
 </div>
@@ -368,7 +638,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
     <td>
       <p align="right">
       <small>
-          &nbsp; &nbsp;  Generated by doxygen 1.8.9.1  &nbsp; &nbsp;
+          &nbsp; &nbsp;  Generated by doxygen 1.8.11  &nbsp; &nbsp;
        </small>
        </p>
     </td>
