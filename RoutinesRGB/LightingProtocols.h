@@ -168,27 +168,27 @@ enum  EColorPreset
      */
     eRedWhiteBlue,
     /*!
-     * <b>14</b><br>
+     * <b>13</b><br>
      * <i>red, green, and blue.</i>
      */
     eRGB,
     /*!
-     * <b>15</b><br>
+     * <b>14</b><br>
      * <i>Cyan, magenta, yellow.</i>
      */
     eCMY,
     /*!
-     * <b>16</b><br>
+     * <b>15</b><br>
      * <i>Red, yellow, green, cyan, blue, magenta.</i>
      */
     eSixColor,
     /*!
-     * <b>17</b><br>
+     * <b>16</b><br>
      * <i>Red, yellow, green, cyan, blue, magenta, white.</i>
      */
     eSevenColor,
     /*!
-     * <b>13</b><br>
+     * <b>17</b><br>
      * <i>Rather than using using presets, it uses all
      * possible colors.</i>
      */
