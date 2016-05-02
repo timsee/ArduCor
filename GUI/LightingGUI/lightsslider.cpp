@@ -20,7 +20,6 @@ LightsSlider::LightsSlider(QWidget *parent) : QWidget(parent) {
     setSnapToNearestTick(false);
     slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(slider.get(), SIGNAL(valueChanged(int)), this, SLOT(receivedValue(int)));
-    mShouldEmit = true;
 }
 
 
@@ -46,10 +45,7 @@ void LightsSlider::setSliderColorBackground(QColor color) {
 
 void LightsSlider::receivedValue(int value) {
     value = jumpSliderToPosition(slider, value);
-
-    if (mShouldEmit) {
-        emit valueChanged(value);
-    }
+    emit valueChanged(value);
 }
 
 /*!

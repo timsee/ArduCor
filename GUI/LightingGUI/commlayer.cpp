@@ -95,14 +95,16 @@ void CommLayer::closeSerialPort() {
 }
 
 void CommLayer::sendMainColorChange(QColor color) {
-    QString message = QString("1,%1,%2,%3;").arg(QString::number(color.red()),
+    QString message = QString("%1,%2,%3,%4;").arg(QString::number((int)EPacketHeader::eMainColorChange),
+                                                  QString::number(color.red()),
                                                  QString::number(color.green()),
                                                  QString::number(color.blue()));
     serial->write(message.toStdString().c_str());
 }
 
 void CommLayer::sendArrayColorChange(int index, QColor color) {
-    QString message = QString("2,%1,%2,%3,%4;").arg(QString::number(index),
+    QString message = QString("%1,%2,%3,%4,%5;").arg(QString::number((int)EPacketHeader::eCustomArrayColorChange),
+                                                     QString::number(index),
                                                     QString::number(color.red()),
                                                     QString::number(color.green()),
                                                     QString::number(color.blue()));
@@ -110,7 +112,8 @@ void CommLayer::sendArrayColorChange(int index, QColor color) {
 }
 
 void CommLayer::sendModeChange(ELightingMode mode) {
-    QString message = QString("0,%1;").arg(QString::number((int)mode));
+    QString message = QString("%1,%2;").arg(QString::number((int)EPacketHeader::eModeChange),
+                                           QString::number((int)mode));
     serial->write(message.toStdString().c_str());
 }
 
@@ -121,32 +124,38 @@ void CommLayer::sendArrayModeChange(ELightingMode mode, int preset) {
           || mode == ELightingMode::eMultiGlimmer
           || mode == ELightingMode::eMultiRandomIndividual
           || mode == ELightingMode::eMultiRandomSolid) {
-        QString message = QString("0,%1,%2;").arg(QString::number((int)mode),QString::number(preset));
+        QString message = QString("%1,%2,%3;").arg(QString::number((int)EPacketHeader::eModeChange),
+                                                   QString::number((int)mode),
+                                                   QString::number(preset));
         serial->write(message.toStdString().c_str());
     }
 }
 
-void CommLayer::sendCustomArrayCount(int count) {
-    QString message = QString("5,%1;").arg(QString::number(count));
-    serial->write(message.toStdString().c_str());
-}
-
 void CommLayer::sendBrightness(int brightness) {
-    QString message = QString("3,%1;").arg(QString::number(brightness));
+    QString message = QString("%1,%2;").arg(QString::number((int)EPacketHeader::eBrightnessChange),
+                                            QString::number(brightness));
     serial->write(message.toStdString().c_str());
 }
 
 void CommLayer::sendSpeed(int speed) {
-    QString message = QString("4,%1;").arg(QString::number(speed));
+    QString message = QString("%1,%2;").arg(QString::number((int)EPacketHeader::eSpeedChange),
+                                            QString::number(speed));
+    serial->write(message.toStdString().c_str());
+}
+
+void CommLayer::sendCustomArrayCount(int count) {
+    QString message = QString("%1,%2;").arg(QString::number((int)EPacketHeader::eCustomColorCountChange),
+                                            QString::number(count));
     serial->write(message.toStdString().c_str());
 }
 
 void CommLayer::sendTimeOut(int timeOut) {
-    QString message = QString("5,%1;").arg(QString::number(timeOut));
+    QString message = QString("%1,%2;").arg(QString::number((int)EPacketHeader::eIdleTimeoutChange),
+                                            QString::number(timeOut));
     serial->write(message.toStdString().c_str());
 }
 
 void CommLayer::sendReset() {
-    QString message = QString("6,42,71;");
+    QString message = QString("%1,42,71;").arg(QString::number((int)EPacketHeader::eResetSettingsToDefaults));
     serial->write(message.toStdString().c_str());
 }

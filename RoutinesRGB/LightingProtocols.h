@@ -1,7 +1,7 @@
 /*!
  * \file LightingProtocols.h
- * \version v1.9.0
- * \date April 24, 2016
+ * \version v1.9.1
+ * \date May 1, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -14,6 +14,8 @@
  * changes allow the GUI version to use the strongly typed enums that were made available in C++11.
  *
  */
+ 
+ 
 /*!
  * \enum ELightingMode The mode is for determining what LED routines to use. Some routines
  *  use a single color and others use multiple colors.
@@ -166,12 +168,6 @@ enum  EColorPreset
      */
     eRedWhiteBlue,
     /*!
-     * <b>13</b><br>
-     * <i>Rather than using using presets, it uses all
-     * possible colors.</i>
-     */
-    eAll,
-    /*!
      * <b>14</b><br>
      * <i>red, green, and blue.</i>
      */
@@ -191,5 +187,63 @@ enum  EColorPreset
      * <i>Red, yellow, green, cyan, blue, magenta, white.</i>
      */
     eSevenColor,
+    /*!
+     * <b>13</b><br>
+     * <i>Rather than using using presets, it uses all
+     * possible colors.</i>
+     */
+    eAll,
     eColorPreset_MAX //total number of presets
+};
+
+
+/*!
+ * \enum EPacketHeader Message headers for packets coming over serial.
+ */
+enum EPacketHeader
+{
+  /*!
+   * <b>0</b><br>
+   * <i>Takes one int parameter that gets cast to ELightingMode.</i>
+   */
+  eModeChange,
+  /*!
+   * <b>1</b><br>
+   * <i>Takes 3 parameters, a 0-255 representation of Red, Green, and Blue.</i>
+   */
+  eMainColorChange,
+  /*!
+   * <b>2</b><br>
+   * <i>Takes four parameters, three parameters, the LED, a 0-255 representation 
+   *  of Red, Green, and Blue.</i>
+   */
+  eCustomArrayColorChange,
+  /*!
+   * <b>3</b><br>
+   * <i>Takes one parameter, sets the brightness between 0 and 100.</i>
+   */
+  eBrightnessChange,
+  /*!
+   * <b>4</b><br>
+   * <i>Takes one parameter, sets the delay value 1 - 23767.</i>
+   */
+  eSpeedChange,
+  /*!
+   * <b>5</b><br>
+   * <i>Change the number of colors used in a custom array routine.</i>
+   */
+  eCustomColorCountChange,
+  /*!
+   * <b>6</b><br>
+   * <i>Set to 0 to turn off, set to any other number minutes until
+   * idle timeout happens.</i>
+   */
+  eIdleTimeoutChange,
+  /*!
+   * <b>7</b><br>
+   * <i>Resets all values inside of RoutinesRGB back to their 
+   * default values. Useful for soft reseting the LED hardware. </i>
+   */
+  eResetSettingsToDefaults,
+  ePacketHeader_MAX //total number of Packet Headers
 };

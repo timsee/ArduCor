@@ -25,18 +25,19 @@
 class IconData
 {
 public:
+    /*!
+     * \brief Constructor
+     */
     IconData();
     /*!
-     * Standard Constructor, values must
-     * be a multiple of four.
+     * Standard Constructor, values must  be a multiple of four.
      *
      * \param width the width
      * \param height the height
      */
     IconData(int width, int height);
     /*!
-     * Required constructor when the icons
-     * use the color array.
+     * Required constructor when the icons use the color array.
      *
      * \param width the width
      * \param height the height
@@ -104,8 +105,15 @@ public:
      * getters for private values
      */
     uint dataLength();
-    uint8_t *data();
+    /*!
+     * \brief width getter for the data buffer's width.
+     * \return the width of the IconData.
+     */
     uint width();
+    /*!
+     * \brief height getter for the data buffer's height.
+     * \return the height of the IconData.
+     */
     uint height();
 
     /*!
@@ -121,8 +129,16 @@ public:
 
 private:
 
+    /*!
+     * \brief setup used by the constructors to set up the data buffers.
+     * \param width the width of the data buffers.
+     * \param height the height of the data buffers.
+     */
     void setup(int width, int height);
 
+    /*!
+     * \brief mDataLayer a pointer to the data layer.
+     */
     std::shared_ptr<DataLayer> mDataLayer;
 
     /*!
@@ -130,8 +146,18 @@ private:
      * It matches in size the size of the image
      */
     QVector<uint8_t> mData;
+    /*!
+     * \brief mWidth the width of the resulting icon
+     */
     uint mWidth;
+    /*!
+     * \brief mHeight the height of the resulting icon.
+     */
     uint mHeight;
+    /*!
+     * \brief mDataLength the number of bytes needed to
+     *        to fill mWidth * mHeight * 3.
+     */
     uint mDataLength;
 
     /*!
@@ -141,8 +167,18 @@ private:
      * be called in any function to map mBuffer to mData.
      */
     QVector<uint8_t> mBuffer;
+    /*!
+     * \brief mBufferWidth the buffer's width.
+     */
     uint mBufferWidth;
+    /*!
+     * \brief mBufferHeight the buffer's height.
+     */
     uint mBufferHeight;
+    /*!
+     * \brief mBufferLength the number of bytes needed to fill
+     *        mBufferWidth * mBufferHeight * 3.
+     */
     uint mBufferLength;
 
     /*!
@@ -151,8 +187,17 @@ private:
      */
     void bufferToOutput();
 
-    QColor getMiddleColor(QColor c_1,
-                          QColor c_2);
+    /*!
+     * \brief getMiddleColor helper that takes two colors and computes
+     *        the color in the middle of those colors by averaging their
+     *        values.
+     * \param first The first color being used.
+     * \param second The second color being used.
+     * \return A new QColor based on adding the two colors together and dividing
+     *         by two.
+     */
+    QColor getMiddleColor(QColor first,
+                          QColor second);
 
 };
 

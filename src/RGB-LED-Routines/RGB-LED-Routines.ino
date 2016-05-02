@@ -12,13 +12,11 @@
  * COM_PLACEHOLDER
  * by the RoutinesRGB library.
  *
- * Version 1.9.0
- * Date: April 24, 2016
+ * Version 1.9.1
+ * Date: May 1, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
-
-#include <SoftwareSerial.h>
 #include <RoutinesRGB.h>
 #if IS_NEOPIXELS
 #include <Adafruit_NeoPixel.h>
@@ -32,6 +30,7 @@
 #include <YunClient.h>
 #endif
 #if IS_CUSTOM
+#include <SoftwareSerial.h>
 #include <Adafruit_NeoPixel.h>
 #include <SoftwareSerial.h>
 #endif
@@ -41,85 +40,33 @@
 //================================================================================
 
 #if IS_NEOPIXELS
-const int CONTROL_PIN       = 6;      // pin used by NeoPixels library
+const byte CONTROL_PIN       = 6;      // pin used by NeoPixels library
 #endif
 #if IS_SINGLE_LED
-const int R_PIN             = 5;      // SINGLE_LED only
-const int G_PIN             = 4;      // SINGLE_LED only
-const int B_PIN             = 3;      // SINGLE_LED only
-const int IS_COMMON_ANODE   = 1;      // SINGLE_LED only, 0 if common cathode, 1 if common anode
+const byte R_PIN             = 5;      // SINGLE_LED only
+const byte G_PIN             = 4;      // SINGLE_LED only
+const byte B_PIN             = 3;      // SINGLE_LED only
+const byte IS_COMMON_ANODE   = 1;      // SINGLE_LED only, 0 if common cathode, 1 if common anode
 #endif
 #if IS_CUSTOM
-const int CONTROL_PIN       = 6;     
-const int CONTROL_PIN_2     = 5;     
+const byte CONTROL_PIN       = 6;     
+const byte CONTROL_PIN_2     = 5;     
 
-const int CUBE_IN           = 4;    
-const int CUBE_OUT          = 3; 
+const byte CUBE_IN           = 4;    
+const byte CUBE_OUT          = 3; 
 #endif
-const int LED_COUNT         = 64;
-const int COLOR_COUNT       = 25;     // Number of array colors
+const int LED_COUNT          = 64;
 
-const int DEFAULT_SPEED     = 300;    // default delay for LEDs update, suggested range: 10 (super fast) - 1000 (slow). 
-const int DELAY_VALUE       = 3;    // amount of sleep time between loops 
-const int DEFAULT_BAR_SIZE  = 4;      // default length of a bar for bar routines
-const int DEFAULT_BAR_COUNT = 2;      // the number of colors used in bar routines
+const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
+const byte FADE_SPEED        = 20;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
+const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
+const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
 
-const int FADE_SPEED        = 20;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
-const int GLIMMER_PERCENT   = 8;      // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
-
-const unsigned long DEFAULT_TIMEOUT = 120;  // number of minutes without packets until the arduino times out.
-
-//================================================================================
-// Enums
-//================================================================================
-/*!
- * Mesage headers for packets coming over serial.
- */
-enum EPacketHeader
-{
-  /*!
-   * Takes one int parameter that gets cast to ELightingMode.
-   */
-  eModeChange,
-  /*!
-   * Takes 3 parameters, a 0-255 representation of Red, Green, and Blue.
-   */
-  eMainColorChange,
-  /*!
-   * Takes four parameters, three parameters, the LED, a 0-255 representation of Red, Green, and Blue.
-   */
-  eCustomArrayColorChange,
-  /*!
-   * Takes one parameter, sets the brightness between 0 and 100.
-   */
-  eBrightnessChange,
-  /*!
-   * Takes one parameter, sets the delay value 1 - 23767.
-   */
-  eSpeedChange,
-  /*!
-   * Change the number of colors used in a custom array routine.
-   */
-  eCustomColorCountChange,
-  /*!
-   * Set to 0 to turn off, set to any other number minutes until
-   * idle timeout happens
-   */
-  eIdleTimeoutChange,
-  /*!
-   * Resets all values inside of RoutinesRGB back to their 
-   * default values. Useful for soft reseting the LED hardware. 
-   */
-  eResetSettingsToDefaults,
-  ePacketHeader_MAX //total number of Packet Headers
-};
-
-//================================================================================
-// Variables
-//================================================================================
+const int DEFAULT_SPEED      = 300;    // default delay for LEDs update, suggested range: 10 (super fast) - 1000 (slow). 
+const int DEFAULT_TIMEOUT    = 120;    // number of minutes without packets until the arduino times out.
 
 //=======================
-// Settings
+// Stored Values and States
 //=======================
 
 // checked on each frame to see how the LEDs should update
@@ -129,22 +76,10 @@ EColorPreset  current_preset = eCustom;
 // contrary to popular belief, light_speed != MC^2. Instead, it is the delay
 // between updates of the LEDs. Calculate it by DEFAULT_SPEED * 10msec
 int light_speed = (1000 / DELAY_VALUE) / (DEFAULT_SPEED / 100);
-int bar_size    = DEFAULT_BAR_SIZE;
 
-// sets for array color routines
-int custom_array_count = COLOR_COUNT;
-
-unsigned long idle_timeout = DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
-
-//=======================
-// Stored Values and States
-//=======================
-
-// turn off the lights when idle
-boolean idle_timeout_on = true;
-
-// timeout variable
-unsigned long last_message_time;
+// timeout variables
+unsigned long idle_timeout = (unsigned long)DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
+unsigned long last_message_time = 0;
 
 // counts each loop and uses it to determine
 // when to update the LEDs.
@@ -164,21 +99,27 @@ struct ParsedIntPacket
   byte count;   // count of values
   byte isValid;
 };
-// stored version of last parsed packet
+
+// temporary values used by the string parsing system
 ParsedIntPacket parsed_packet;
+uint8_t delimited_packet_size = 0;
+uint8_t delimited_counter = 0;
+uint8_t delimited_index = 0;
+String delimited_string;
 
 // function prototype to compile with struct
 ParsedIntPacket delimitedStringToIntArray(String message);
 
 //=======================
-// Miscellaneous
+// RoutinesRGB Setup
 //=======================
 
 // Library used to generate the RGB LED routines.
-RoutinesRGB routines = RoutinesRGB(LED_COUNT, COLOR_COUNT);
+RoutinesRGB routines = RoutinesRGB(LED_COUNT);
 
-// prototype function, needed for compiler to recognize the enum.
-void currentLightingRoutine(ELightingMode currentMode);
+//=======================
+// Hardware Setup
+//=======================
 
 #if IS_NEOPIXELS
 //NOTE: you may need to change the NEO_GRB or NEO_KHZ2800 for this sample to work with your lights. 
@@ -223,12 +164,12 @@ void setup()
   server.begin();
 #endif
 
-  // setup the timeout.
-  idle_timeout = DEFAULT_TIMEOUT * 60 * 1000;
-  last_message_time = 0;
-
+  // choose the default color for the single
+  // color routines. This can be changed at any time.
+  // and its set it to green in sample routines. 
+  // If its not set, it defaults to a faint orange. 
   routines.setMainColor(0, 255, 0);
-  
+
   // put your setup code here, to run once:
   Serial.begin(19200);
 }
@@ -253,8 +194,8 @@ void loop()
     parsed_packet = delimitedStringToIntArray(currentPacket);
     // parse a paceket only if its header is is in the correct range
     if (parsed_packet.isValid
-        && parsed_packet.count > 0
-        && parsed_packet.values[0] < ePacketHeader_MAX) {
+        && (parsed_packet.count > 0)
+        && (parsed_packet.values[0] < ePacketHeader_MAX)) {
       parsePacket(parsed_packet.values[0]);
     }
   }
@@ -265,7 +206,8 @@ void loop()
   }
 
   // Timeout the LEDs.
-  if (idle_timeout_on && last_message_time + idle_timeout < millis()) {
+  if ((idle_timeout != 0) && 
+      (last_message_time + idle_timeout < millis())) {
     routines.solid(0, 0, 0);
     current_mode = eOff;
   }
@@ -402,15 +344,14 @@ void currentLightingRoutine(ELightingMode currentMode)
       break;
 
     case eMultiBarsSolid:
-      routines.arrayBarsSolid(current_preset, bar_size);
+      routines.arrayBarsSolid(current_preset, BAR_SIZE);
       break;
 
     case eMultiBarsMoving:
-      routines.arrayBarsMoving(current_preset, bar_size);
+      routines.arrayBarsMoving(current_preset, BAR_SIZE);
       break;
       
     default:
-      //routines.glimmer(0, 255, 0, GLIMMER_PERCENT);
       break;
   }
 }
@@ -423,32 +364,29 @@ void currentLightingRoutine(ELightingMode currentMode)
  * This parser looks at the header of a control packet and from that determines
  * which parameters to use and what settings to change.
  */
-RoutinesRGB::Color mainColor;
 void parsePacket(int header)
 {
   // In each case, theres a final check that the packet was properly
   // formatted by making sure its getting the right number of values.
   boolean success = false;
-  boolean requiresRedraw = false;
   switch (header)
   {
     case eModeChange:
       if (parsed_packet.count == 2 && parsed_packet.values[1] < eLightingMode_MAX) {
         if (parsed_packet.values[1] != current_mode) {
-          success = true;
+            // Reset to 0 to draw to screen right away
+            loop_counter = 0;
+            success = true;
         }
         // change mode to new mode
         current_mode = (ELightingMode)parsed_packet.values[1];
       }
       // pick up cases where the modes can take extra optional arguments
       if (parsed_packet.count == 3) {
-        if (parsed_packet.values[1] == eMultiGlimmer
-            || parsed_packet.values[1] == eMultiRandomIndividual
-            || parsed_packet.values[1] == eMultiRandomSolid
-            || parsed_packet.values[1] == eMultiFade
-            || parsed_packet.values[1] == eMultiBarsSolid
-            || parsed_packet.values[1] == eMultiBarsMoving ) {
+        if (parsed_packet.values[1] >= (int)eMultiGlimmer) {
             if (parsed_packet.values[1] != current_mode) {
+              // Reset to 0 to draw to screen right away
+              loop_counter = 0;
               success = true;
             }
             current_mode = (ELightingMode)parsed_packet.values[1];
@@ -458,30 +396,36 @@ void parsePacket(int header)
       break;
     case eMainColorChange:
       if (parsed_packet.count == 4) {
-        if (parsed_packet.values[1] != mainColor.red 
-        || parsed_packet.values[2] != mainColor.green 
-        || parsed_packet.values[3] != mainColor.blue) {
+        if (parsed_packet.values[1] != routines.mainColor().red 
+        || parsed_packet.values[2] != routines.mainColor().green 
+        || parsed_packet.values[3] != routines.mainColor().blue) {
+          // Reset to 0 to draw to screen right away
+          loop_counter = 0;
           success = true;
         }
-        mainColor.red = parsed_packet.values[1];
-        mainColor.green = parsed_packet.values[2];
-        mainColor.blue = parsed_packet.values[3];
-        routines.setMainColor(mainColor.red, mainColor.green, mainColor.blue);
+        routines.setMainColor(parsed_packet.values[1], 
+                              parsed_packet.values[2], 
+                              parsed_packet.values[3]);
       }
       break;
     case eCustomArrayColorChange:
       if (parsed_packet.count == 5) {
         int color_index = parsed_packet.values[1];
         if (color_index >= 0 && color_index < eLightingMode_MAX) {
+          // Reset to 0 to draw to screen right away
+          loop_counter = 0;
           success = true;
-          routines.setColor(color_index, parsed_packet.values[2], parsed_packet.values[3], parsed_packet.values[4]);
+          routines.setColor(color_index, 
+                            parsed_packet.values[2], 
+                            parsed_packet.values[3], 
+                            parsed_packet.values[4]);
         }
       }
       break;
     case eBrightnessChange:
       {
         if (parsed_packet.count == 2) {
-          //success = true;
+          success = true;
           int param = constrain(parsed_packet.values[1], 0, 100);
           // update brightness level
           routines.brightness(param);
@@ -490,28 +434,23 @@ void parsePacket(int header)
       }
     case eSpeedChange:
       if (parsed_packet.count == 2) {
-        //success = true;
+        success = true;
         // convert from 100 * FPS to real data 
         light_speed = (1000 / DELAY_VALUE) / (parsed_packet.values[1] / 100);
       }
       break;
     case eIdleTimeoutChange:
       if (parsed_packet.count == 2) {
-        //success = true;
-        if (parsed_packet.values[1] == 0) {
-          idle_timeout_on = false;
-        } else {
-          idle_timeout_on = true;
-          unsigned long new_timeout = (unsigned long)parsed_packet.values[1];
-          idle_timeout = new_timeout * 60 * 1000;
-        }
+        success = true;
+        unsigned long new_timeout = (unsigned long)parsed_packet.values[1];
+        idle_timeout = new_timeout * 60 * 1000;
       }
       break;
    case eCustomColorCountChange:
       if (parsed_packet.count == 2) {
         if (parsed_packet.values[1] > 0) {
-          custom_array_count = parsed_packet.values[1];
-          routines.setColorCount(custom_array_count);
+          success = true;
+          routines.setColorCount(parsed_packet.values[1]);
         }
       }
       break;
@@ -524,6 +463,7 @@ void parsePacket(int header)
         // sizes. 
         if ((parsed_packet.values[1] == 42) 
             && (parsed_packet.values[2] == 71)) {
+            success = true;
             routines.resetToDefaults();
         }
       }
@@ -533,8 +473,6 @@ void parsePacket(int header)
   }
   if (success) {
     last_message_time = millis();
-    // Reset to 0 to draw to screen right away only if its been enough time
-    loop_counter = 0;
   }
 }
 
@@ -552,23 +490,22 @@ void parsePacket(int header)
 ParsedIntPacket delimitedStringToIntArray(String message)
 {
   if (checkIfValidString(message)) {
-    int packetSize = countDelimitedValues(message);
-    if (packetSize > 0) {
-      int valueStartIndex = 0;
-      int valueCounter = 0;
-      int valueArray[packetSize];
+    delimited_packet_size = countDelimitedValues(message);
+    if (delimited_packet_size > 0) {
+      delimited_index = 0;
+      delimited_counter = 0;
+      int valueArray[delimited_packet_size];
       for (int i = 0; i < message.length(); i++) {
         if (message.charAt(i) == delimiter) {
-          String valueString = message.substring(valueStartIndex, i);
-          valueArray[valueCounter] = valueString.toInt();
-          valueCounter++;
-          valueStartIndex = i + 1;
+          delimited_string = message.substring(delimited_index, i);
+          valueArray[delimited_counter] = delimited_string.toInt();
+          delimited_counter++;
+          delimited_index = i + 1;
         }
       }
       // grab the last value of the string
-      String valueString = message.substring(valueStartIndex, message.length());
-      valueArray[valueCounter] = valueString.toInt();
-      ParsedIntPacket packet = {valueArray, packetSize, 1};
+      valueArray[delimited_counter] = message.substring(delimited_index, message.length()).toInt();
+      ParsedIntPacket packet = {valueArray, delimited_packet_size, 1};
       return packet;
     }
   }
@@ -593,7 +530,7 @@ boolean checkIfValidString(String message)
     if (!(isDigit(message.charAt(i))
           || message.charAt(i) == delimiter
           || message.charAt(i) == '-')) {
-      Serial.println("String is not properly formatted!");
+      Serial.println("Invalid String");
       return false;
     }
   }
@@ -610,15 +547,15 @@ boolean checkIfValidString(String message)
  */
 int countDelimitedValues(String message)
 {
-  int delimiters_count = 0;
+  delimited_counter = 0;
   for (int i = 0; i < message.length(); i++) {
-    if (message.charAt(i) == delimiter) delimiters_count++;
+    if (message.charAt(i) == delimiter) delimited_counter++;
   }
 
-  if (delimiters_count == 0) {
+  if (delimited_counter == 0) {
     return 1;
   } else {
-    return delimiters_count + 1; // first delimiter has two values
+    return delimited_counter + 1; // first delimiter has two values
   }
 }
 

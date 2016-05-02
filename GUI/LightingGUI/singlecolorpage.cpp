@@ -76,10 +76,9 @@ void SingleColorPage::highlightModeButton(ELightingMode lightingMode) {
 // ----------------------------
 
 void SingleColorPage::modeChanged(int newMode) {
-    mCurrentMode = (ELightingMode)newMode;
-    mData->currentMode(mCurrentMode);
-    mComm->sendModeChange(mCurrentMode);
-    highlightModeButton(mCurrentMode);
+    mData->currentMode((ELightingMode)newMode);
+    mComm->sendModeChange((ELightingMode)newMode);
+    highlightModeButton((ELightingMode)newMode);
 }
 
 void SingleColorPage::colorChanged(QColor color) {
@@ -119,7 +118,6 @@ void SingleColorPage::colorChanged(QColor color) {
 
 
 void SingleColorPage::showEvent(QShowEvent *) {
-  mCurrentMode = mData->currentMode();
-  highlightModeButton(mCurrentMode);
+  highlightModeButton(mData->currentMode());
 }
 

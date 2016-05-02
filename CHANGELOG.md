@@ -40,3 +40,10 @@
 * Added 17 color presets. These can be used with multi color routines and are based around basic themes, such as *Fire* or *Snow*.
 * Refactored GUI, sample code, and arduino library to support the color presets.
 * Cleaned code and fixed bugs across all projects.
+
+### **v1.9.1** 
+#### Memory Reduction Update
+* Significantly reduced memory usage of arduino samples and library.
+* Moved color presets to PROGMEM. 
+* Documented all projects.
+* Cleaned code and fixed bugs across all projects.

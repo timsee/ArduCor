@@ -26,3 +26,9 @@
 * Added 17 color presets. These can be used with multi color routines and are based around basic themes, such as *Fire* or *Snow*.
 * Refactored the GUI's PresetArrayPage to support all of the new color presets.
 * Fixed miscellaneous bugs.
+
+### **v0.6.0** 
+#### Memory Reduction Update
+* Removed unnecessary variables.
+* Documented all headers.
+* Fixed miscellaneous bugs.

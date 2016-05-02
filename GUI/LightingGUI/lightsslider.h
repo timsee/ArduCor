@@ -33,6 +33,9 @@ class LightsSlider : public QWidget
     Q_OBJECT
 
 public:
+    /*!
+     * \brief Constructor
+     */
     explicit LightsSlider(QWidget *parent = 0);
 
     /*!
@@ -66,8 +69,6 @@ public:
      */
     void setMinimumPossible(bool useMinimumPossible, int minimumPossible);
 
-
-
 signals:
     /*!
      * Sends out the value that the slider has been set to after all the processing of snapping
@@ -76,23 +77,64 @@ signals:
     void valueChanged(int);
 
 private slots:
+    /*!
+     * \brief receivedValue called whenever the QSlider signals valueChanged().
+     */
     void receivedValue(int);
 
 protected:
-    void resizeEvent(QResizeEvent *event);
-    void paintEvent(QPaintEvent *event);
+    /*!
+     * \brief resizeEvent makes sure that the QSlider resizes with the QWidget
+     */
+    void resizeEvent(QResizeEvent *);
+    /*!
+     * \brief paintEvent handles edge cases created by the having a QSlider and
+     *        an elaborate stylesheet. Draws the application's background color
+     *        and the slider's ticks.
+     */
+    void paintEvent(QPaintEvent *);
 
 private:
+    /*!
+     * \brief mShouldSnap true if the slider should snap to the nearest ticks, false
+     *        if it should use the value specified by the user.
+     */
     bool mShouldSnap;
+    /*!
+     * \brief mUseMinimumPossible true if the slider should have a minimum possible value it
+     *        can be set to, which must be above its actual minimum. False otherwise.
+     */
     bool mUseMinimumPossible;
-    bool mShouldEmit;
+    /*!
+     * \brief mMinimumPossible true if it should use the minimum possible setting,
+     *        false otherwise.
+     */
     int mMinimumPossible;
 
     /*!
+     * \brief Makes it so that by default, the slider jumps to the position the user
+     * clicks instead of jumping up by a page value. This gives the slider a more
+     * "mobile like" experience than the standard QSlider.
+     *
      * solution based on this stack overflow response:
      * http://stackoverflow.com/a/15321654
+     *
+     * \param slider the slider that was clicked
+     * \param newPos the position that user clicked.
+     * \return the new position of the slider.
      */
     int jumpSliderToPosition(std::shared_ptr<QSlider> slider, int newPos);
+    /*!
+     * \brief snapSliderToNearestTick checks the value that the slider is
+     *        is getting changed to and, if its not exactly over one of the
+     *        sliders ticks, it'll update the value to the value of the closest
+     *        tick. This provides extra logic to jumpSliderToPosition, but only
+     *        if its enabled by setSnapToNearestTick().
+     *
+     * \param slider the internal slider
+     * \param pos the position determined by jumpSliderToPosition.
+     * \return the final position of the slider.
+     */
     int snapSliderToNearestTick(std::shared_ptr<QSlider> slider, int pos);
 };
 

@@ -6,8 +6,8 @@
 #include "LightingProtocols.h"
 
 /*!
- * \version v1.9.0
- * \date April 24, 2016
+ * \version v1.9.1
+ * \date May 1, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -24,11 +24,10 @@
  * arduino sketch:
  *
  * ~~~~~~~~~~~~~~~~~~~~~
- * RoutinesRGB routines = RoutinesRGB(LED_COUNT, COLOR_COUNT);
+ * RoutinesRGB routines = RoutinesRGB(LED_COUNT);
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * where `LED_COUNT` is the number of LEDs in your array, and `COLOR_COUNT` is the maximum number of
- * colors you want available in the custom color array.  
+ * where `LED_COUNT` is the number of LEDs in your array.  
  *
  * After setting up the global object, it will be showing a solid green color with a glimmer by default. To
  * update the colors, first call the proper functions to change it to the mode you want. For instance,
@@ -72,16 +71,14 @@ public:
     };
     
     /*!
-     * Required constructor. This library can support as many LEDs and colors
-     * as your arduino's memory can support. The library should be stored in
+     * Required constructor. The library should be stored in
      * global memory and allocated only once at startup.
      *
-     * It will allocate `(4 * ledCount) + (3 * colorCount)` bytes.
+     * It will allocate `4 * ledCount` bytes.
      *
      * \param ledCount number of individual RGB LEDs.
-     * \param number of colors that are allocated for the array.
      */
-    RoutinesRGB(uint16_t ledCount, uint16_t colorCount);
+    RoutinesRGB(uint16_t ledCount);
     
     /*!
      * Resets all internal values to the original values.
@@ -297,12 +294,20 @@ public:
     
     /*! @} */    
 private:
-        
+
+    // used by multi color routines to store their colors.
+    Color    m_temp_array[10];
+    // stores the user's settings for custom colors. 
+    Color    m_custom_colors[10];
+    // stores how many colors from the custom colors array should
+    // be used in a routine.
+    uint8_t  m_custom_count;
+
+    EColorPreset  m_current_preset;
+    ELightingMode m_current_mode;
+    
     // used for single color routines
     Color m_main_color;
-
-    uint8_t *m_preset_count;
-    Color   **m_colors;
 
     // buffers used for storing the RGB LED values
     uint8_t *r_buffer;
@@ -311,17 +316,11 @@ private:
     
     // settings and stored values
     uint16_t m_LED_count;
-    uint16_t m_color_count;
-    uint16_t m_bar_count;
     uint16_t m_bar_size;
     uint8_t  m_bright_level;
     uint8_t  m_fade_speed;
     uint8_t  m_blink_speed;
-    uint8_t  m_preset_total;
     boolean  m_preprocess_flag;
-
-    EColorPreset  m_current_preset;
-    ELightingMode m_current_mode;
    
     // temp values
     uint8_t *m_temp_buffer;
@@ -329,24 +328,14 @@ private:
     uint16_t m_temp_index;
     boolean  m_temp_bool;
     Color    m_temp_color;
-    Color   *m_temp_array;
     uint8_t  m_temp_size;
     
-    // colors used by specific routines
-    Color m_fade_color;
-    Color m_goal_color;
-    
-    // used at start of fade to switch colors
-    boolean m_start_next_fade;
-    // turn off the lights when idle
-    boolean m_idle_timeout_on;
-    // stored value for fade
-    uint8_t m_solid_fade_value;
-    
-    // fades save their place between modes so they use their own counters
-    uint16_t m_fade_counter;
-    uint16_t m_fade_array_counter;
-    
+    // variables used by specific routines
+    Color    m_goal_color;
+    boolean  m_start_next_fade;
+    uint16_t m_loop_index;
+    uint8_t  m_loop_count;
+
     /*!
      * Called before every function. Used to update the library state tracking
      * and to reset any necessary variables when a state changes.
@@ -357,6 +346,12 @@ private:
      * Called after every function that uses brightness and other post-processing.
      */
     void postProcess();
+    
+    /*!
+     * Called by preprocessing if the the preset has changed. This sets up the
+     * m_temp_array and m_temp_size with the relevant data from the color preset.
+     */
+    void setupPreset(EColorPreset preset);
     
     /*!
      * Helper used to apply the brightness level to any value.
