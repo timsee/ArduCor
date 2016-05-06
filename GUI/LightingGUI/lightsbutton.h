@@ -29,26 +29,26 @@ public:
     explicit LightsButton(QWidget *parent = 0);
 
     /*!
-     * \brief setupAsPresetButton sets up the button for use with the PresetArrayPage. Assigns
+     * \brief setupAsMultiButton sets up the button for use with the PresetArrayPage. Assigns
      *        it a mode, a preset, and an icon. Whenever the button is clicked it will emit
      *        presetClicked and will send its mode and preset in that signal.
-     * \param mode the ELightingMode that emits when this button is pushed.
-     * \param preset The EColorPreset that emits when this button is pushed.
+     * \param routine the ELightingRoutine that emits when this button is pushed.
+     * \param colorGroup The EColorGroup that emits when this button is pushed.
      * \param dataLayer used to create the icon for the button
      */
-    void setupAsPresetButton(ELightingMode mode, EColorPreset preset, std::shared_ptr<DataLayer> dataLayer);
+    void setupAsMultiButton(ELightingRoutine routine, EColorGroup colorGroup, std::shared_ptr<DataLayer> dataLayer);
 
     /*!
-     * \brief lightingMode the ELightingMode assigned to the button by setupAsPresetButton.
-     * \return the button's lighting mode
+     * \brief lightingRoutine the ELightingRoutine assigned to the button by setupAsMultiButton.
+     * \return the button's lighting routine
      */
-    ELightingMode lightingMode();
+    ELightingRoutine lightingRoutine();
 
     /*!
-     * \brief lightingMode the EColorPreset assigned to the button by setupAsPresetButton.
-     * \return the button's preset
+     * \brief colorGroup the EColorGroup assigned to the button by setupAsMultiButton.
+     * \return the button's color group
      */
-    EColorPreset colorPreset();
+    EColorGroup colorGroup();
 
     /*!
      * \brief button The QPushButton that this QWidget wraps.
@@ -91,19 +91,19 @@ private:
     bool mIsPresetButton;
 
     /*!
-     * \brief mLightingMode stored lighting mode. can only be
+     * \brief mLightingRoutine stored lighting routine. can only be
      *        used if the button is set up as a presetButton.
      *        If it is a preset button, this will be emitted
      *        as a signal whenever the button is clicked.
      */
-    ELightingMode mLightingMode;
+    ELightingRoutine mLightingRoutine;
     /*!
-     * \brief mColorPreset stored color preset. can only be
+     * \brief mColorGroup stored color group. can only be
      *        used if the button is set up as a presetButton.
      *        If it is a preset button, this will be emitted
      *        as a signal whenever the button is clicked.
      */
-    EColorPreset mColorPreset;
+    EColorGroup mColorGroup;
 
 };
 

@@ -91,17 +91,17 @@ ColorPicker::~ColorPicker() {
 void ColorPicker::chooseColor(QColor color, bool shouldSignal) {
     mColor = color;
 
-    bool rBlocked = rSlider->slider->blockSignals(true);
+    bool blocked = rSlider->slider->blockSignals(true);
     rSlider->slider->setValue(color.red());
-    rSlider->slider->blockSignals(rBlocked);
+    rSlider->slider->blockSignals(blocked);
 
-    bool gBlocked = gSlider->slider->blockSignals(true);
+    blocked = gSlider->slider->blockSignals(true);
     gSlider->slider->setValue(color.green());
-    gSlider->slider->blockSignals(gBlocked);
+    gSlider->slider->blockSignals(blocked);
 
-    bool bBlocked = bSlider->slider->blockSignals(true);
+    blocked = bSlider->slider->blockSignals(true);
     bSlider->slider->setValue(color.blue());
-    bSlider->slider->blockSignals(bBlocked);
+    bSlider->slider->blockSignals(blocked);
 
     if (shouldSignal) {
         emit colorUpdate(color);
@@ -279,7 +279,6 @@ void ColorPicker::handleMouseEvent(QMouseEvent *event) {
         // map numbers to more usable ranges
         int x = map(event->pos().x(), deadZoneLeft, deadZoneRight, 0, colorWheel->pixmap()->width());
         int y = map(event->pos().y(), deadZoneTop, deadZoneBottom, 0, colorWheel->pixmap()->height());
-        //qDebug()<< "y:" << y;
         // grab the color of the pixel that the user has clicked
         QColor color = QColor(colorWheel->pixmap()->toImage().pixel((int)x, (int)y));
 

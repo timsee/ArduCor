@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PresetArrayPage</class>
- <widget class="QWidget" name="PresetArrayPage">
+ <class>PresetColorsPage</class>
+ <widget class="QWidget" name="PresetColorsPage">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -217,7 +217,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>891</width>
+          <width>883</width>
           <height>523</height>
          </rect>
         </property>

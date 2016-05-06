@@ -28,20 +28,20 @@
   </tr>
   <tr>
     <td>
-        <h2>Custom Array Page</h2>        
-        \copydoc CustomArrayPage  
+        <h2>Custom Colors Page</h2>        
+        \copydoc CustomColorsPage  
     </td>
     <td> 
-        \image html customArrayPagePreview.png
+        \image html customColorsPagePreview.png
     </td>
   </tr>
   <tr>
     <td>  
-       <h2>Preset Array Page</h2>
-       \copydoc PresetArrayPage
+       <h2>Preset Colors Page</h2>
+       \copydoc PresetColorsPage
     </td>
     <td>     
-       \image html presetArrayPagePreview.png
+       \image html presetColorsPagePreview.png
     </td>
   </tr>
   <tr>

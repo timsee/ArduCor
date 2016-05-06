@@ -8,8 +8,8 @@
 #include <QDebug>
 
 LightsButton::LightsButton(QWidget *parent) : QWidget(parent) {
-    mLightingMode = ELightingMode::eLightingMode_MAX;
-    mColorPreset = EColorPreset::eColorPreset_MAX;
+    mLightingRoutine = ELightingRoutine::eLightingRoutine_MAX;
+    mColorGroup = EColorGroup::eColorGroup_MAX;
     mIsPresetButton = false;
 
     button = new QPushButton(this);
@@ -21,35 +21,19 @@ LightsButton::LightsButton(QWidget *parent) : QWidget(parent) {
     setLayout(mLayout);
 }
 
-void LightsButton::setupAsPresetButton(ELightingMode mode, EColorPreset preset, std::shared_ptr<DataLayer> dataLayer) {
+void LightsButton::setupAsMultiButton(ELightingRoutine routine, EColorGroup colorGroup, std::shared_ptr<DataLayer> dataLayer) {
     mIconData = IconData(120, 120, dataLayer);
     button->setIcon(mIconData.renderAsQPixmap());
 
     mIsPresetButton = true;
     bool renderIcon = false;
-    switch(mode) {
-        case ELightingMode::eMultiGlimmer:
-            mIconData.setArrayGlimmer(preset);
-            renderIcon = true;
-            break;
-        case ELightingMode::eMultiFade:
-            mIconData.setArrayFade(preset);
-            renderIcon = true;
-            break;
-        case ELightingMode::eMultiRandomSolid:
-            mIconData.setArrayRandomSolid(preset);
-            renderIcon = true;
-            break;
-        case ELightingMode::eMultiRandomIndividual:
-            mIconData.setArrayRandomIndividual(preset);
-            renderIcon = true;
-            break;
-        case ELightingMode::eMultiBarsSolid:
-            mIconData.setArrayBarsSolid(preset);
-            renderIcon = true;
-            break;
-        case ELightingMode::eMultiBarsMoving:
-            mIconData.setArrayBarsMoving(preset);
+    switch(routine) {
+        case ELightingRoutine::eMultiGlimmer:
+        case ELightingRoutine::eMultiFade:
+        case ELightingRoutine::eMultiRandomSolid:
+        case ELightingRoutine::eMultiRandomIndividual:
+        case ELightingRoutine::eMultiBarsSolid:
+        case ELightingRoutine::eMultiBarsMoving:
             renderIcon = true;
             break;
         default:
@@ -57,19 +41,20 @@ void LightsButton::setupAsPresetButton(ELightingMode mode, EColorPreset preset, 
     }
 
     if (renderIcon) {
+        mIconData.setLightingRoutine(routine, colorGroup);
         button->setIcon(mIconData.renderAsQPixmap());
     }
 
-    mLightingMode = mode;
-    mColorPreset = preset;
+    mLightingRoutine = routine;
+    mColorGroup = colorGroup;
 }
 
-ELightingMode LightsButton::lightingMode() {
-    return mLightingMode;
+ELightingRoutine LightsButton::lightingRoutine() {
+    return mLightingRoutine;
 }
 
-EColorPreset LightsButton::colorPreset() {
-    return mColorPreset;
+EColorGroup LightsButton::colorGroup() {
+    return mColorGroup;
 }
 
 void LightsButton::resizeEvent(QResizeEvent *event) {
@@ -80,6 +65,6 @@ void LightsButton::resizeEvent(QResizeEvent *event) {
 
 void LightsButton::buttonClicked() {
     if (mIsPresetButton) {
-        emit presetClicked((int)mLightingMode,(int)mColorPreset);
+        emit presetClicked((int)mLightingRoutine,(int)mColorGroup);
     }
 }

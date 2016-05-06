@@ -6,19 +6,20 @@
 #include "LightingProtocols.h"
 
 /*!
- * \version v1.9.1
- * \date May 1, 2016
+ * \version v1.9.2
+ * \date May 5, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
  *            </a>
  *
  *
- * \brief An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware.
+ * \brief An Arduino library that provides a set of RGB lighting routines for compatible LED 
+ *        array hardware.
  *
  * \details This library has been tested with SeeedStudio Rainbowduinos, quite a few of the
- *  Adafruit Neopixels products, and a standard RGB LED. Sample code is provided in the git repo for all
- * tested hardware in the samples folder of the git repository.
+ * Adafruit Neopixels products, and a standard RGB LED. Sample code is provided in the git
+ * repo for all tested hardware in the samples folder of the git repository.
  *
  * If you are starting a project from scratch, first you'll need to make a global object in the
  * arduino sketch:
@@ -29,12 +30,17 @@
  *
  * where `LED_COUNT` is the number of LEDs in your array.  
  *
- * After setting up the global object, it will be showing a solid green color with a glimmer by default. To
- * update the colors, first call the proper functions to change it to the mode you want. For instance,
- * to update to a red blinking light, call this function:
+ * The library produces lighting routines based on the functions used and stores the routine
+ * in its internal buffers. These buffers can then be accessed by getters and displayed
+ * on the LED hardware. For routines that change over time, this processed should be repeated
+ * on a loop. For example, here is how you would make a red blinking light with the library
+ * and a Neopixels board:
+ *
+ * 
+ * First, call this function to store the routine in the library's internal buffers:
  *
  * ~~~~~~~~~~~~~~~~~~~~~
- * routines.blink(255, 0, 0);
+ * routines.singleBlink(255, 0, 0);
  * ~~~~~~~~~~~~~~~~~~~~~
  *
  * Then, update the LED array with the values from the library's RGB buffer. The way to do this will
@@ -49,9 +55,10 @@
  * pixels.show();
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * Some routines, change their values over time.
- * For these, put the routine's API call and the hardware update in your `loop()` and use your loop's
- * update speed to determime how fast the LEDs change.
+ * By this point, the LEDs should be showing red. To achieve the blink effect, put both of
+ * these in your `loop()` function and then put a delay between updates. This delay will 
+ * be used to determine how fast the LED's blink. 
+ *
  *
  */
 class RoutinesRGB
@@ -100,23 +107,22 @@ public:
     void setMainColor(byte r, byte g, byte b);
     
     /*!
-     * Set the color at a given index with the RGB values provided. colorIndex must
-     * be less than the colorCount provided to the constructor or else it will not
-     * have any effect.
+     * Set the color in the custom color array at the provided index. colorIndex must be
+     * less than the size of the custom color array or else it won't have any effect.
      */
     void setColor(uint16_t colorIndex, byte r, byte g, byte b);
     
     /*!
-     * Sets the amount of colors used in custom array routines. This is useful when you
-     * want to use a subset of the custom array. The value given must be less than the size
+     * Sets the amount of colors used in custom multi color routines. This is useful when you
+     * want to use a subset of the custom colors. The value given must be less than the size
      * of the custom array or else it will be set to use the entire array. 
      */
-    void setColorCount(uint8_t count);
+    void setCustomColorCount(uint8_t count);
     
     /*!
      * Retrieve the amount of colors that are used from the custom array. 
      */
-    uint8_t colorCount();
+    uint8_t customColorCount();
         
     /*!
      * Set the brightness between 0 and 100. 0 is off, 100 is full power.
@@ -184,7 +190,7 @@ public:
      * \param green strength of green LED, between 0 and 255
      * \param blue strength of blue LED, between 0 and 255
      */
-    void solid(uint8_t red, uint8_t green, uint8_t blue);
+    void singleSolid(uint8_t red, uint8_t green, uint8_t blue);
     
     /*!
      * Switches between ON and OFF states using the provided color.
@@ -193,7 +199,7 @@ public:
      * \param green strength of green LED, between 0 and 255
      * \param blue strength of blue LED, between 0 and 255
      */
-    void blink(uint8_t red, uint8_t green, uint8_t blue);
+    void singleBlink(uint8_t red, uint8_t green, uint8_t blue);
     
     /*!
      * Fades the LEDs on and off based on the provided color.
@@ -205,7 +211,7 @@ public:
      * \param blue strength of blue LED, between 0 and 255
      * \param fadeSpeed how many ticks it takes to fade. Higher numbers are slower.
      */
-    void fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate);
+    void singleFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate);
     
     /*!
      * Set every LED to the provided color. A subset of the LEDs
@@ -217,7 +223,7 @@ public:
      * \param blue strength of blue LED, between 0 and 255
      * \param percent determines how many LEDs will be slightly dimmer than the rest
      */
-    void glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate);
+    void singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate);
     
     /*! @} */
     //================================================================================
@@ -226,12 +232,12 @@ public:
     /*! @defgroup multiRoutines Multi Colors Routines
      *
      *  These routines use multiple colors. 
-     *  They all take the parameter of `preset` which is used to determine which set of 
-     *  colors to use. The custom color array is eCustom, all other values for `preset` 
-     *  come from predefined color groups. Go to the project's github for a full list 
-     *  of the presets and their corresponding values.
+     *  They all take the parameter of `colorGroup` which is used to determine which set of 
+     *  colors to use. The custom color array is eCustom, all other values for `colorGroup` 
+     *  come from presets color. Go to the project's github for a full list 
+     *  of the colorGroups and their corresponding values.
      *
-     *  All routines except eArrayBarsSolid should be called repeatedly on a loop 
+     *  All routines except multiBarsSolid should be called repeatedly on a loop 
      *  for their full effect. The speed of the loop determines how fast the LEDs update.
      *  @{
      */
@@ -239,58 +245,58 @@ public:
     /*!
      * This method uses its percent parameter to dim LEDs randomly, similar to the
      * standard glimmer mode. It also uses the percent to randomly change the color
-     * of select LEDs to a color in the chosen array. The base color is the first
-     * from the chosen array.
+     * of select LEDs to a color in the chosen color group. The base color is the first
+     * from the chosen color group.
      *
-     * \param preset the color array to use for the routine. eCustom is the custom array, 
-     *        all other values are preset arrays. 
+     * \param colorGroup the color group to use for the routine. eCustom is the custom array, 
+     *        all other values are preset groups.
      * \param percent percent of LEDs that will get the glimmer applied
      */
-    void arrayGlimmer(EColorPreset preset, long percent);
+    void multiGlimmer(EColorGroup colorGroup, long percent);
         
     /*!
-     * Fades between the number of colors in the array.
+     * Fades between all the colors used by the color group.
      *
-     * \param preset the color array to use for the routine. eCustom is the custom array, 
-     *        all other values are preset arrays.
+     * \param colorGroup the color group to use for the routine. eCustom is the custom array, 
+     *        all other values are preset groups.
      */
-    void arrayFade(EColorPreset preset);
+    void multiFade(EColorGroup colorGroup);
     
     /*!
-     * sets each individual LED as a random color from the chosen color array.
+     * sets each individual LED as a random color from the chosen color group.
      *
-     * \param preset the color array to use for the routine. eCustom is the custom array, 
-     *        all other values are preset arrays
+     * \param colorGroup the color array to use for the routine. eCustom is the custom array, 
+     *        all other values are colorGroup arrays
      */
-    void arrayRandomIndividual(EColorPreset preset);
+    void multiRandomIndividual(EColorGroup colorGroup);
     
     /*!
-     * A random color is chosen from the chosen color array and applied to each LED.
+     * A random color is chosen from the chosen color group and applied to each LED.
      *
-     * \param preset the color array to use for the routine. eCustom is the custom array, 
-     *        all other values are preset arrays.
+     * \param colorGroup the color group to use for the routine. eCustom is the custom array, 
+     *        all other values are preset groups.
      */
-    void arrayRandomSolid(EColorPreset preset);
+    void multiRandomSolid(EColorGroup colorGroup);
     
     /*!
-     * Uses the chosen color array to set the LEDs in alternating patches with a size of barSize.
+     * Uses the chosen color group to set the LEDs in alternating patches with a size of barSize.
      *
-     * \param preset the color array to use for the routine. eCustom is the custom array, 
-     *        all other values are preset arrays.
+     * \param colorGroup the color group to use for the routine. eCustom is the custom array, 
+     *        all other values are preset groups.
      * \param barSize how many LEDs before switching to the other bar.
      *
      */
-    void arrayBarsSolid(EColorPreset preset, byte barSize);
+    void multiBarsSolid(EColorGroup colorGroup, byte barSize);
     
     /*!
-     * Provides a similar effect as arrayBarSolid, but the alternating patches
+     * Provides a similar effect as multiBarSolid, but the alternating patches
      * move up one LED index on each frame update to create a "scrolling" effect.
      *
-     * \param preset the color array to use for the routine. eCustom is the custom array, 
-     *        all other values are preset arrays.
+     * \param colorGroup the color group to use for the routine. eCustom is the custom array, 
+     *        all other values are preset groups.
      * \param barSize how many LEDs before switching to the other bar.
      */
-    void arrayBarsMoving(EColorPreset preset, byte barSize);
+    void multiBarsMoving(EColorGroup colorGroup, byte barSize);
     
     /*! @} */    
 private:
@@ -303,8 +309,8 @@ private:
     // be used in a routine.
     uint8_t  m_custom_count;
 
-    EColorPreset  m_current_preset;
-    ELightingMode m_current_mode;
+    ELightingRoutine m_current_routine;
+    EColorGroup  m_current_group;
     
     // used for single color routines
     Color m_main_color;
@@ -340,7 +346,7 @@ private:
      * Called before every function. Used to update the library state tracking
      * and to reset any necessary variables when a state changes.
      */
-    void preProcess(ELightingMode state, EColorPreset preset);
+    void preProcess(ELightingRoutine newRoutine, EColorGroup newGroup);
     
     /*!
      * Called after every function that uses brightness and other post-processing.
@@ -348,10 +354,10 @@ private:
     void postProcess();
     
     /*!
-     * Called by preprocessing if the the preset has changed. This sets up the
-     * m_temp_array and m_temp_size with the relevant data from the color preset.
+     * Called by preprocessing if the the colorGroup has changed. This sets up the
+     * m_temp_array and m_temp_size with the relevant data from the color colorGroup.
      */
-    void setupPreset(EColorPreset preset);
+    void setupColorGroup(EColorGroup colorGroup);
     
     /*!
      * Helper used to apply the brightness level to any value.

@@ -4,7 +4,7 @@
 This project is based around an arduino library that generates a set of lighting routines for various arduino-based lighting arrays.
 
 Sample sketches are provided for Rainbowduino, a NeoPixel products, or a standard RGB LED. The samples
-provide an ASCII based serial interface to change the lighting routines, the brightness of the lights, and more. A Qt-based GUI is also provided which can control the arduino sketches. The GUI has been tested on Windows and Mac OS X and requires Qt 5.1 or later.
+provide an ASCII based serial interface to change the lighting routines, the brightness of the lights, and more. A Qt-based GUI is also provided which can control the arduino sketches. The GUI has been tested on Windows and Mac OS X and requires Qt 5.1 or later and C++11.
 
 ## <a name="toc"></a>Table of Contents
 
@@ -30,7 +30,7 @@ provide an ASCII based serial interface to change the lighting routines, the bri
 4. Build and upload to your board.  
 
 
-If there are compilation issues, make sure you have the library for your hardware setup installed. For a Rainbowduino, you can find the library [here](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0). For a NeoPixels, you can find the library [here](https://github.com/adafruit/Adafruit_NeoPixel). 
+If there are compilation issues, make sure you have the library for your hardware setup installed. For a Rainbowduino, you can find the library [here](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0). For a NeoPixel, you can find the library [here](https://github.com/adafruit/Adafruit_NeoPixel). 
 
 
 ## <a name="library-usage"></a>Library Usage
@@ -46,8 +46,7 @@ These routines use a single color:
 
 ### <a name="multi-routines"></a>Multi Colors Routines
 
-These routines use the colors saved in an array to execute the routine. These have a parameter that 
-determines what type color set to use. A description of the different color sets is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). 
+These routines use groups of colors saved in an array to execute the routine. This can be a custom group of colors or it can come from a pallete of preset colros. All routines have a parameter used to determine the color group for the routine. A description of the different color groups is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). 
 
 * Multi Glimmer
 * Multi Random Individual

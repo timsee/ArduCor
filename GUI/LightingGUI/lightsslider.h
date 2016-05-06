@@ -71,8 +71,8 @@ public:
 
 signals:
     /*!
-     * Sends out the value that the slider has been set to after all the processing of snapping
-     * it to a tick or accounting for its minium value or any of that.
+     * \brief Sends out the value that the slider has been set to after all the processing of snapping
+     *        it to a tick or accounting for its minium value or any of that.
      */
     void valueChanged(int);
 
@@ -113,8 +113,8 @@ private:
 
     /*!
      * \brief Makes it so that by default, the slider jumps to the position the user
-     * clicks instead of jumping up by a page value. This gives the slider a more
-     * "mobile like" experience than the standard QSlider.
+     *        clicks instead of jumping up by a page value. This gives the slider a more
+     *        "mobile like" experience than the standard QSlider.
      *
      * solution based on this stack overflow response:
      * http://stackoverflow.com/a/15321654
