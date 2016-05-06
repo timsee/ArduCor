@@ -1,6 +1,6 @@
 /*!
- * \version v1.9.1
- * \date May 1, 2016
+ * \version v1.9.2
+ * \date May 5, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -69,8 +69,8 @@ void RoutinesRGB::resetToDefaults()
     m_main_color = {100, 25, 0};
     
     // set user configurable settings
-    m_current_preset = eCustom;
-    m_current_mode = eSingleGlimmer;
+    m_current_group = eCustom;
+    m_current_routine = eSingleGlimmer;
     
     m_bright_level = DEFAULT_BRIGHTNESS;
     m_fade_speed   = DEFAULT_FADE_SPEED;
@@ -119,19 +119,19 @@ RoutinesRGB::setColor(uint16_t colorIndex, uint8_t r, uint8_t g, uint8_t b)
 
 
 void 
-RoutinesRGB::setColorCount(uint8_t count)
+RoutinesRGB::setCustomColorCount(uint8_t count)
 {
     if (count != 0) {
         m_custom_count = count;
         // catch edge case that preprocess isn't well suited to catch. 
-        if (m_current_preset == eCustom) {
+        if (m_current_group == eCustom) {
             m_preprocess_flag = true;
         }
     }
 }
 
 uint8_t 
-RoutinesRGB::colorCount()
+RoutinesRGB::customColorCount()
 {
     return m_custom_count;
 }
@@ -218,20 +218,21 @@ RoutinesRGB::blue(uint16_t i)
 //================================================================================
  
 void
-RoutinesRGB::preProcess(ELightingMode newState, EColorPreset newPreset)
+RoutinesRGB::preProcess(ELightingRoutine newRoutine, EColorGroup newGroup)
 {    
     // prevent illegal values
-    if (newPreset >= eColorPreset_MAX) {
-        newPreset = (EColorPreset)((int)eColorPreset_MAX - 1);
+    if (newGroup >= eColorGroup_MAX) {
+        newGroup = (EColorGroup)((int)eColorGroup_MAX - 1);
     }
-    if (newPreset < 0) {
-        newPreset = (EColorPreset)0;
+    if (newGroup < 0) {
+        newGroup = (EColorGroup)0;
     }
     
     //---------
     // State Has Changed
     //---------
-    if (m_current_mode != newState) {
+    if ((m_current_routine != newRoutine)
+        || m_preprocess_flag) {
         // reset the temps
         m_temp_index = 0;
         m_temp_counter = 0;
@@ -239,53 +240,58 @@ RoutinesRGB::preProcess(ELightingMode newState, EColorPreset newPreset)
         m_temp_color = {0,0,0};
         
         // always reset blink
-        if (m_current_mode == eSingleBlink) {
+        if (m_current_routine == eSingleBlink) {
             m_temp_counter = 0;
             m_temp_bool = true;
         }
         m_preprocess_flag = true;
-        m_current_mode = newState;
+        m_current_routine = newRoutine;
     }
     
     //---------
     // Preset Has Changed
     //---------
-    if (((m_current_preset != newPreset) 
-        || m_preprocess_flag)) {
+    if ((m_current_group != newGroup) 
+        || m_preprocess_flag) {
         
         // reset flag
         m_preprocess_flag = false;
-
-        // reset fades, even when only the preset changes
-        if (m_current_mode == eMultiFade) {
+        // reset the temps
+        m_temp_index = 0;
+        m_temp_counter = 0;
+        m_temp_bool = true;
+        m_temp_color = {0,0,0};      
+        
+        // reset fades, even when only the colorGroup changes
+        if (m_current_routine == eMultiFade) {
             m_start_next_fade = true;
             m_temp_counter = 0;
         }
         
-        setupPreset(newPreset);
+        setupColorGroup(newGroup);
         
         // setup the buffer to do a moving array.
-        if (newState == eMultiBarsMoving
-            || newState == eMultiBarsSolid) {
+        if (newRoutine == eMultiBarsMoving
+            || newRoutine == eMultiBarsSolid) {
             m_temp_index = 0;
             movingBufferSetup(m_temp_size, m_bar_size);
         }
         
-        m_current_preset = newPreset;
+        m_current_group = newGroup;
     }
 }
 
 
 void 
-RoutinesRGB::setupPreset(EColorPreset preset)
+RoutinesRGB::setupColorGroup(EColorGroup colorGroup)
 {
     // Set up the m_temp_array used for the multi color routines
     // This is done by copying the relevant colors into the 
     // m_temp_array and storing the number of colors in m_temp_size.
-    if (preset == eCustom) {
+    if (colorGroup == eCustom) {
         m_temp_size = m_custom_count;
         memcpy(m_temp_array, m_custom_colors, sizeof(m_custom_colors));
-    } else if (preset == eAll) {
+    } else if (colorGroup == eAll) {
         // create a random color for every color in the temp array.
         m_temp_size = (sizeof(m_temp_array) / sizeof(Color));
         for (int i = 0 ; i < (sizeof(m_temp_array) / sizeof(Color)); i++) {
@@ -295,12 +301,12 @@ RoutinesRGB::setupPreset(EColorPreset preset)
         }
     } else {
         // For our PROGMEM we aimed to have as small of footprint as possible.
-        // We currently store a 2D array of color presets, and another array of
-        // the sizes of those presets groups. First we grab the size, then we copy
+        // We currently store a 2D array of color colorGroups, and another array of
+        // the sizes of those colorGroups groups. First we grab the size, then we copy
         // the buffer directly from the 2D array.
-        m_temp_size = pgm_read_word_near(presetSizes + preset - 1);
+        m_temp_size = pgm_read_word_near(presetSizes + colorGroup - 1);
         memcpy_P(m_temp_array, 
-                (void*)pgm_read_word_near(colorPresets + preset - 1), 
+                (void*)pgm_read_word_near(colorPresets + colorGroup - 1), 
                 (m_temp_size * 3));
     } 
 }
@@ -335,9 +341,9 @@ RoutinesRGB::applyBrightness(uint8_t value)
 
 
 void
-RoutinesRGB::solid(uint8_t red, uint8_t green, uint8_t blue)
+RoutinesRGB::singleSolid(uint8_t red, uint8_t green, uint8_t blue)
 {
-    preProcess(eSingleSolid, m_current_preset);
+    preProcess(eSingleSolid, m_current_group);
     for (uint16_t x = 0; x < m_LED_count; x++) {
         r_buffer[x] = red;
         g_buffer[x] = green;
@@ -348,9 +354,9 @@ RoutinesRGB::solid(uint8_t red, uint8_t green, uint8_t blue)
 
 
 void
-RoutinesRGB::blink(uint8_t red, uint8_t green, uint8_t blue)
+RoutinesRGB::singleBlink(uint8_t red, uint8_t green, uint8_t blue)
 {
-    preProcess(eSingleBlink, m_current_preset);
+    preProcess(eSingleBlink, m_current_group);
     // switches states between on/off based off of m_blink_speed
     if (!(m_temp_counter % m_blink_speed)) {
         if (m_temp_bool) {
@@ -375,9 +381,9 @@ RoutinesRGB::blink(uint8_t red, uint8_t green, uint8_t blue)
 
 
 void
-RoutinesRGB::fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)
+RoutinesRGB::singleFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)
 {
-    preProcess(eSingleFade, m_current_preset);
+    preProcess(eSingleFade, m_current_group);
     if (shouldUpdate) {
         // catch illegal argument and fix it
         if (fadeSpeed == 0) fadeSpeed = 1;
@@ -403,9 +409,9 @@ RoutinesRGB::fade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, b
 
 
 void
-RoutinesRGB::glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate)
+RoutinesRGB::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate)
 {
-    preProcess(eSingleGlimmer, m_current_preset);
+    preProcess(eSingleGlimmer, m_current_group);
     for (uint16_t x = 0; x < m_LED_count; x++) {
         // a random number is generated. If its less than the percent,
         // treat this as an LED that gets a glimmer effect
@@ -431,9 +437,9 @@ RoutinesRGB::glimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boo
 //================================================================================
 
 void
-RoutinesRGB::arrayGlimmer(EColorPreset preset, long percent)
+RoutinesRGB::multiGlimmer(EColorGroup colorGroup, long percent)
 {
-    preProcess(eMultiGlimmer, preset);
+    preProcess(eMultiGlimmer, colorGroup);
     
     for (uint16_t x = 0; x < m_LED_count; x++) {
         m_temp_color = m_temp_array[0];
@@ -447,7 +453,6 @@ RoutinesRGB::arrayGlimmer(EColorPreset preset, long percent)
         if (random(1,101) < percent && percent != 0) {
             // chooses how much to divide the input by
             byte scaleFactor = (byte)random(2,6);
-
             r_buffer[x] = m_temp_color.red / scaleFactor;
             g_buffer[x] = m_temp_color.green / scaleFactor;
             b_buffer[x] = m_temp_color.blue / scaleFactor;
@@ -462,9 +467,9 @@ RoutinesRGB::arrayGlimmer(EColorPreset preset, long percent)
 
 
 void
-RoutinesRGB::arrayFade(EColorPreset preset)
+RoutinesRGB::multiFade(EColorGroup colorGroup)
 {   
-    preProcess(eMultiFade, preset);  
+    preProcess(eMultiFade, colorGroup);  
     // checks if it should change the colors it is fading between.
     if (m_start_next_fade) {
         m_start_next_fade = false;
@@ -496,11 +501,11 @@ RoutinesRGB::arrayFade(EColorPreset preset)
 
 
 void
-RoutinesRGB::arrayRandomSolid(EColorPreset preset)
+RoutinesRGB::multiRandomSolid(EColorGroup colorGroup)
 {
-    preProcess(eMultiRandomSolid, preset); 
+    preProcess(eMultiRandomSolid, colorGroup); 
     if (!(m_temp_counter % m_blink_speed)) {
-        switch ((EColorPreset)preset) {
+        switch ((EColorGroup)colorGroup) {
             case eAll:
                 // uses a random color instead of the m_temp_array buffer. 
                 m_temp_color = {(uint8_t)random(0, 256),
@@ -528,11 +533,11 @@ RoutinesRGB::arrayRandomSolid(EColorPreset preset)
 }
 
 void
-RoutinesRGB::arrayRandomIndividual(EColorPreset preset)
+RoutinesRGB::multiRandomIndividual(EColorGroup colorGroup)
 {   
-    preProcess(eMultiRandomIndividual, preset);  
+    preProcess(eMultiRandomIndividual, colorGroup);  
 
-    switch ((EColorPreset)preset) {
+    switch ((EColorGroup)colorGroup) {
         case eAll:
             // uses random values for each individual LED
             // instead of the m_temp_array buffer. 
@@ -559,10 +564,10 @@ RoutinesRGB::arrayRandomIndividual(EColorPreset preset)
 
 
 void
-RoutinesRGB::arrayBarsSolid(EColorPreset preset, uint8_t barSize)
+RoutinesRGB::multiBarsSolid(EColorGroup colorGroup, uint8_t barSize)
 {   
     m_bar_size =  barSize;
-    preProcess(eMultiBarsSolid, preset);  
+    preProcess(eMultiBarsSolid, colorGroup);  
      
     m_temp_counter = 0;
     m_temp_index = 0;
@@ -581,10 +586,10 @@ RoutinesRGB::arrayBarsSolid(EColorPreset preset, uint8_t barSize)
 
 
 void
-RoutinesRGB::arrayBarsMoving(EColorPreset preset, uint8_t barSize)
+RoutinesRGB::multiBarsMoving(EColorGroup colorGroup, uint8_t barSize)
 {   
     m_bar_size =  barSize;
-    preProcess(eMultiBarsMoving, preset);
+    preProcess(eMultiBarsMoving, colorGroup);
     
     uint16_t repeat_index = 0;
     // loop through all the values between 0 and m_loop_index m_loop_count times.

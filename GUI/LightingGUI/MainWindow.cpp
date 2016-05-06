@@ -15,18 +15,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-/*!
- * \brief The ELightingPage enum used internally to map the updatePreview to
- * int to a lighting page.
- */
-enum class ELightingPage {
-    ePageSingleLEDRoutines,
-    ePageArrayLEDRoutines,
-    ePageMultiLEDRoutines,
-    ePageSettings
-};
-
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
@@ -39,26 +27,18 @@ MainWindow::MainWindow(QWidget *parent) :
     mData = std::shared_ptr<DataLayer>(new DataLayer());
     mComm =std::shared_ptr<CommLayer>(new CommLayer());
     ui->singleColorPage->setup(mComm, mData);
-    ui->customArrayPage->setup(mComm, mData);
-    ui->presetArrayPage->setup(mComm, mData);
+    ui->customColorsPage->setup(mComm, mData);
+    ui->presetColorsPage->setup(mComm, mData);
     ui->settingsPage->setup(mComm, mData);
-    ui->presetArrayPage->setupPresets();
+    ui->presetColorsPage->setupPresets();
 
     // --------------
     // Setup Pages
     // --------------
-    QSignalMapper* previewSignalMapper = new QSignalMapper(this);
 
-    connect(ui->singleColorPage, SIGNAL(updateMainIcons()), previewSignalMapper, SLOT(map()));
-    connect(ui->customArrayPage, SIGNAL(updateMainIcons()), previewSignalMapper, SLOT(map()));
-    connect(ui->presetArrayPage, SIGNAL(updateMainIcons()), previewSignalMapper, SLOT(map()));
-
-    previewSignalMapper->setMapping(ui->singleColorPage, (int)ELightingPage::ePageSingleLEDRoutines);
-    previewSignalMapper->setMapping(ui->customArrayPage, (int)ELightingPage::ePageArrayLEDRoutines);
-    previewSignalMapper->setMapping(ui->presetArrayPage, (int)ELightingPage::ePageMultiLEDRoutines);
-
-    connect(previewSignalMapper, SIGNAL(mapped(int)), this, SLOT(updatePreviewIcon(int)));
-
+    connect(ui->singleColorPage, SIGNAL(updateMainIcons()),  this, SLOT(updateMenuBar()));
+    connect(ui->customColorsPage, SIGNAL(updateMainIcons()), this, SLOT(updateMenuBar()));
+    connect(ui->presetColorsPage, SIGNAL(updateMainIcons()), this, SLOT(updateMenuBar()));
 
     // --------------
     // Setup Buttons
@@ -77,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
         QPushButton* button =(*mPageButtons.get())[i];
         button->setCheckable(true);
         connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
+        button->setStyleSheet("background-color: rgb(52, 52, 52); ");
         signalMapper->setMapping(button, i);
     }
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(pageChanged(int)));
@@ -102,26 +83,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->onOffButton, SIGNAL(clicked(bool)), this, SLOT(toggleOnOff()));
 
     // setup the icons
-    mPreviewIcon = IconData(64, 64, mData);
-    mPreviewIcon.setSolidColor(QColor(0,255,0));
-    ui->onOffButton->setIcon(mPreviewIcon.renderAsQPixmap());
-
+    mIconData = IconData(64, 64, mData);
+    mIconData.setSolidColor(QColor(0,255,0));
+    ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
 
     // --------------
     // Setup Remaining Page Button Icons
     // --------------
 
-    mSinglePageIcon = IconData(64, 64, mData);
-    mSinglePageIcon.setSolidColor(QColor(0,255,0));
-    ui->singleColorButton->setIcon(mSinglePageIcon.renderAsQPixmap());
+    mIconData.setSolidColor(QColor(0,255,0));
+    ui->singleColorButton->setIcon(mIconData.renderAsQPixmap());
 
-    mCustomArrayIcon = IconData(64, 64, mData);
-    mCustomArrayIcon.setArrayFade(EColorPreset::eCustom);
-    ui->customArrayButton->setIcon(mCustomArrayIcon.renderAsQPixmap());
+    mIconData.setMultiFade(EColorGroup::eCustom, true);
+    ui->customArrayButton->setIcon(mIconData.renderAsQPixmap());
 
-    mPresetArrayIcon = IconData(64, 64, mData);
-    mPresetArrayIcon.setArrayFade(EColorPreset::eSevenColor);
-    ui->presetArrayButton->setIcon(mPresetArrayIcon.renderAsQPixmap());
+    mIconData.setMultiFade(EColorGroup::eSevenColor);
+    ui->presetArrayButton->setIcon(mIconData.renderAsQPixmap());
 
     // --------------
     // Final setup
@@ -130,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // reset the LED array to defaults
     mComm->sendReset();
     // Start on SingleColorPage
-    pageChanged((int)ELightingPage::ePageSingleLEDRoutines);
+    pageChanged(0);
     // setup the SingleColorPage
     ui->singleColorPage->chooseColor(mData->mainColor());
 }
@@ -143,16 +120,19 @@ MainWindow::~MainWindow() {
 // ----------------------------
 // Slots
 // ----------------------------
-
+bool hackIsOn = true;
 void MainWindow::toggleOnOff() {
-    if (mData->isOn()) {
-        mPreviewIcon.setSolidColor(QColor(0,0,0));
-        ui->onOffButton->setIcon(mPreviewIcon.renderAsQPixmap());
-        mData->isOn(false);
+    //TODO: why are we faking the on/off? why not use whats already
+    //      built in?
+    if (hackIsOn) {
+        mIconData.setSolidColor(QColor(0,0,0));
+        ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
+        hackIsOn = false;
         mComm->sendBrightness(0);
     } else {
-        ui->onOffButton->setIcon(mPreviewIcon.renderAsQPixmap());
-        mData->isOn(true);
+        mIconData.setLightingRoutine(mData->currentRoutine(), mData->currentColorGroup());
+        ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
+        hackIsOn = true;
         mComm->sendBrightness(mData->brightness());
     }
 }
@@ -160,38 +140,39 @@ void MainWindow::toggleOnOff() {
 void MainWindow::brightnessChanged(int newBrightness) {
    mData->brightness(newBrightness);
    mComm->sendBrightness(mData->brightness());
-   mData->isOn(true);
+   hackIsOn = true;
 }
 
 
 void MainWindow::pageChanged(int pageIndex) {
-    for (uint i = 0; i < mPageButtons->size(); i++)
-    {
-        QPushButton* button =(*mPageButtons.get())[i];
-        button->setChecked(false);
+    for (uint i = 0; i < mPageButtons->size(); i++) {
+        (*mPageButtons.get())[i]->setChecked(false);
+        (*mPageButtons.get())[i]->setStyleSheet("background-color: rgb(52, 52, 52); ");
     }
     ui->stackedWidget->setCurrentIndex(pageIndex);
     (*mPageButtons.get())[pageIndex]->setChecked(true);
+    (*mPageButtons.get())[pageIndex]->setStyleSheet("background-color: rgb(80, 80, 80); ");
 }
 
 
-void MainWindow::updatePreviewIcon(int lightingPage) {
-    if ((ELightingPage)lightingPage == ELightingPage::ePageSingleLEDRoutines) {
-        QColor color = mData->mainColor();
-        mPreviewIcon.setSolidColor(color);
-        mSinglePageIcon.setSolidColor(color);
-        ui->singleColorButton->setIcon(mSinglePageIcon.renderAsQPixmap());
-    } else if ((ELightingPage)lightingPage == ELightingPage::ePageArrayLEDRoutines) {
-        mPreviewIcon.setSolidColor(QColor(0,0,0));
-        mPreviewIcon.setArrayFade(EColorPreset::eCustom);
-        mCustomArrayIcon.setArrayFade(EColorPreset::eCustom);
-        ui->customArrayButton->setIcon(mCustomArrayIcon.renderAsQPixmap());
-    } else if ((ELightingPage)lightingPage == ELightingPage::ePageMultiLEDRoutines) {
-        mPreviewIcon.setSolidColor(QColor(0,0,0));
-        mPreviewIcon.setArrayFade(EColorPreset::eSevenColor);
+void MainWindow::updateMenuBar() {
+    if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
+        ui->brightnessSlider->setSliderColorBackground(mData->mainColor());
+        mIconData.setSolidColor(mData->mainColor());
+        ui->singleColorButton->setIcon(mIconData.renderAsQPixmap());
+        mIconData.setLightingRoutine(mData->currentRoutine());
+    } else {
+        ui->brightnessSlider->setSliderColorBackground(mData->colorsAverage(mData->currentColorGroup()));
+        mIconData.setLightingRoutine(mData->currentRoutine(), mData->currentColorGroup());
+        if (mData->currentColorGroup() == EColorGroup::eCustom) {
+            mIconData.setMultiFade(EColorGroup::eCustom, true);
+           ui->customArrayButton->setIcon(mIconData.renderAsQPixmap());
+        } else {
+           mIconData.setMultiFade(mData->currentColorGroup());
+           ui->presetArrayButton->setIcon(mIconData.renderAsQPixmap());
+        }
     }
-    ui->onOffButton->setIcon(mPreviewIcon.renderAsQPixmap());
-    mData->isOn(true);
+    ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
 }
 
 

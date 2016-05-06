@@ -73,13 +73,6 @@ private:
     Ui::SettingsPage *ui;
 
     /*!
-     * \brief mFirstLoad temporary hack while loading the list of connected
-     *        serial devices. Allows the first time loading the serial list
-     *        to have unique behavior.
-     */
-    bool mFirstLoad;
-
-    /*!
      * \brief updateSerialList updates the serial list based on the information
      *        found in the CommLayer. Does not search for new serial devices.
      */

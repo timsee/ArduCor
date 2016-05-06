@@ -2,7 +2,8 @@
 #ifndef COMMLAYER_H
 #define COMMLAYER_H
 
-#include "datalayer.h"
+#include "lightingprotocols.h"
+#include <QColor>
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QList>
@@ -15,9 +16,9 @@
  * \brief The CommLayer class provides communication protocols
  *  that allow the user to connect and send packets to an LED
  *  array. Currently it supports serial communication. In a future
- *  update it will also support UDP.
+ *  update it will also support UDP and HTTP
  *
- * \todo Add UDP support.
+ * \todo Add UDP and HTTP.
  */
 class CommLayer
 {
@@ -33,7 +34,7 @@ public:
 
     /*!
      * \brief serialList list of possible serial ports
-     * for connection
+     *        for connection
      */
     QList<QSerialPortInfo> serialList;
 
@@ -43,7 +44,7 @@ public:
     std::shared_ptr<QSerialPort> serial;
 
     /*!
-     *  start up a serial port
+     *  \brief start up a serial port
      */
     bool connectSerialPort(QString serialPortName);
 
@@ -67,21 +68,13 @@ public:
     void sendArrayColorChange(int index, QColor color);
 
     /*!
-     * \brief sendModeChange change the mode of the lights. The mode changes
+     * \brief sendRoutineChange change the mode of the lights. The mode changes
      *        how the lights look. some modes are a single color, some modes are random colors
      *        and some use a saved array.
-     * \param mode the mode being sent to the LED system
+     * \param routine the mode being sent to the LED system
+     * \param colorGroupUsed -1 if single color routine, otherwise a EColorGroup.
      */
-    void sendModeChange(ELightingMode mode);
-
-    /*!
-     * \brief sendArrayModeChange similar to sendModeChange, but this command works specifically
-     *        with array modes. It has an added argument that controls how many colors are used when
-     *        displaying the array mode.
-     * \param mode the array mode being sent to the LED system
-     * \param count the number of colors from the array it will use.
-     */
-    void sendArrayModeChange(ELightingMode mode, int presetUsed = 0);
+    void sendRoutineChange(ELightingRoutine routine, int colorGroupUsed = -1);
 
     /*!
      * \brief sendCustomArrayCount sends a new custom array count to the LED array. This count determines
@@ -99,7 +92,7 @@ public:
 
     /*!
      * \brief sendSpeed sends a desired FPS for light updates. This value is the FPS * 100,
-     * for example if you want a FPS of 5, send the value 500.
+     *        for example if you want a FPS of 5, send the value 500.
      * \param speed the FPS multiplied by 100.
      */
     void sendSpeed(int speed);

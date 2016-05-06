@@ -244,15 +244,6 @@ DataLayer::~DataLayer() {
 
 }
 
-bool DataLayer::isOn(bool isOn) {
-    mIsOn = isOn;
-    return true;
-}
-
-bool DataLayer::isOn() {
-    return mIsOn;
-}
-
 bool DataLayer::brightness(int brightness) {
     if (brightness >= 0 && brightness <= 100) {
         mBrightness = brightness;
@@ -276,54 +267,55 @@ QColor DataLayer::mainColor() {
     return mMainColor;
 }
 
+uint8_t DataLayer::maxColorGroupSize() {
+    return 10;
+}
 
-uint8_t DataLayer::arraySize(int index) {
-    if (index < (int)EColorPreset::eColorPreset_MAX) {
-        return mArraySizes[index];
+uint8_t DataLayer::groupSize(EColorGroup group) {
+    if (group == EColorGroup::eCustom) {
+        return mCustomColorsUsed;
+    } else if ((int)group < (int)EColorGroup::eColorGroup_MAX) {
+        return mArraySizes[(int)group];
     } else {
         return 0;
     }
 }
 
-QColor* DataLayer::colorArray(int index) {
-    if (index < (int)EColorPreset::eColorPreset_MAX) {
-        return mColors[index];
+QColor* DataLayer::colorGroup(EColorGroup group) {
+    if ((int)group < (int)EColorGroup::eColorGroup_MAX) {
+        return mColors[(int)group];
     } else {
         return nullptr;
     }
 }
 
-QColor* DataLayer::customArray() {
-    return mColors[0];
-}
-
-
-QColor DataLayer::colorsAverage() {
+QColor DataLayer::colorsAverage(EColorGroup group) {
     int r = 0;
     int g = 0;
     int b = 0;
-    for (int i = 0; i < mColorsUsed; ++i) {
-       r = r + mColors[0][i].red();
-       g = g + mColors[0][i].green();
-       b = b + mColors[0][i].blue();
+    uint8_t count = groupSize(group);
+    for (int i = 0; i < count; ++i) {
+       r = r + mColors[(int)group][i].red();
+       g = g + mColors[(int)group][i].green();
+       b = b + mColors[(int)group][i].blue();
     }
-    return QColor(r / mColorsUsed,
-                  g / mColorsUsed,
-                  b / mColorsUsed);
+    return QColor(r / count,
+                  g / count,
+                  b / count);
 }
 
 
-bool DataLayer::currentMode(ELightingMode mode) {
-    if ((int)mode >= 0 && (int)mode < (int)ELightingMode::eLightingMode_MAX) {
-        mCurrentMode = mode;
+bool DataLayer::currentRoutine(ELightingRoutine routine) {
+    if ((int)routine >= 0 && (int)routine < (int)ELightingRoutine::eLightingRoutine_MAX) {
+        mCurrentRoutine = routine;
         return true;
     } else {
         return false;
     }
 }
 
-ELightingMode  DataLayer::currentMode() {
-    return mCurrentMode;
+ELightingRoutine DataLayer::currentRoutine() {
+    return mCurrentRoutine;
 }
 
 bool DataLayer::timeOut(int timeOut) {
@@ -340,72 +332,33 @@ int DataLayer::timeOut() {
 }
 
 
-bool DataLayer::preset(EColorPreset preset) {
-    if (preset < EColorPreset::eColorPreset_MAX) {
-        mPreset = preset;
+bool DataLayer::currentColorGroup(EColorGroup colorGroup) {
+    if (colorGroup < EColorGroup::eColorGroup_MAX) {
+        mColorGroup = colorGroup;
         return true;
     } else {
         return false;
     }
 }
 
-EColorPreset DataLayer::preset() {
-    return mPreset;
-}
-
-bool DataLayer::setupSerial(QString serial) {
-    mSerialPort = serial;
-    return true;
-}
-
-QString DataLayer::serialPort() {
-    return mSerialPort;
-}
-
-// NYI: UDP
-bool DataLayer::setupUDP(QString ip, int port) {
-    mIpAddress = ip;
-    mUDPPort = port;
-    return true;
-}
-
-// NYI: UDP
-int DataLayer::UDPPort() {
-    return mUDPPort;
-}
-
-// NYI: UDP
-QString DataLayer::IP() {
-    return mIpAddress;
+EColorGroup DataLayer::currentColorGroup() {
+    return mColorGroup;
 }
 
 
-bool DataLayer::customColorCount(int count) {
-    if (count > 0) {
-        mArraySizes[0] = count;
+bool DataLayer::customColorsUsed(int count) {
+    if (count > 0 && count < (int)EColorGroup::eColorGroup_MAX) {
+        mCustomColorsUsed = count;
         return true;
-    } else {
-        return false;
     }
-}
-
-int DataLayer::customColorCount() {
-    return mArraySizes[0];
+    return false;
 }
 
 
-bool DataLayer::colorsUsed(int colorsUsed) {
-    if ((colorsUsed >= 0) && (colorsUsed <= mArraySizes[0])) {
-        mColorsUsed = colorsUsed;
-        return true;
-    } else {
-        return false;
-    }
+int DataLayer::customColorUsed() {
+    return mCustomColorsUsed;
 }
 
-int DataLayer::colorsUsed() {
-    return mColorsUsed;
-}
 
 bool DataLayer::speed(int speed) {
     if (speed > 0) {
@@ -423,10 +376,10 @@ int DataLayer::speed() {
 
 
 void DataLayer::resetToDefaults() {
-    mCurrentMode = ELightingMode::eSingleGlimmer;
+    mCurrentRoutine = ELightingRoutine::eSingleGlimmer;
     mTimeOut = 120;
     mBrightness = 50;
-    mColorsUsed = 2;
+    mCustomColorsUsed = 2;
     mSpeed = 300;
     mMainColor = QColor(0,255,0);
 

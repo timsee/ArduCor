@@ -24,6 +24,16 @@ int main(int argc, char *argv[])
     }
 
     MainWindow w;
+    // choose the icon using preprocessors
+#ifdef __APPLE__
+    QIcon icon(":images/icon.icns");
+#else
+    QIcon icon(":images/icon.ico");
+#endif
+    // set the icon
+    w.setWindowIcon(icon);
+
+    // show the window
     w.show();
     return a.exec();
 }

@@ -61,6 +61,28 @@ void IconData::setup(int width, int height) {
     for (uint i = 0; i < mDataLength; i ++) {
         mData[i] = 0;
     }
+
+    // Our "random individual is a lie". It uses
+    // this array to determine its "random" values,
+    // and if the number is too large for that particular
+    // color group's size, then it defaults to either 0
+    // or 1, since all color groups are at least 2 in size.
+    mRandomIndividual[0] = 0;
+    mRandomIndividual[1] = 5;
+    mRandomIndividual[2] = 5;
+    mRandomIndividual[3] = 1;
+    mRandomIndividual[4] = 0;
+    mRandomIndividual[5] = 3;
+    mRandomIndividual[6] = 6;
+    mRandomIndividual[7] = 2;
+    mRandomIndividual[8] = 6;
+    mRandomIndividual[9] = 0;
+    mRandomIndividual[10] = 0;
+    mRandomIndividual[11] = 5;
+    mRandomIndividual[12] = 7;
+    mRandomIndividual[13] = 1;
+    mRandomIndividual[14] = 2;
+    mRandomIndividual[15] = 6;
 }
 
 void IconData::bufferToOutput() {
@@ -98,6 +120,47 @@ void IconData::bufferToOutput() {
     }
 }
 
+void IconData::setLightingRoutine(ELightingRoutine routine, EColorGroup colorGroup) {
+    switch (routine)
+    {
+        case ELightingRoutine::eSingleSolid:
+            setSolidColor(mDataLayer->mainColor());
+            break;
+        case ELightingRoutine::eSingleBlink:
+            setSolidColor(mDataLayer->mainColor());
+            addBlink();
+            break;
+        case ELightingRoutine::eSingleFade:
+            setSolidColor(mDataLayer->mainColor());
+            addFade();
+            break;
+        case ELightingRoutine::eSingleGlimmer:
+            setSolidColor(mDataLayer->mainColor());
+            addGlimmer();
+            break;
+        case ELightingRoutine::eMultiGlimmer:
+            setMultiGlimmer(colorGroup);
+            break;
+        case ELightingRoutine::eMultiFade:
+            setMultiFade(colorGroup);
+            break;
+        case ELightingRoutine::eMultiRandomSolid:
+            setMultiRandomSolid(colorGroup);
+            break;
+        case ELightingRoutine::eMultiRandomIndividual:
+            setMultiRandomIndividual(colorGroup);
+            break;
+        case ELightingRoutine::eMultiBarsSolid:
+            setMultiBarsSolid(colorGroup);
+            break;
+        case ELightingRoutine::eMultiBarsMoving:
+            setMultiBarsMoving(colorGroup);
+            break;
+        default:
+            break;
+    }
+}
+
 void IconData::setSolidColor(QColor color) {
     for (uint i = 0; i < mBufferLength; i = i + 3) {
         mBuffer[i] = color.red();
@@ -108,18 +171,18 @@ void IconData::setSolidColor(QColor color) {
 }
 
 
-void IconData::setArrayColors(EColorPreset preset) {
+void IconData::setMultiColors(EColorGroup group) {
     if (mDataLayer == NULL) {
         qDebug() << "ERROR: the data layer is not set, cannot use the arary colors!";
     }
-    int colorCount = mDataLayer->arraySize((int)preset);
-    QColor *color_array = mDataLayer->colorArray((int)preset);
+    int colorCount = mDataLayer->groupSize(group);
+    QColor *colors = mDataLayer->colorGroup(group);
 
     int j = 0;
     for (uint i = 0; i < mBufferLength; i = i + 3) {
-        mBuffer[i] = color_array[j].red();
-        mBuffer[i + 1] = color_array[j].green();
-        mBuffer[i + 2] = color_array[j].blue();
+        mBuffer[i] = colors[j].red();
+        mBuffer[i + 1] = colors[j].green();
+        mBuffer[i + 2] = colors[j].blue();
         j = (j + 1) % colorCount;
     }
     bufferToOutput();
@@ -127,28 +190,47 @@ void IconData::setArrayColors(EColorPreset preset) {
 
 
 
-void IconData::setArrayGlimmer(EColorPreset preset) {
-    int colorCount = mDataLayer->arraySize((int)preset);
-    QColor *color_array = mDataLayer->colorArray((int)preset);
+void IconData::setMultiGlimmer(EColorGroup group) {
+    int colorCount = mDataLayer->groupSize(group);
+    QColor *colors = mDataLayer->colorGroup(group);
+    int j = 0;
     for (uint i = 0; i < mBufferLength; i = i + 3) {
-        int shouldChange = rand() % 100;
-        if (shouldChange <= 20) {
-            int index = rand() % colorCount;
-            mBuffer[i] = color_array[index].red();
-            mBuffer[i + 1] = color_array[index].green();
-            mBuffer[i + 2] = color_array[index].blue();
+        // the third element and the 8th element get their
+        // color changed to simulate the multi glimmer effect.
+        if (j == 3) {
+            mBuffer[i]     = colors[2].red();
+            mBuffer[i + 1] = colors[2].green();
+            mBuffer[i + 2] = colors[2].blue();
+        } else if (j == 8) {
+            int color = 1;
+            // only use this value if the colorCount allows it
+            if (colorCount > 2) {
+                color = 2;
+            }
+            mBuffer[i]     = colors[color].red();
+            mBuffer[i + 1] = colors[color].green();
+            mBuffer[i + 2] = colors[color].blue();
         } else {
-            mBuffer[i] = color_array[0].red();
-            mBuffer[i + 1] = color_array[0].green();
-            mBuffer[i + 2] = color_array[0].blue();
+            mBuffer[i]     = colors[0].red();
+            mBuffer[i + 1] = colors[0].green();
+            mBuffer[i + 2] = colors[0].blue();
         }
+        j++;
     }
     addGlimmer(); // this already draws to output.
 }
 
-void IconData::setArrayFade(EColorPreset preset) {
-    int colorCount = mDataLayer->arraySize((int)preset);
-    QColor *color_array = mDataLayer->colorArray((int)preset);
+void IconData::setMultiFade(EColorGroup group, bool showMore) {
+    // By default, showMore is set to false because everything shows its
+    // max, except the color count. For the menu bar we override this
+    // feature. This handles a silly edge case.
+    int colorCount;
+    if (showMore) {
+        colorCount = mDataLayer->maxColorGroupSize();
+    } else {
+        colorCount = mDataLayer->groupSize(group);
+    }
+    QColor *colors = mDataLayer->colorGroup(group);
 
     int k = 0;
     int tempIndex = 0;
@@ -162,13 +244,13 @@ void IconData::setArrayFade(EColorPreset preset) {
     QColor *output = new QColor[count];
     int colorIndex = 0;
     for (int i = 0; i < count - 2; i = i + 2) {
-        output[i] = color_array[arrayIndices[colorIndex]];
-        output[i + 1] = getMiddleColor(color_array[arrayIndices[colorIndex]], color_array[arrayIndices[colorIndex + 1]]);
+        output[i] = colors[arrayIndices[colorIndex]];
+        output[i + 1] = getMiddleColor(colors[arrayIndices[colorIndex]], colors[arrayIndices[colorIndex + 1]]);
         colorIndex++;
     }
     // wrap the last value around
-    output[count - 2] = color_array[arrayIndices[colorIndex]];
-    output[count - 1] = getMiddleColor(color_array[arrayIndices[colorIndex]], color_array[arrayIndices[0]]);
+    output[count - 2] = colors[arrayIndices[colorIndex]];
+    output[count - 1] = getMiddleColor(colors[arrayIndices[colorIndex]], colors[arrayIndices[0]]);
 
     int j = 0;
     for (uint i = 0; i < mBufferLength; i = i + 3) {
@@ -181,42 +263,70 @@ void IconData::setArrayFade(EColorPreset preset) {
     bufferToOutput();
 }
 
-void IconData::setArrayRandomSolid(EColorPreset preset) {
-    int colorCount = mDataLayer->arraySize((int)preset);
-    QColor *color_array = mDataLayer->colorArray((int)preset);
+void IconData::setMultiRandomSolid(EColorGroup group) {
+    int colorCount = mDataLayer->groupSize(group);
+    QColor *colors = mDataLayer->colorGroup(group);
 
+    int k = 0;
     for (uint i = 0; i < mBufferLength; i = i + 12) {
-        QColor randomColor = color_array[rand() % colorCount];
+        QColor randomColor;
+        if (k == 0) {
+            randomColor = colors[1];
+        } else if (k == 1) {
+            randomColor = colors[0];
+        } else if (k == 2) {
+            if (colorCount > 3) {
+                randomColor = colors[2];
+            } else if (colorCount > 2) {
+                randomColor = colors[1];
+            } else {
+                randomColor = colors[0];
+            }
+        } else {
+            if (colorCount > 2) {
+                randomColor = colors[1];
+            } else {
+                randomColor = colors[0];
+            }
+        }
         for (int j = 0; j < 12; j = j + 3) {
             mBuffer[i + j] = randomColor.red();
             mBuffer[i + j + 1] = randomColor.green();
             mBuffer[i + j + 2] = randomColor.blue();
         }
+        k++;
     }
     bufferToOutput();
 }
 
-void IconData::setArrayRandomIndividual(EColorPreset preset) {
-    if (preset == EColorPreset::eAll) {
+void IconData::setMultiRandomIndividual(EColorGroup group) {
+    if (group == EColorGroup::eAll) {
         for (uint i = 0; i < mBufferLength; i++) {
             int random = rand() % 256;
             mBuffer[i] = (uchar)random;
         }
     } else {
-        int colorCount = mDataLayer->arraySize((int)preset);
-        QColor *color_array = mDataLayer->colorArray((int)preset);
+        int colorCount = mDataLayer->groupSize(group);
+        QColor *colors = mDataLayer->colorGroup(group);
+        int j = 0;
         for (uint i = 0; i < mBufferLength; i = i + 3) {
-            int index = rand() % colorCount;
-            mBuffer[i] = color_array[index].red();
-            mBuffer[i + 1] = color_array[index].green();
-            mBuffer[i + 2] = color_array[index].blue();
+            int index;
+            if (mRandomIndividual[j] >= colorCount) {
+                index = j % 2; // even number use 0, odd numbers use 1
+            } else {
+                index = mRandomIndividual[j];
+            }
+            mBuffer[i] = colors[index].red();
+            mBuffer[i + 1] = colors[index].green();
+            mBuffer[i + 2] = colors[index].blue();
+            j++;
         }
     }
     bufferToOutput();
 }
 
-void IconData::setArrayBarsSolid(EColorPreset preset) {
-     if (preset == EColorPreset::eAll) {
+void IconData::setMultiBarsSolid(EColorGroup group) {
+     if (group == EColorGroup::eAll) {
          for (uint i = 0; i < mBufferLength; i = i + 12) {
              int r = rand() % 256;
              int g = rand() % 256;
@@ -228,18 +338,18 @@ void IconData::setArrayBarsSolid(EColorPreset preset) {
              }
          }
      } else {
-         int colorCount = mDataLayer->arraySize((int)preset);
-         QColor *color_array = mDataLayer->colorArray((int)preset);
+         int colorCount = mDataLayer->groupSize(group);
+         QColor *colors = mDataLayer->colorGroup(group);
 
          int colorIndex = 0;
          for (uint i = 0; i < mBufferLength; i = i + 12) {
-             QColor color = color_array[colorIndex % colorCount];
+             QColor color = colors[colorIndex % colorCount];
              for (int j = 0; j < 6; j = j + 3) {
                  mBuffer[i + j] = color.red();
                  mBuffer[i + j + 1] = color.green();
                  mBuffer[i + j + 2] = color.blue();
              }
-             color = color_array[(colorIndex + 1) % colorCount];
+             color = colors[(colorIndex + 1) % colorCount];
              for (int j = 6; j < 12; j = j + 3) {
                  mBuffer[i + j] = color.red();
                  mBuffer[i + j + 1] = color.green();
@@ -251,20 +361,20 @@ void IconData::setArrayBarsSolid(EColorPreset preset) {
     bufferToOutput();
 }
 
-void IconData::setArrayBarsMoving(EColorPreset preset) {
-    int colorCount = mDataLayer->arraySize((int)preset);
-    QColor *color_array = mDataLayer->colorArray((int)preset);
+void IconData::setMultiBarsMoving(EColorGroup group) {
+    int colorCount = mDataLayer->groupSize(group);
+    QColor *colors = mDataLayer->colorGroup(group);
 
     int colorIndex = 0;
     QColor color;
     for (uint i = 3; i < mBufferLength; i = i + 12) {
-        color = color_array[colorIndex % colorCount];
+        color = colors[colorIndex % colorCount];
         for (int j = 0; j < 6; j = j + 3) {
             mBuffer[i + j] = color.red();
             mBuffer[i + j + 1] = color.green();
             mBuffer[i + j + 2] = color.blue();
         }
-        color = color_array[(colorIndex + 1) % colorCount];
+        color = colors[(colorIndex + 1) % colorCount];
         for (int j = 6; j < 12; j = j + 3) {
             if (i + j + 2 < mBufferLength) {
                 mBuffer[i + j] = color.red();
@@ -274,7 +384,7 @@ void IconData::setArrayBarsMoving(EColorPreset preset) {
         }
         colorIndex = (colorIndex + 2) % colorCount;
     }
-    color = color_array[colorIndex % colorCount];
+    color = colors[colorIndex % colorCount];
     mBuffer[0] = color.red();
     mBuffer[1] = color.green();
     mBuffer[2] = color.blue();
@@ -285,11 +395,37 @@ void IconData::setArrayBarsMoving(EColorPreset preset) {
 }
 
 void IconData::addGlimmer() {
-    for (int i = 0; i < 5 ; i++) {
-        int index = rand() % 16;
-        mBuffer[index * 3] = mBuffer[index * 3] / 2;
-        mBuffer[index * 3 + 1] = mBuffer[index * 3 + 1] / 2;
-        mBuffer[index * 3 + 2] = mBuffer[index * 3 + 2] / 2;
+    int j = 0;
+    for (uint i = 0; i < mBufferLength; i = i + 3) {
+        // the same colors get assigned the glimmer
+        // each time this routine is ran.
+        bool shouldGlimmer;
+        switch (j) {
+            case 0:
+            case 5:
+            case 6:
+            case 10:
+            case 12:
+            case 15:
+                shouldGlimmer = true;
+                break;
+            default:
+                shouldGlimmer = false;
+                break;
+        }
+        if (shouldGlimmer) {
+            // 12 and 10 receive a strong glimmer.
+            if (j == 12 || j == 10) {
+                mBuffer[i] = mBuffer[i] / 4;
+                mBuffer[i + 1] = mBuffer[i + 1] / 4;
+                mBuffer[i + 2] = mBuffer[i + 2] / 4;
+            } else {
+                mBuffer[i] = mBuffer[i] / 2;
+                mBuffer[i + 1] = mBuffer[i + 1] / 2;
+                mBuffer[i + 2] = mBuffer[i + 2] / 2;
+            }
+        }
+        j++;
     }
     bufferToOutput();
 }

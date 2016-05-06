@@ -1,6 +1,6 @@
 
-#ifndef PRESETARRAYPAGE_H
-#define PRESETARRAYPAGE_H
+#ifndef PresetColorsPage_H
+#define PresetColorsPage_H
 
 #include "lightingpage.h"
 
@@ -13,21 +13,21 @@
 #include "lightsbutton.h"
 
 namespace Ui {
-class PresetArrayPage;
+class PresetColorsPage;
 }
 
 /*!
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
- * \brief The PresetArrayPage provides a way to use the Color Presets
- *        from the arduino's RoutineRGB library.
+ * \brief The PresetColorsPage provides a way to use the Color Presets
+ *        from the arduino's RoutineRGB library to do Multi Color Routines.
  *
  * It contains a grid of buttons that map color presets to lighting
  * modes. The list expands horizontally into a QScrollArea.
  *
  */
-class PresetArrayPage : public QWidget, public LightingPage
+class PresetColorsPage : public QWidget, public LightingPage
 {
     Q_OBJECT
 
@@ -35,19 +35,19 @@ public:
     /*!
      * \brief Constructor
      */
-    explicit PresetArrayPage(QWidget *parent = 0);
+    explicit PresetColorsPage(QWidget *parent = 0);
     /*!
      * \brief Deconstructor
      */
-    ~PresetArrayPage();
+    ~PresetColorsPage();
     /*!
-     * \brief highlightModeButton highlights the button that implements
-     *        the lightingMode parameter. If it can't find a button that
-     *        implements lightingMode, then all buttons are unhighlighted
-     * \param lightingMode the mode that the highlighted button implements.
-     * \param preset the color preset that the highlighted button implements.
+     * \brief highlightRoutineButton highlights the button that implements
+     *        the routine parameter. If it can't find a button that
+     *        implements this lighting routine, then all buttons are unhighlighted
+     * \param routine the lighting routine the highlighted button implements.
+     * \param colorGroup the color group that the highlighted button implements.
      */
-    void highlightModeButton(ELightingMode mode, EColorPreset preset);
+    void highlightRoutineButton(ELightingRoutine routine, EColorGroup colorGroup);
     /*!
      * \brief setupPresets sets up the preset buttons. Requires the DataLayer
      *        of the application to be set up first.
@@ -56,24 +56,24 @@ public:
 
 signals:
     /*!
-     * used to signal back to the main page that it should update its top-left icon
-     * with a new color mode
+     * \brief used to signal back to the main page that it should update its
+     *        top-left icon with a new color mode
      */
     void updateMainIcons();
 
 
 public slots:
     /*!
-     * \brief presetButtonClicked every button setup as a presetButton will signal
+     * \brief multiButtonClicked every button setup as a presetButton will signal
      *        this slot whenever they are clicked.
-     * \param mode the stored ELightingMode of the button cast to an int.
-     * \param preset the stored EColorPreset of the button cast to an int.
+     * \param routine the stored ELightingRoutine of the button cast to an int.
+     * \param colorGroup the stored EColorGroup of the button cast to an int.
      */
-    void presetButtonClicked(int mode, int preset);
+    void multiButtonClicked(int routine, int colorGroup);
 
 protected:
     /*!
-     * called whenever the page is shown on screen.
+     * \brief called whenever the page is shown on screen.
      */
     void showEvent(QShowEvent *);
 
@@ -81,7 +81,7 @@ private:
     /*!
      * \brief ui pointer to Qt UI form.
      */
-    Ui::PresetArrayPage *ui;
+    Ui::PresetColorsPage *ui;
 
     /*!
      * \brief mButtonLayout layout used to put the buttons in the QScrollArea as a grid.
@@ -105,10 +105,10 @@ private:
 
     /*!
      * \brief mPageButtons pointers to all the main buttons, used
-     * to iterate through them quickly.
+     *        to iterate through them quickly.
      */
-    std::shared_ptr<std::vector<QToolButton*> > mPageButtons;
+    std::shared_ptr<std::vector<QToolButton *> > mPageButtons;
 
 };
 
-#endif // PRESETARRAYPAGE_H
+#endif // PresetColorsPage_H

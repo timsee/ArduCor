@@ -12,9 +12,6 @@ SettingsPage::SettingsPage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SettingsPage) {
     ui->setupUi(this);
-    //TODO: fix edge case during loading that requires loading
-    //      the serial list twice. for now, this flag is a workaround.
-    mFirstLoad = true;
 
     // setup sliders
     ui->speedSlider->slider->setRange(1, 1000);
@@ -78,16 +75,28 @@ void SettingsPage::showEvent(QShowEvent *event) {
     ui->speedSlider->slider->setValue(mData->speed());
     ui->timeoutSlider->slider->setValue(mData->timeOut());
 
+    // default the settings bars to the current colors
+    if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
+        ui->speedSlider->setSliderColorBackground(mData->mainColor());
+        ui->timeoutSlider->setSliderColorBackground(mData->mainColor());
+    } else {
+        ui->speedSlider->setSliderColorBackground(mData->colorsAverage(mData->currentColorGroup()));
+        ui->timeoutSlider->setSliderColorBackground(mData->colorsAverage(mData->currentColorGroup()));
+    }
+
     // update the serial list, if needed
     updateSerialList();
 
-    // run the update twice the first time, so that it can properly
-    // select the active serial port.
-    //TODO: remove the need for this
-    if (mFirstLoad) {
-        mFirstLoad = false;
-        updateSerialList();
+    // select the QSerialPort portname that matches the currently connected port
+    for (int i = 0; i < ui->serialList->count(); i++) {
+        QListWidgetItem *item = ui->serialList->item(i);
+        if (!QString::compare(item->text(), mComm->serial->portName())) {
+            item->setSelected(true);
+        } else {
+            item->setSelected(false);
+        }
     }
+
 }
 
 

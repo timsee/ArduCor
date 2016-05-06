@@ -75,7 +75,7 @@ bool CommLayer::connectSerialPort(QString serialPortName) {
         serial->setFlowControl(QSerialPort::NoFlowControl);
         // set up lights to the defaults
         sendMainColorChange(QColor(0,255,0));
-        sendModeChange(ELightingMode::eSingleGlimmer);
+        sendRoutineChange(ELightingRoutine::eSingleGlimmer);
         sendBrightness(50);
         sendTimeOut(120);
         sendSpeed(300); // desired FPS * 100
@@ -111,23 +111,23 @@ void CommLayer::sendArrayColorChange(int index, QColor color) {
     serial->write(message.toStdString().c_str());
 }
 
-void CommLayer::sendModeChange(ELightingMode mode) {
-    QString message = QString("%1,%2;").arg(QString::number((int)EPacketHeader::eModeChange),
-                                           QString::number((int)mode));
-    serial->write(message.toStdString().c_str());
-}
-
-void CommLayer::sendArrayModeChange(ELightingMode mode, int preset) {
-    if (mode == ELightingMode::eMultiBarsMoving
-          || mode == ELightingMode::eMultiBarsSolid
-          || mode == ELightingMode::eMultiFade
-          || mode == ELightingMode::eMultiGlimmer
-          || mode == ELightingMode::eMultiRandomIndividual
-          || mode == ELightingMode::eMultiRandomSolid) {
-        QString message = QString("%1,%2,%3;").arg(QString::number((int)EPacketHeader::eModeChange),
-                                                   QString::number((int)mode),
-                                                   QString::number(preset));
+void CommLayer::sendRoutineChange(ELightingRoutine routine, int colorGroup) {
+    if (colorGroup == -1){
+        QString message = QString("%1,%2;").arg(QString::number((int)EPacketHeader::eModeChange),
+                                                QString::number((int)routine));
         serial->write(message.toStdString().c_str());
+    } else {
+        if (routine == ELightingRoutine::eMultiBarsMoving
+              || routine == ELightingRoutine::eMultiBarsSolid
+              || routine == ELightingRoutine::eMultiFade
+              || routine == ELightingRoutine::eMultiGlimmer
+              || routine == ELightingRoutine::eMultiRandomIndividual
+              || routine == ELightingRoutine::eMultiRandomSolid) {
+            QString message = QString("%1,%2,%3;").arg(QString::number((int)EPacketHeader::eModeChange),
+                                                       QString::number((int)routine),
+                                                       QString::number(colorGroup));
+            serial->write(message.toStdString().c_str());
+        }
     }
 }
 

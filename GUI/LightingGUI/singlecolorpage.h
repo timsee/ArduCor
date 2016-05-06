@@ -42,12 +42,12 @@ public:
      */
     ~SingleColorPage();
     /*!
-     * \brief highlightModeButton highlights the button that implements
-     *        the lightingMode parameter. If it can't find a button that
-     *        implements lightingMode, then all buttons are unhighlighted
-     * \param lightingMode the mode that the highlighted button implements.
+     * \brief highlightRoutineButton highlights the button that implements
+     *        the routine parameter. If it can't find a button that
+     *        implements the lighting routine, then all buttons are unhighlighted
+     * \param routine the mode that the highlighted button implements.
      */
-    void highlightModeButton(ELightingMode lightingMode);
+    void highlightRoutineButton(ELightingRoutine routine);
     /*!
      * \brief chooseColor allows the color of the ColorPicker and the single
      *        color routines to be set programmatically. Used by the MainWindow
@@ -60,8 +60,8 @@ public:
 
 signals:
     /*!
-     * used to signal back to the main page that it should update its top-left icon
-     * with new RGB values
+     * \brief Used to signal back to the main page that it should update its top-left icon
+     *        with new RGB values
      */
     void updateMainIcons();
 
@@ -93,27 +93,14 @@ private:
 
     /*!
      * \brief mPageButtons pointers to all the main buttons, used
-     * to iterate through them quickly.
+     *        to iterate through them quickly.
      */
     std::shared_ptr<std::vector<QToolButton*> > mPageButtons;
 
     /*!
-     * \brief mSolidData IconData for the Solid single color routine.
+     * \brief IconData for the Single Color Routine Icons
      */
-    IconData mSolidData;
-    /*!
-     * \brief mFadeData IconData for the Fade single color routine.
-     */
-    IconData mFadeData;
-    /*!
-     * \brief mBlinkData IconData for the Blink single color routine.
-     */
-    IconData mBlinkData;
-    /*!
-     * \brief mGlimmerData IconData for the Glimmer single color routine.
-     */
-    IconData mGlimmerData;
-
+    IconData mIconData;
 };
 
 #endif // SINGLECOLORPAGE_H

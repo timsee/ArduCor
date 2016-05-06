@@ -15,12 +15,10 @@
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
- * \brief The IconData class creates all the grids of colors that are seen throughout
- * the app's icons. The grids are made by using a very small buffer of RGB values to do the 
- * computation. For display, this buffer gets upscaled to the desired icon size. This 
- * gives it the square pixel-y effect.
+ * \brief The IconData class creates all the pixel-y square icons that are seen throughout
+ * the app. The grids are made by using a very small buffer of RGB values to do the
+ * computation. For display, this buffer gets upscaled to the desired icon size.
  *
- * \todo Clean up the icons that don't accurately represent their modes such as the "Bars Moving" icon.
  */
 class IconData
 {
@@ -30,14 +28,14 @@ public:
      */
     IconData();
     /*!
-     * Standard Constructor, values must  be a multiple of four.
+     * \brief Standard Constructor, values must  be a multiple of four.
      *
      * \param width the width
      * \param height the height
      */
     IconData(int width, int height);
     /*!
-     * Required constructor when the icons use the color array.
+     * \brief Required constructor when the icons use the color array.
      *
      * \param width the width
      * \param height the height
@@ -46,46 +44,56 @@ public:
     IconData(int width, int height, std::shared_ptr<DataLayer> data);
 
     /*!
+     * \brief setLightingRoutine use a lighting routine to set the colors of the icon instead of a function call
+     * \param routine the routine that you want to use for the icon
+     * \param colorGroup the group that you want to use for the icon.
+     */
+    void setLightingRoutine(ELightingRoutine routine, EColorGroup colorGroup = EColorGroup::eCustom);
+
+    /*!
      * \brief setSolidColor sets the icon as a solid color
      */
     void setSolidColor(QColor color);
 
     /*!
-     * \brief setArrayColors shows all array colors, repeating if necessary
+     * \brief setMultiColors shows all array colors, repeating if necessary
      */
-    void setArrayColors(EColorPreset preset);
+    void setMultiColors(EColorGroup group);
 
     /*!
-     * \brief setArrayGlimmer sets as mostly mainColor, but adds random colors
+     * \brief setMultiGlimmer sets as mostly mainColor, but adds random colors
      *        as a glimmer effect
      */
-    void setArrayGlimmer(EColorPreset preset);
+    void setMultiGlimmer(EColorGroup group);
 
     /*!
-     * \brief setArrayFade regions slowly fade from one array color to another
+     * \brief setMultiFade regions slowly fade from one array color to another
+     * \param colorGroup the colorGroup used for the IconData
+     * \param set to false in nearly all cases, this only gets set to true for the menu bar
+     *        so the custom array shows a few more colors than 2 when defaulted to 2.
      */
-    void setArrayFade(EColorPreset preset);
+    void setMultiFade(EColorGroup group, bool showMore = false);
 
     /*!
-     * \brief setArrayRandomSolid sets icon as 4 colors from array
+     * \brief setMultiRandomSolid sets icon as 4 colors from array
      */
-    void setArrayRandomSolid(EColorPreset preset);
+    void setMultiRandomSolid(EColorGroup group);
 
     /*!
-     * \brief setArrayRandomIndividual sets each region a random color from the array
+     * \brief setMultiRandomIndividual sets each region a random color from the array
      */
-    void setArrayRandomIndividual(EColorPreset preset);
+    void setMultiRandomIndividual(EColorGroup group);
 
     /*!
-     * \brief setArrayBarsSolid draws the bars with region sizes of 2
+     * \brief setMultiBarsSolid draws the bars with region sizes of 2
      */
-    void setArrayBarsSolid(EColorPreset preset);
+    void setMultiBarsSolid(EColorGroup group);
 
     /*!
-     * \brief setArrayBarsSolid draws the bars with region sizes of 2 but slightly offset
+     * \brief setMultiBarsSolid draws the bars with region sizes of 2 but slightly offset
      *        'cause its hard to show motion in a static icon.
      */
-    void setArrayBarsMoving(EColorPreset preset);
+    void setMultiBarsMoving(EColorGroup group);
 
     /*!
      * \brief addGlimmer adds glimmer lighting effect to the preexisting data
@@ -102,7 +110,7 @@ public:
     void addFade();
 
     /*!
-     * getters for private values
+     * \brief getters for private values
      */
     uint dataLength();
     /*!
@@ -199,6 +207,7 @@ private:
     QColor getMiddleColor(QColor first,
                           QColor second);
 
+    int mRandomIndividual[16];
 };
 
 #endif // ICONDATA_H

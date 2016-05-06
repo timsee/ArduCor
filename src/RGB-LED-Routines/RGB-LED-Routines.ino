@@ -12,8 +12,8 @@
  * COM_PLACEHOLDER
  * by the RoutinesRGB library.
  *
- * Version 1.9.1
- * Date: May 1, 2016
+ * Version 1.9.2
+ * Date: May 5, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -70,8 +70,8 @@ const int DEFAULT_TIMEOUT    = 120;    // number of minutes without packets unti
 //=======================
 
 // checked on each frame to see how the LEDs should update
-ELightingMode current_mode = eSingleGlimmer;
-EColorPreset  current_preset = eCustom;
+ELightingRoutine current_routine = eSingleGlimmer;
+EColorGroup  current_group = eCustom;
 
 // contrary to popular belief, light_speed != MC^2. Instead, it is the delay
 // between updates of the LEDs. Calculate it by DEFAULT_SPEED * 10msec
@@ -117,15 +117,19 @@ ParsedIntPacket delimitedStringToIntArray(String message);
 // Library used to generate the RGB LED routines.
 RoutinesRGB routines = RoutinesRGB(LED_COUNT);
 
+#if IS_NEOPIXELS
 //=======================
 // Hardware Setup
 //=======================
 
-#if IS_NEOPIXELS
 //NOTE: you may need to change the NEO_GRB or NEO_KHZ2800 for this sample to work with your lights. 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
 #endif
 #if IS_CUSTOM
+//=======================
+// Hardware Setup
+//=======================
+
 // NeoPixels controller object
 Adafruit_NeoPixel pixels_desk = Adafruit_NeoPixel(60, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel pixels_dresser = Adafruit_NeoPixel(60, CONTROL_PIN_2, NEO_GRB + NEO_KHZ800);
@@ -133,6 +137,7 @@ Adafruit_NeoPixel pixels_dresser = Adafruit_NeoPixel(60, CONTROL_PIN_2, NEO_GRB 
 SoftwareSerial cubeSerial(CUBE_IN, CUBE_OUT); // RX, TX
 #endif
 #if IS_YUN
+
 YunServer server;
 #endif
 
@@ -201,15 +206,15 @@ void loop()
   }
 
   if (!(loop_counter % light_speed)) {
-    currentLightingRoutine(current_mode);
+    currentLightingRoutine(current_routine);
     updateLEDs();
   }
 
   // Timeout the LEDs.
   if ((idle_timeout != 0) && 
       (last_message_time + idle_timeout < millis())) {
-    routines.solid(0, 0, 0);
-    current_mode = eOff;
+    routines.singleSolid(0, 0, 0);
+    current_routine = eOff;
   }
 
   loop_counter++;
@@ -293,62 +298,62 @@ void updateLEDs()
  *
  * @param currentMode the current mode of the program
  */
-void currentLightingRoutine(ELightingMode currentMode)
+void currentLightingRoutine(ELightingRoutine currentMode)
 {
   switch (currentMode)
   {
     case eOff:
-      routines.solid(0, 0, 0);
+      routines.singleSolid(0, 0, 0);
       break;
 
     case eSingleSolid:
-      routines.solid(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
+      routines.singleSolid(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
       break;
 
     case eSingleBlink:
-      routines.blink(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
+      routines.singleBlink(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
       break;
 
     case eSingleFade:
       // allow for the color to change independently of the fade animation while setting a color
       if (last_message_time + light_speed > millis()) {
-        routines.fade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
+        routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
       } else {
-        routines.fade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
+        routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
       }
 
       break;
 
     case eSingleGlimmer:
       if (last_message_time + light_speed > millis()) {
-        routines.glimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT, false);
+        routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT, false);
       } else {
-        routines.glimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT, true);
+        routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT, true);
       }
       break;
 
     case eMultiGlimmer:
-      routines.arrayGlimmer(current_preset, GLIMMER_PERCENT);
+      routines.multiGlimmer(current_group, GLIMMER_PERCENT);
       break;
 
     case eMultiFade:
-      routines.arrayFade(current_preset);
+      routines.multiFade(current_group);
       break;
       
     case eMultiRandomSolid:
-      routines.arrayRandomSolid(current_preset);
+      routines.multiRandomSolid(current_group);
       break;
 
     case eMultiRandomIndividual:
-      routines.arrayRandomIndividual(current_preset);
+      routines.multiRandomIndividual(current_group);
       break;
 
     case eMultiBarsSolid:
-      routines.arrayBarsSolid(current_preset, BAR_SIZE);
+      routines.multiBarsSolid(current_group, BAR_SIZE);
       break;
 
     case eMultiBarsMoving:
-      routines.arrayBarsMoving(current_preset, BAR_SIZE);
+      routines.multiBarsMoving(current_group, BAR_SIZE);
       break;
       
     default:
@@ -372,25 +377,25 @@ void parsePacket(int header)
   switch (header)
   {
     case eModeChange:
-      if (parsed_packet.count == 2 && parsed_packet.values[1] < eLightingMode_MAX) {
-        if (parsed_packet.values[1] != current_mode) {
+      if (parsed_packet.count == 2 && parsed_packet.values[1] < eLightingRoutine_MAX) {
+        if (parsed_packet.values[1] != current_routine) {
             // Reset to 0 to draw to screen right away
             loop_counter = 0;
             success = true;
         }
         // change mode to new mode
-        current_mode = (ELightingMode)parsed_packet.values[1];
+        current_routine = (ELightingRoutine)parsed_packet.values[1];
       }
       // pick up cases where the modes can take extra optional arguments
       if (parsed_packet.count == 3) {
         if (parsed_packet.values[1] >= (int)eMultiGlimmer) {
-            if (parsed_packet.values[1] != current_mode) {
+            if (parsed_packet.values[1] != current_routine) {
               // Reset to 0 to draw to screen right away
               loop_counter = 0;
               success = true;
             }
-            current_mode = (ELightingMode)parsed_packet.values[1];
-            current_preset = (EColorPreset)parsed_packet.values[2];
+            current_routine = (ELightingRoutine)parsed_packet.values[1];
+            current_group = (EColorGroup)parsed_packet.values[2];
         } 
       }
       break;
@@ -411,7 +416,7 @@ void parsePacket(int header)
     case eCustomArrayColorChange:
       if (parsed_packet.count == 5) {
         int color_index = parsed_packet.values[1];
-        if (color_index >= 0 && color_index < eLightingMode_MAX) {
+        if (color_index >= 0 && color_index < eLightingRoutine_MAX) {
           // Reset to 0 to draw to screen right away
           loop_counter = 0;
           success = true;
@@ -450,7 +455,7 @@ void parsePacket(int header)
       if (parsed_packet.count == 2) {
         if (parsed_packet.values[1] > 0) {
           success = true;
-          routines.setColorCount(parsed_packet.values[1]);
+          routines.setCustomColorCount(parsed_packet.values[1]);
         }
       }
       break;

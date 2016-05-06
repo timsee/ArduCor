@@ -25,9 +25,9 @@ LightsSlider::LightsSlider(QWidget *parent) : QWidget(parent) {
 
 void LightsSlider::setSliderColorBackground(QColor color) {
     // compute a darker version for our gradient
-    QColor darkColor = QColor((uint8_t)(color.red() / 5),
-                              (uint8_t)(color.green() / 5),
-                              (uint8_t)(color.blue() / 5));
+    QColor darkColor = QColor((uint8_t)(color.red()   / 4),
+                              (uint8_t)(color.green() / 4),
+                              (uint8_t)(color.blue()  / 4));
 
     // generate a stylesheet based off of the color with a gradient
     QString styleSheetString = QString("QSlider::sub-page:horizontal{ "
@@ -45,7 +45,10 @@ void LightsSlider::setSliderColorBackground(QColor color) {
 
 void LightsSlider::receivedValue(int value) {
     value = jumpSliderToPosition(slider, value);
+    slider->blockSignals(true);
+    slider->setValue(value);
     emit valueChanged(value);
+    slider->blockSignals(false);
 }
 
 /*!
@@ -53,36 +56,33 @@ void LightsSlider::receivedValue(int value) {
  * http://stackoverflow.com/a/15321654
  */
 int LightsSlider::jumpSliderToPosition(std::shared_ptr<QSlider> slider, int newPos) {
+
     Qt::MouseButtons btns = QApplication::mouseButtons();
     QPoint localMousePos = slider->mapFromGlobal(QCursor::pos());
+    // check if a click happens directly on the slider
     bool clickOnSlider = (btns & Qt::LeftButton)
-                          && (localMousePos.x() >= 0
-                          && localMousePos.y() >= 0
-                          && localMousePos.x() < slider->size().width()
-                          && localMousePos.y() < slider->size().height());
+                          && (localMousePos.x() >= 0)
+                          && (localMousePos.y() >= 0)
+                          && (localMousePos.x() < slider->size().width())
+                          && (localMousePos.y() < slider->size().height());
+
+    // if its a click on the slider, use our custom logic.
     if (clickOnSlider) {
+        // calculate how far from the left the click on the slider is.
         float posRatio = localMousePos.x() / (float)slider->size().width();
         int sliderRange = slider->maximum() - slider->minimum();
-        int sliderPosUnderMouse = slider->minimum() + sliderRange * posRatio;
-        if (sliderPosUnderMouse != newPos) {
-            if (mShouldSnap) {
-                sliderPosUnderMouse = snapSliderToNearestTick(slider, sliderPosUnderMouse);
-            }
-            if (mUseMinimumPossible && (sliderPosUnderMouse < mMinimumPossible)) {
-                sliderPosUnderMouse = mMinimumPossible;
-            }
-            slider->setValue(sliderPosUnderMouse);
-           return sliderPosUnderMouse;
-        }
+        // update newPos to our new value
+        newPos = slider->minimum() + sliderRange * posRatio;
     }
 
+    // check if snapping is enabled, and snap if necessary
     if (mShouldSnap) {
         newPos = snapSliderToNearestTick(slider, newPos);
     }
+    // check if minimum possible is enabled, and update if necessary
     if (mUseMinimumPossible && (newPos < mMinimumPossible)) {
         newPos = mMinimumPossible;
     }
-
     return newPos;
 }
 

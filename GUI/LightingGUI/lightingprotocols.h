@@ -14,10 +14,11 @@
  */
 
 /*!
- * \enum ELightingMode The mode is for determining what LED routines to use. Some routines
- *  use a single color and others use multiple colors.
+ * \enum ELightingRoutine Each routine makes the LEDs shine in different ways. There are
+ *       two main types of routines: Single Color Routines use a single color while Multi
+ *       Color Routines rely on an EColorGroup.
  */
-enum class ELightingMode
+enum class ELightingRoutine
 {
     /*!
      * <b>0</b><br>
@@ -82,21 +83,22 @@ enum class ELightingMode
      *  effect.</i>
      */
     eMultiBarsMoving,
-    eLightingMode_MAX //total number of modes
+    eLightingRoutine_MAX //total number of modes
 };
 
 
 
 /*!
- * \enum EColorPreset used during multi color routines to determine
- * which colors to use in the routine. eCustom uses the custom color array,
- * while all other values use presets based around overall themes.
+ * \enum EColorGroup used during multi color routines to determine
+ *       which colors to use in the routine. eCustom uses the custom
+ *       color array, eAll generates its colors randomly. All
+ *       other values use presets based around overall themes.
  */
-enum class EColorPreset
+enum class EColorGroup
 {
     /*!
      * <b>0</b><br>
-     * <i>Use the custom color array instead of a preset routine.</i>
+     * <i>Use the custom color array instead of a preset group.</i>
      */
     eCustom,
     /*!
@@ -186,11 +188,11 @@ enum class EColorPreset
     eSevenColor,
     /*!
      * <b>17</b><br>
-     * <i>Rather than using using presets, it uses all
+     * <i>Rather than using using preset colors, it uses all
      * possible colors.</i>
      */
     eAll,
-    eColorPreset_MAX //total number of presets
+    eColorGroup_MAX //total number of presets
 };
 
 

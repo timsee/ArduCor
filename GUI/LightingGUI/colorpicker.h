@@ -45,14 +45,14 @@ enum class ELayoutColorPicker {
 
 /*!
  * \brief The ColorPicker class is an object that combines three LightsSliders
- * and a color wheel to giver an interface for choosing colors.
+ * and a color wheel to create an interface for choosing colors.
  *
- * Whenever a color is selected, it signals out a QColor representation of that
- * color to all connected slots. Colors can be selected by by moving the sliders
- * or by clicking anywhere on the color wheel. A timer is used to throttle the
- * signals to prevent sending messages too frequently.
+ * Whenever a color is selected, it signals out a QColor of to all connected slots.
+ * Colors can be selected by by moving the sliders or by clicking anywhere on the
+ * color wheel. A timer is used to throttle the signals to prevent sending messages
+ * too frequently.
  *
- * A layout should be set in the constructor that owns a ColorPicker. This
+ * A layout can be set during its construction, but cannot be changed on the fly. This
  * layout uses ELayoutColorPicker as a parameter and this can be used to hide the
  * sliders, hide the color wheel, or move the color wheel from the top of the sliders
  * to the left of them.

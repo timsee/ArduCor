@@ -34,12 +34,6 @@ public:
     ~DataLayer();
 
     /*!
-     * \brief creates a color based off of the average of all colors currently being used
-     * \return a QColor that represents the average of all colors up to `mColorsUsed` in `colors*`.
-     */
-    QColor colorsAverage();
-
-    /*!
      * \brief the main saved color, used for single color routines.
      */
     bool mainColor(QColor newColor);
@@ -50,82 +44,46 @@ public:
     QColor mainColor();
 
     /*!
-     * \brief arraySize size of the color array at the given index.
-     * \return the size of the color array at the given index.
+     * \brief groupSize number of colors used by a color group. For the custom color array,
+     *        this changes by changing the customColorCount. For all others, its the size of the
+     *        of the preset array.
+     * \return the number of colors used in the color group.
      */
-    uint8_t arraySize(int);
+    uint8_t groupSize(EColorGroup group);
 
     /*!
-     * \brief colorArray the color array at the given index. Can be used
+     * \brief colorGroup the color group at the given index. Can be used
      *        to access the custom color array or any of the presets.
      * \return the color array at the given index.
      */
-    QColor* colorArray(int);
+    QColor *colorGroup(EColorGroup group);
 
     /*!
-     * \brief customArray convenience function to access the custom color array
-     * \return the custom color array.
+     * \brief maxColorGroupSize the largest possible size for a color group. Can also
+     *        be used as the size of the custom color group.
+     * \return the size of the largest EColorGroup.
      */
-    QColor* customArray();
+    uint8_t maxColorGroupSize();
 
     /*!
-     * \brief isUsingSerial true if using serial, false if using UDP
+     * \brief creates a color based off of the average of all colors in the color group
+     * \param group a color group
+     * \return a QColor that represents the average of all colors used by color group.
      */
-    bool isUsingSerial;
+    QColor colorsAverage(EColorGroup group);
 
     /*!
-     * serial port maintence
+     * \brief current routine of LEDs
      */
-    bool setupSerial(QString serial);
+    bool currentRoutine(ELightingRoutine mode);
     /*!
-     * \brief serialPort getter for the string of the current serial port.
-     * \return string representation of the current serial port.
+     * \brief routine getter for the current ELightingRoutine.
+     * \return the current lighting routine getting displayed on the LED array.
      */
-    QString serialPort();
+    ELightingRoutine currentRoutine();
 
     /*!
-     * NYI
-     * \brief setupUDP sets up the UDP client to talk to the LED array.
-     * \param ip ip address of hte LED array
-     * \param port port for connection to the LED array
-     * \return true if client is set up properly, false otherwise.
-     */
-    bool setupUDP(QString ip, int port);
-    /*!
-     * NYI
-     * \brief IP getter for the IP Address of the current UDP connection.
-     * \return IP Address for the UDP connection.
-     */
-    QString IP();
-    /*!
-     * NYI
-     * \brief UDPPort getter for the port of the current UDP connection.
-     * \return port for the UDP connection.
-     */
-    int UDPPort();
-
-    /*!
-     * true if lights are on, false otherwise
-     */
-    bool isOn(bool isOn);
-    /*!
-     * \brief isOn getter which checks if the lights are currently on.
-     * \return true if the lights are on, false otherwise.
-     */
-    bool isOn();
-
-    /*!
-     * mode of LEDs
-     */
-    bool currentMode(ELightingMode mode);
-    /*!
-     * \brief currentMode getter for the current ELightingMode.
-     * \return the current lighting mode getting displayed on the LED array.
-     */
-    ELightingMode currentMode();
-
-    /*!
-     * value between 0-100 that represents how bright the LEDs shine
+     * \brief value between 0-100 that represents how bright the LEDs shine
      */
     bool brightness(int brightness);
     /*!
@@ -135,7 +93,7 @@ public:
     int brightness();
 
     /*!
-     * Time it takes the LEDs to turn off in minutes.
+     * \brief Time it takes the LEDs to turn off in minutes.
      */
     bool timeOut(int timeOut);
     /*!
@@ -147,20 +105,20 @@ public:
     int timeOut();
 
     /*!
-     * The EColorPreset currently in use by the LEDs. This is used
-     * for multi color routines.
+     * \brief The EColorGroup currently in use by the LEDs. This is used
+     *        for multi color routines.
      */
-    bool preset(EColorPreset preset);
+    bool currentColorGroup(EColorGroup preset);
     /*!
-     * \brief preset getter for the current color preset.
-     * \return the EColorPreset that represents the colors being displayed on
+     * \brief currentColorGroup getter for the current color preset.
+     * \return the EColorGroup that represents the colors being displayed on
      *         the LED array.
      */
-    EColorPreset preset();
+    EColorGroup currentColorGroup();
 
     /*!
-     *  Time between LED updates as FPS * 100. For example,
-     *  a FPS of 5 is 500.
+     *  \brief Time between LED updates as FPS * 100. For example,
+     *         a FPS of 5 is 500.
      */
     bool speed(int speed);
     /*!
@@ -170,31 +128,20 @@ public:
     int speed();
 
     /*!
-     * number of colors in the color array
+     * \brief number of colors in the color array
      */
-    bool customColorCount(int count);
+    bool customColorsUsed(int count);
     /*!
      * \brief colorCount getter for the number of colors usd by
      *        the by the custom color routines. Will always be less
      *        than the total number of colors in the custom color array.
      * \return the number of colors used for a custom color routine.
      */
-    int customColorCount();
-
-    /*!
-     * number of colors to use in the color array routines.
-     * Must be less than the color count.
-     */
-    bool colorsUsed(int colorsUsed);
-    /*!
-     * \brief colorsUsed getted for the number of colors used
-     * \return the number of colors used by the current color preset.
-     */
-    int colorsUsed();
+    int customColorUsed();
 
     /*!
      * \brief resetToDefaults resets the GUI and the arduino to the default values,
-     * as defined at compile time.
+     *        as defined at compile time.
      */
     void resetToDefaults();
 
@@ -203,32 +150,38 @@ private:
     /*!
      * \brief mArraySizes the array that holds the sizes color arrays.
      */
-    uint8_t mArraySizes[(int)EColorPreset::eColorPreset_MAX];
+    uint8_t mArraySizes[(int)EColorGroup::eColorGroup_MAX];
 
     /*!
      * \brief mColors the color arrays used for routines. This contains
      *        the custom color array and all of the presets.
      */
-    QColor *mColors[(int)EColorPreset::eColorPreset_MAX];
+    QColor *mColors[(int)EColorGroup::eColorGroup_MAX];
 
     /*!
-     * The color used for single color routines.
+     * \brief The color used for single color routines.
      */
     QColor mMainColor;
 
     /*!
-     * \brief true if lights are on, false otherwise
+     * \brief mCurrentRoutine the mode of the LEDs
      */
-    bool mIsOn;
+    ELightingRoutine mCurrentRoutine;
 
     /*!
-     * \brief currentMode the mode of the LEDs
+     * \brief mColorGroup the current preset being used for multi color routines.
      */
-    ELightingMode mCurrentMode;
+    EColorGroup mColorGroup;
+
+    /*!
+     * \brief mCustomColorsUsed the number of colors used multi color routines using the
+     *        custom color group.
+     */
+    int mCustomColorsUsed;
 
     /*!
      * \brief timeOut the amount of minutes before the lights turn off. If 0, then the
-     *  lights never turn off.
+     *        lights never turn off.
      */
     int mTimeOut;
 
@@ -236,32 +189,6 @@ private:
      * \brief brightness 0-100, how bright the LEDs are
      */
     int mBrightness;
-
-    /*!
-     * \brief mPreset the current preset being used for multi color routines.
-     */
-    EColorPreset mPreset;
-
-    /*!
-     * \brief serialPort the name of the serial port, used only if isUsingSerial is true.
-     */
-    QString mSerialPort;
-
-    /*!
-     * \brief ipAddress the IP address, only used if isUsingSerial is false.
-     */
-    QString mIpAddress;
-
-    /*!
-     * \brief port the port for the UDP connection, only used if isUSingSerial is false.
-     */
-    int mUDPPort;
-
-    /*!
-     * \brief mColorsUsed the number of colors used for array colors routines. Must be less
-     *        than colorCount.
-     */
-    int mColorsUsed;
 
     /*!
      * \brief mSpeed the current speed value of the arduino.

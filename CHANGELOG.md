@@ -47,3 +47,14 @@
 * Moved color presets to PROGMEM. 
 * Documented all projects.
 * Cleaned code and fixed bugs across all projects.
+
+### **v1.9.2** 
+#### API and Bug Fixes Update
+* Refactored `EColorPreset` and `ELightingMode` to `EColorGroup` and `ELightingRoutine`.
+* Updated API to be more uniform across projects. 
+* Polished menu bar for the GUI.
+* Added Application Icon for the GUI. 
+* Cleaned code and fixed bugs across all projects.
+* Updated project documentation to reflect API changes. 
+* Cleaned code and fixed bugs across all projects.
+

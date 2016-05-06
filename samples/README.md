@@ -1,6 +1,6 @@
 # Sample Sketches for RGB LED Routines
 
-Provides a set of sample sketches for Adafruit NeoPixels products, SeeedStudio Rainbowduino, and a single standard RGB LED. 
+The sample sketches for Adafruit NeoPixels, SeeedStudio Rainbowduino, and a single RGB LED. 
 
 ## <a name="toc"></a>Table of Contents
 
@@ -34,26 +34,26 @@ behavior depending on whether its a common anode or a common cathode. To handle 
 ### <a name="ascii-communication"></a>ASCII Communication
 
 
-The sample sketch provides a serial interface that is designed to take ASCII strings at a baud rate of 19200. The commands are a list of integers in the following format:
+The sample sketches provide a serial interface that uses ASCII strings at a baud rate of 19200. The commands are a list of integers in the following format:
 
 ```
 Header,param1,param2,param3,param4;
 ```
 
-#### Mode Change
+#### Lighting Routine Change
 
 | Parameter         | Values        | 
 | ----------------- | ------------- |
 | Header            |     0         | 
-| New Mode          | (ELightingMode)0 - 10  |  
-| Preset (Optional) | (EColorPreset)0 - 17        |  
+| New Routine       | (ELightingRoutine)0 - 10  |  
+| Color Group (Optional) | (EColorGroup)0 - 17        |  
 
-**Example:** `0,1;` *(Header 0, New Mode 1)*
- `0,4,6;` *(Header 0, New Mode 4, New Mode 6)* 
+**Example:** `0,1;` *(Header 0, New Routine 1)*
+ `0,4,6;` *(Header 0, New Routine 4, New Color Group 6)* 
 
-*Note: If a preset is provided, it changes the color array being used with multi color routines. To find a description and number representation of ELightingMode and EColorPreset, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). *
+*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). *
 
-#### Set Main Color
+#### Set Color for Single Color Routines
 
 | Parameter     | Values        | 
 | ------------- | ------------- |
@@ -63,20 +63,19 @@ Header,param1,param2,param3,param4;
 | Blue          | 0 - 255       |
 **Example:** `1,255,127,0;` *(Header 1, Saved Color 3, Red 255, Green 127, Blue 0)*
 
-*Note: In the sample sketches, this color is used for single color routines.*
 
 #### Set Color in Custom Color Array
 
 | Parameter     | Values        | 
 | ------------- | ------------- |
 | Header        |     2         | 
-| Saved Color   | 0 - NUM_OF_COLORS | 
+| Color Index   | 0 - 10 | 
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
 **Example:** `2,3,255,127,0;` *(Header 2, Saved Color 3, Red 255, Green 127, Blue 0)*
 
-*Note: The number of array colors is defined by the const `NUM_OF_COLORS` in the code. By default it is set to 5. These colors can only be used in routines that use multiple colors.*
+*Note: The Color Index must be smaller than the size of the custom color array, which is currently 10. These can be used in multi color routines by using the EColorGroup `eCustom`*
 
 #### Set Brightness
 
@@ -101,7 +100,7 @@ Header,param1,param2,param3,param4;
 | Parameter     | Values        | 
 | ------------- | ------------- |
 | Header        |     5         | 
-| Count *       | 1 - COLOR_COUNT |
+| Count *       | 1 - 10        |
 **Example:** `5,3;` *(Header 5, 3 colors)*
 
 *Note: This setting controls the number of colors used for multi color routines using the custom color array.*
@@ -129,9 +128,9 @@ Header,param1,param2,param3,param4;
 
 ### <a name="generating-samples"></a>Generating Samples
 
-Samples are generated off of the `RGB-LED-Routines` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates 3 versions of the sketch. It does this since the arduino IDE doesn't always play nicely with preprocesor directives. Each of the versions generated contains only the relevant code for one of the hardware setups. To make changes to all the samples, changes need to be made the `RGB-LED-Routines` sketch and then the `generate_samples.sh` script must be ran again. To test any independent sketch from the `RGB-LED-Routines` sketch, you can set the preprocessor directives on the first few lines of the sketch. Only one define should be set to `1` at any given time. 
+Samples are generated off of the `RGB-LED-Routines` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates 3 versions of the sketch. It does this since the arduino IDE doesn't always play nicely with preprocesor directives and it will outright ignore them for includes, making the sample size larger than it needs to be. Each of the versions generated contains only the relevant code for one of the hardware setups. To make changes to all the samples, changes need to be made the `RGB-LED-Routines` sketch and then the `generate_samples.sh` script must be ran again. To test any independent sketch from the `RGB-LED-Routines` sketch, you can set the preprocessor directives on the first few lines of the sketch. Only one define should be set to `1` at any given time. 
 
-There is also the option for a custom sketch, which is useful if you have a complex light setup but you still want to use the master project instead of sketches for development.
+There is also the option for a custom sketch, which is useful if you have a complex light setup but you still want to use the master project for development.
 
 
 

@@ -4,30 +4,30 @@
  *
  */
 
-#include "presetarraypage.h"
-#include "ui_presetarraypage.h"
+#include "presetcolorspage.h"
+#include "ui_PresetColorsPage.h"
 #include <QDebug>
 #include <QSignalMapper>
 #include "icondata.h"
 
-PresetArrayPage::PresetArrayPage(QWidget *parent) :
+PresetColorsPage::PresetColorsPage(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::PresetArrayPage) {
+    ui(new Ui::PresetColorsPage) {
     ui->setupUi(this);
 
     ui->scrollArea->setStyleSheet("background-color:transparent;");
 }
 
-PresetArrayPage::~PresetArrayPage() {
+PresetColorsPage::~PresetColorsPage() {
     delete ui;
 }
 
 
 void
-PresetArrayPage::setupPresets()
+PresetColorsPage::setupPresets()
 {
-    int presetMax = (int)EColorPreset::eColorPreset_MAX - 1;
-    mButtonCount = presetMax * ((int)ELightingMode::eLightingMode_MAX - (int)ELightingMode::eMultiGlimmer);
+    int colorGroupMax = (int)EColorGroup::eColorGroup_MAX - 1;
+    mButtonCount = colorGroupMax * ((int)ELightingRoutine::eLightingRoutine_MAX - (int)ELightingRoutine::eMultiGlimmer);
     std::vector<std::string> labels = {"Water",
                                        "Frozen",
                                        "Snow",
@@ -48,33 +48,33 @@ PresetArrayPage::setupPresets()
 
     mButtonLayout = new QGridLayout;
     mPresetButtons = std::vector<LightsButton *>(mButtonCount, nullptr);
-    mPresetLabels = std::vector<QLabel *>(presetMax, nullptr);
+    mPresetLabels = std::vector<QLabel *>(colorGroupMax, nullptr);
 
     int modeIndex = 0;
-    int presetIndex = 0;
+    int groupIndex = 0;
     int layoutColumnIndex = 0;
-    for (int preset = (int)EColorPreset::eWater; preset < (int)EColorPreset::eColorPreset_MAX; preset++) {
-        mPresetLabels[presetIndex] = new QLabel;
-        mPresetLabels[presetIndex]->setText(labels[presetIndex].c_str());
-        mPresetLabels[presetIndex]->setAlignment(Qt::AlignCenter);
-        mPresetLabels[presetIndex]->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    for (int preset = (int)EColorGroup::eWater; preset < (int)EColorGroup::eColorGroup_MAX; preset++) {
+        mPresetLabels[groupIndex] = new QLabel;
+        mPresetLabels[groupIndex]->setText(labels[groupIndex].c_str());
+        mPresetLabels[groupIndex]->setAlignment(Qt::AlignCenter);
+        mPresetLabels[groupIndex]->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
         layoutColumnIndex = 0;
         // add to layout
-        mButtonLayout->addWidget(mPresetLabels[presetIndex], layoutColumnIndex, presetIndex);
+        mButtonLayout->addWidget(mPresetLabels[groupIndex], layoutColumnIndex, groupIndex);
         layoutColumnIndex++;
-        for (int mode = (int)ELightingMode::eMultiGlimmer; mode < (int)ELightingMode::eLightingMode_MAX; mode++) {
+        for (int routine = (int)ELightingRoutine::eMultiGlimmer; routine < (int)ELightingRoutine::eLightingRoutine_MAX; routine++) {
             mPresetButtons[modeIndex] = new LightsButton;
-            mPresetButtons[modeIndex]->setupAsPresetButton((ELightingMode)mode, (EColorPreset)preset, mData);
+            mPresetButtons[modeIndex]->setupAsMultiButton((ELightingRoutine)routine, (EColorGroup)preset, mData);
             mPresetButtons[modeIndex]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            connect(mPresetButtons[modeIndex], SIGNAL(presetClicked(int, int)), this, SLOT(presetButtonClicked(int, int)));
+            connect(mPresetButtons[modeIndex], SIGNAL(presetClicked(int, int)), this, SLOT(multiButtonClicked(int, int)));
 
             // add to layout
-            mButtonLayout->addWidget(mPresetButtons[modeIndex], layoutColumnIndex, presetIndex);
+            mButtonLayout->addWidget(mPresetButtons[modeIndex], layoutColumnIndex, groupIndex);
             layoutColumnIndex++;
             modeIndex++;
         }
-        presetIndex++;
+        groupIndex++;
     }
 
     ui->scrollArea->setWidgetResizable(true);
@@ -85,14 +85,16 @@ PresetArrayPage::setupPresets()
     ui->scrollArea->setStyleSheet("background-color:transparent;");
  }
 
-void PresetArrayPage::highlightModeButton(ELightingMode mode, EColorPreset preset) {
+void PresetColorsPage::highlightRoutineButton(ELightingRoutine routine, EColorGroup colorGroup) {
     for (int i = 0; i < mButtonCount; i++) {
-        if ((mPresetButtons[i]->lightingMode() == mode)
-                && (mPresetButtons[i]->colorPreset() == preset)) {
+        if ((mPresetButtons[i]->lightingRoutine() == routine)
+                && (mPresetButtons[i]->colorGroup() == colorGroup)) {
             mPresetButtons[i]->button->setChecked(true);
+            mPresetButtons[i]->button->setStyleSheet("background-color: rgb(67, 67, 67); ");
         }
         else {
             mPresetButtons[i]->button->setChecked(false);
+            mPresetButtons[i]->button->setStyleSheet("background-color: rgb(47, 47, 47);");
         }
     }
 }
@@ -102,11 +104,11 @@ void PresetArrayPage::highlightModeButton(ELightingMode mode, EColorPreset prese
 // Slots
 // ----------------------------
 
-void PresetArrayPage::presetButtonClicked(int mode, int preset) {
-    mData->currentMode((ELightingMode)mode);
-    mData->preset((EColorPreset)preset);
-    mComm->sendArrayModeChange((ELightingMode)mode, preset);
-    highlightModeButton(mData->currentMode(), mData->preset());
+void PresetColorsPage::multiButtonClicked(int routine, int colorGroup) {
+    mData->currentRoutine((ELightingRoutine)routine);
+    mData->currentColorGroup((EColorGroup)colorGroup);
+    mComm->sendRoutineChange((ELightingRoutine)routine, colorGroup);
+    highlightRoutineButton(mData->currentRoutine(), mData->currentColorGroup());
     emit updateMainIcons();
 }
 
@@ -115,7 +117,7 @@ void PresetArrayPage::presetButtonClicked(int mode, int preset) {
 // Protected
 // ----------------------------
 
-void PresetArrayPage::showEvent(QShowEvent *) {
-    highlightModeButton(mData->currentMode(), mData->preset());
+void PresetColorsPage::showEvent(QShowEvent *) {
+    highlightRoutineButton(mData->currentRoutine(), mData->currentColorGroup());
 }
 

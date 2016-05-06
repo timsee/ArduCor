@@ -32,3 +32,12 @@
 * Removed unnecessary variables.
 * Documented all headers.
 * Fixed miscellaneous bugs.
+
+### **v0.7.0** 
+#### API and Bug Fixes Update
+* Refactored `EColorPreset` and `ELightingMode` to `EColorGroup` and `ELightingRoutine`.
+* Polished menu bar.
+* Added Application Icon.
+* Fixed bugs in LightsSlider.
+* Fixed state management bugs.
+* Updated project documentation to reflect API changes. 
