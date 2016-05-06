@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.1</span>
+   &#160;<span id="projectnumber">v1.9.2</span>
    </div>
   </td>
  </tr>
@@ -87,10 +87,10 @@ Functions</h2></td></tr>
 <tr class="separator:gae780a47936a2411639a14bfccb8afd7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0c4936c51b267619e3ca8e14fd6c926b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga0c4936c51b267619e3ca8e14fd6c926b">RoutinesRGB::setColor</a> (uint16_t colorIndex, byte r, byte g, byte b)</td></tr>
 <tr class="separator:ga0c4936c51b267619e3ca8e14fd6c926b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab3e3e895e19dcb54bda890511f44093a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gab3e3e895e19dcb54bda890511f44093a">RoutinesRGB::setColorCount</a> (uint8_t count)</td></tr>
-<tr class="separator:gab3e3e895e19dcb54bda890511f44093a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga98cd8085491ee6c33c728998af65e631"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga98cd8085491ee6c33c728998af65e631">RoutinesRGB::colorCount</a> ()</td></tr>
-<tr class="separator:ga98cd8085491ee6c33c728998af65e631"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac0b1b6bae8d88290211aa095f9ae7879"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gac0b1b6bae8d88290211aa095f9ae7879">RoutinesRGB::setCustomColorCount</a> (uint8_t count)</td></tr>
+<tr class="separator:gac0b1b6bae8d88290211aa095f9ae7879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafe92a925b68f773e9ad3148a329ac4a9"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gafe92a925b68f773e9ad3148a329ac4a9">RoutinesRGB::customColorCount</a> ()</td></tr>
+<tr class="separator:gafe92a925b68f773e9ad3148a329ac4a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga06861d759557dec5efd6a334cce25aa0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga06861d759557dec5efd6a334cce25aa0">RoutinesRGB::brightness</a> (uint8_t brightness)</td></tr>
 <tr class="separator:ga06861d759557dec5efd6a334cce25aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gacbbb97f67e668e7a639c52a07496c03d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gacbbb97f67e668e7a639c52a07496c03d">RoutinesRGB::fadeSpeed</a> (uint8_t fadeSpeed)</td></tr>
@@ -185,12 +185,12 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga98cd8085491ee6c33c728998af65e631"></a>
+<a class="anchor" id="gafe92a925b68f773e9ad3148a329ac4a9"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t RoutinesRGB::colorCount </td>
+          <td class="memname">uint8_t RoutinesRGB::customColorCount </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -303,16 +303,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Set the color at a given index with the RGB values provided. colorIndex must be less than the colorCount provided to the constructor or else it will not have any effect. </p>
+<p>Set the color in the custom color array at the provided index. colorIndex must be less than the size of the custom color array or else it won't have any effect. </p>
 
 </div>
 </div>
-<a class="anchor" id="gab3e3e895e19dcb54bda890511f44093a"></a>
+<a class="anchor" id="gac0b1b6bae8d88290211aa095f9ae7879"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void RoutinesRGB::setColorCount </td>
+          <td class="memname">void RoutinesRGB::setCustomColorCount </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>count</em></td><td>)</td>
@@ -320,7 +320,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Sets the amount of colors used in custom array routines. This is useful when you want to use a subset of the custom array. The value given must be less than the size of the custom array or else it will be set to use the entire array. </p>
+<p>Sets the amount of colors used in custom multi color routines. This is useful when you want to use a subset of the custom colors. The value given must be less than the size of the custom array or else it will be set to use the entire array. </p>
 
 </div>
 </div>

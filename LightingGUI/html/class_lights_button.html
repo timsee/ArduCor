@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.6.0</span>
+   &#160;<span id="projectnumber">v0.7.0</span>
    </div>
   </td>
  </tr>
@@ -55,7 +55,7 @@
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_lights_button.html" title="The LightsButton class provides a QPushbutton with some extra logic to generate its own IconData and ...">LightsButton</a> class provides a QPushbutton with some extra logic to generate its own <a class="el" href="class_icon_data.html" title="The IconData class creates all the grids of colors that are seen throughout the app&#39;s icons...">IconData</a> and custom signals.  
+<p>The <a class="el" href="class_lights_button.html" title="The LightsButton class provides a QPushbutton with some extra logic to generate its own IconData and ...">LightsButton</a> class provides a QPushbutton with some extra logic to generate its own <a class="el" href="class_icon_data.html" title="The IconData class creates all the pixel-y square icons that are seen throughout the app...">IconData</a> and custom signals.  
  <a href="class_lights_button.html#details">More...</a></p>
 
 <p><code>#include &quot;<a class="el" href="lightsbutton_8h_source.html">lightsbutton.h</a>&quot;</code></p>
@@ -74,15 +74,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae68d92b5d8354db7b6ea47dd40917bb2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#ae68d92b5d8354db7b6ea47dd40917bb2">LightsButton</a> (QWidget *parent=0)</td></tr>
 <tr class="memdesc:ae68d92b5d8354db7b6ea47dd40917bb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ae68d92b5d8354db7b6ea47dd40917bb2">More...</a><br /></td></tr>
 <tr class="separator:ae68d92b5d8354db7b6ea47dd40917bb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27b2e355f088d462565b5aef8f5b9fc0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a27b2e355f088d462565b5aef8f5b9fc0">setupAsPresetButton</a> (ELightingMode mode, EColorPreset preset, std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt; dataLayer)</td></tr>
-<tr class="memdesc:a27b2e355f088d462565b5aef8f5b9fc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">setupAsPresetButton sets up the button for use with the <a class="el" href="class_preset_array_page.html" title="The PresetArrayPage provides a way to use the Color Presets from the arduino&#39;s RoutineRGB library...">PresetArrayPage</a>. Assigns it a mode, a preset, and an icon. Whenever the button is clicked it will emit presetClicked and will send its mode and preset in that signal.  <a href="#a27b2e355f088d462565b5aef8f5b9fc0">More...</a><br /></td></tr>
-<tr class="separator:a27b2e355f088d462565b5aef8f5b9fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1beddaad900a0806d1c87ecea4f73895"><td class="memItemLeft" align="right" valign="top">ELightingMode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a1beddaad900a0806d1c87ecea4f73895">lightingMode</a> ()</td></tr>
-<tr class="memdesc:a1beddaad900a0806d1c87ecea4f73895"><td class="mdescLeft">&#160;</td><td class="mdescRight">lightingMode the ELightingMode assigned to the button by setupAsPresetButton.  <a href="#a1beddaad900a0806d1c87ecea4f73895">More...</a><br /></td></tr>
-<tr class="separator:a1beddaad900a0806d1c87ecea4f73895"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acba0e12faeac33a70844ca2fa755beda"><td class="memItemLeft" align="right" valign="top">EColorPreset&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#acba0e12faeac33a70844ca2fa755beda">colorPreset</a> ()</td></tr>
-<tr class="memdesc:acba0e12faeac33a70844ca2fa755beda"><td class="mdescLeft">&#160;</td><td class="mdescRight">lightingMode the EColorPreset assigned to the button by setupAsPresetButton.  <a href="#acba0e12faeac33a70844ca2fa755beda">More...</a><br /></td></tr>
-<tr class="separator:acba0e12faeac33a70844ca2fa755beda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48163f107fc3e9143e465023786f4c94"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a48163f107fc3e9143e465023786f4c94">setupAsMultiButton</a> (ELightingRoutine routine, EColorGroup <a class="el" href="class_lights_button.html#a93e1a4c442d4a6cee80a1a09b3bb2835">colorGroup</a>, std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt; dataLayer)</td></tr>
+<tr class="memdesc:a48163f107fc3e9143e465023786f4c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">setupAsMultiButton sets up the button for use with the PresetArrayPage. Assigns it a mode, a preset, and an icon. Whenever the button is clicked it will emit presetClicked and will send its mode and preset in that signal.  <a href="#a48163f107fc3e9143e465023786f4c94">More...</a><br /></td></tr>
+<tr class="separator:a48163f107fc3e9143e465023786f4c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebf97d7ca465530e46c403489d395a17"><td class="memItemLeft" align="right" valign="top">ELightingRoutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#aebf97d7ca465530e46c403489d395a17">lightingRoutine</a> ()</td></tr>
+<tr class="memdesc:aebf97d7ca465530e46c403489d395a17"><td class="mdescLeft">&#160;</td><td class="mdescRight">lightingRoutine the ELightingRoutine assigned to the button by setupAsMultiButton.  <a href="#aebf97d7ca465530e46c403489d395a17">More...</a><br /></td></tr>
+<tr class="separator:aebf97d7ca465530e46c403489d395a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93e1a4c442d4a6cee80a1a09b3bb2835"><td class="memItemLeft" align="right" valign="top">EColorGroup&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a93e1a4c442d4a6cee80a1a09b3bb2835">colorGroup</a> ()</td></tr>
+<tr class="memdesc:a93e1a4c442d4a6cee80a1a09b3bb2835"><td class="mdescLeft">&#160;</td><td class="mdescRight">colorGroup the EColorGroup assigned to the button by setupAsMultiButton.  <a href="#a93e1a4c442d4a6cee80a1a09b3bb2835">More...</a><br /></td></tr>
+<tr class="separator:a93e1a4c442d4a6cee80a1a09b3bb2835"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -128,53 +128,53 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="acba0e12faeac33a70844ca2fa755beda"></a>
+<a class="anchor" id="a93e1a4c442d4a6cee80a1a09b3bb2835"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">EColorPreset LightsButton::colorPreset </td>
+          <td class="memname">EColorGroup LightsButton::colorGroup </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>the button's preset </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the button's color group </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a1beddaad900a0806d1c87ecea4f73895"></a>
+<a class="anchor" id="aebf97d7ca465530e46c403489d395a17"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">ELightingMode LightsButton::lightingMode </td>
+          <td class="memname">ELightingRoutine LightsButton::lightingRoutine </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>the button's lighting mode </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the button's lighting routine </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a27b2e355f088d462565b5aef8f5b9fc0"></a>
+<a class="anchor" id="a48163f107fc3e9143e465023786f4c94"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void LightsButton::setupAsPresetButton </td>
+          <td class="memname">void LightsButton::setupAsMultiButton </td>
           <td>(</td>
-          <td class="paramtype">ELightingMode&#160;</td>
-          <td class="paramname"><em>mode</em>, </td>
+          <td class="paramtype">ELightingRoutine&#160;</td>
+          <td class="paramname"><em>routine</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">EColorPreset&#160;</td>
-          <td class="paramname"><em>preset</em>, </td>
+          <td class="paramtype">EColorGroup&#160;</td>
+          <td class="paramname"><em>colorGroup</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -191,8 +191,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">mode</td><td>the ELightingMode that emits when this button is pushed. </td></tr>
-    <tr><td class="paramname">preset</td><td>The EColorPreset that emits when this button is pushed. </td></tr>
+    <tr><td class="paramname">routine</td><td>the ELightingRoutine that emits when this button is pushed. </td></tr>
+    <tr><td class="paramname">colorGroup</td><td>The EColorGroup that emits when this button is pushed. </td></tr>
     <tr><td class="paramname">dataLayer</td><td>used to create the icon for the button </td></tr>
   </table>
   </dd>

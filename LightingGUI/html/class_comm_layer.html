@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.6.0</span>
+   &#160;<span id="projectnumber">v0.7.0</span>
    </div>
   </td>
  </tr>
@@ -53,7 +53,7 @@
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_comm_layer.html" title="The CommLayer class provides communication protocols that allow the user to connect and send packets ...">CommLayer</a> class provides communication protocols that allow the user to connect and send packets to an LED array. Currently it supports serial communication. In a future update it will also support UDP.  
+<p>The <a class="el" href="class_comm_layer.html" title="The CommLayer class provides communication protocols that allow the user to connect and send packets ...">CommLayer</a> class provides communication protocols that allow the user to connect and send packets to an LED array. Currently it supports serial communication. In a future update it will also support UDP and HTTP.  
  <a href="class_comm_layer.html#details">More...</a></p>
 
 <p><code>#include &quot;<a class="el" href="commlayer_8h_source.html">commlayer.h</a>&quot;</code></p>
@@ -67,7 +67,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a0ae60a1d5e75464aad64843e8c6d4e36">~CommLayer</a> ()</td></tr>
 <tr class="memdesc:a0ae60a1d5e75464aad64843e8c6d4e36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deconstructor. <br /></td></tr>
 <tr class="separator:a0ae60a1d5e75464aad64843e8c6d4e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94b5e6ad5b6d7b7f021b25ebfc1541ea"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a94b5e6ad5b6d7b7f021b25ebfc1541ea">connectSerialPort</a> (QString serialPortName)</td></tr>
+<tr class="memitem:a94b5e6ad5b6d7b7f021b25ebfc1541ea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94b5e6ad5b6d7b7f021b25ebfc1541ea"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a94b5e6ad5b6d7b7f021b25ebfc1541ea">connectSerialPort</a> (QString serialPortName)</td></tr>
+<tr class="memdesc:a94b5e6ad5b6d7b7f021b25ebfc1541ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">start up a serial port <br /></td></tr>
 <tr class="separator:a94b5e6ad5b6d7b7f021b25ebfc1541ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1895baa7af878d80e3efcd6335b9a588"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1895baa7af878d80e3efcd6335b9a588"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a1895baa7af878d80e3efcd6335b9a588">closeSerialPort</a> ()</td></tr>
@@ -79,12 +81,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a2352cfaf8d78e776922c57bf08252612"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a2352cfaf8d78e776922c57bf08252612">sendArrayColorChange</a> (int index, QColor color)</td></tr>
 <tr class="memdesc:a2352cfaf8d78e776922c57bf08252612"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendColorChange change an array color in the lighting system  <a href="#a2352cfaf8d78e776922c57bf08252612">More...</a><br /></td></tr>
 <tr class="separator:a2352cfaf8d78e776922c57bf08252612"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a344a4ccd2439719dabdc4accbbd18442"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a344a4ccd2439719dabdc4accbbd18442">sendModeChange</a> (ELightingMode mode)</td></tr>
-<tr class="memdesc:a344a4ccd2439719dabdc4accbbd18442"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendModeChange change the mode of the lights. The mode changes how the lights look. some modes are a single color, some modes are random colors and some use a saved array.  <a href="#a344a4ccd2439719dabdc4accbbd18442">More...</a><br /></td></tr>
-<tr class="separator:a344a4ccd2439719dabdc4accbbd18442"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab52e682731b145001a083487e8003a37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#ab52e682731b145001a083487e8003a37">sendArrayModeChange</a> (ELightingMode mode, int presetUsed=0)</td></tr>
-<tr class="memdesc:ab52e682731b145001a083487e8003a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendArrayModeChange similar to sendModeChange, but this command works specifically with array modes. It has an added argument that controls how many colors are used when displaying the array mode.  <a href="#ab52e682731b145001a083487e8003a37">More...</a><br /></td></tr>
-<tr class="separator:ab52e682731b145001a083487e8003a37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab79cb36711c9834885201d679e4bdd85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#ab79cb36711c9834885201d679e4bdd85">sendRoutineChange</a> (ELightingRoutine routine, int colorGroupUsed=-1)</td></tr>
+<tr class="memdesc:ab79cb36711c9834885201d679e4bdd85"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendRoutineChange change the mode of the lights. The mode changes how the lights look. some modes are a single color, some modes are random colors and some use a saved array.  <a href="#ab79cb36711c9834885201d679e4bdd85">More...</a><br /></td></tr>
+<tr class="separator:ab79cb36711c9834885201d679e4bdd85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63aa286e6bddb107ed92875bbc016800"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a63aa286e6bddb107ed92875bbc016800">sendCustomArrayCount</a> (int count)</td></tr>
 <tr class="memdesc:a63aa286e6bddb107ed92875bbc016800"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendCustomArrayCount sends a new custom array count to the LED array. This count determines how many colors from the custom array should be used. It is different from the size of the custom array, which provides a maximum possible amount of colors.  <a href="#a63aa286e6bddb107ed92875bbc016800">More...</a><br /></td></tr>
 <tr class="separator:a63aa286e6bddb107ed92875bbc016800"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,7 +114,7 @@ std::shared_ptr&lt; QSerialPort &gt;&#160;</td><td class="memItemRight" valign="
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Add UDP support. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Add UDP and HTTP. </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a1952ae47ddf75ce4e69838d0636cf94d"></a>
 <div class="memitem">
@@ -134,23 +133,6 @@ std::shared_ptr&lt; QSerialPort &gt;&#160;</td><td class="memItemRight" valign="
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a94b5e6ad5b6d7b7f021b25ebfc1541ea"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool CommLayer::connectSerialPort </td>
-          <td>(</td>
-          <td class="paramtype">QString&#160;</td>
-          <td class="paramname"><em>serialPortName</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>start up a serial port </p>
-
-</div>
-</div>
 <a class="anchor" id="a2352cfaf8d78e776922c57bf08252612"></a>
 <div class="memitem">
 <div class="memproto">
@@ -178,39 +160,6 @@ std::shared_ptr&lt; QSerialPort &gt;&#160;</td><td class="memItemRight" valign="
   <table class="params">
     <tr><td class="paramname">index</td><td>index of array color </td></tr>
     <tr><td class="paramname">color</td><td>the color being sent for the given index </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ab52e682731b145001a083487e8003a37"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void CommLayer::sendArrayModeChange </td>
-          <td>(</td>
-          <td class="paramtype">ELightingMode&#160;</td>
-          <td class="paramname"><em>mode</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>presetUsed</em> = <code>0</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">mode</td><td>the array mode being sent to the LED system </td></tr>
-    <tr><td class="paramname">count</td><td>the number of colors from the array it will use. </td></tr>
   </table>
   </dd>
 </dl>
@@ -283,22 +232,33 @@ std::shared_ptr&lt; QSerialPort &gt;&#160;</td><td class="memItemRight" valign="
 
 </div>
 </div>
-<a class="anchor" id="a344a4ccd2439719dabdc4accbbd18442"></a>
+<a class="anchor" id="ab79cb36711c9834885201d679e4bdd85"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void CommLayer::sendModeChange </td>
+          <td class="memname">void CommLayer::sendRoutineChange </td>
           <td>(</td>
-          <td class="paramtype">ELightingMode&#160;</td>
-          <td class="paramname"><em>mode</em></td><td>)</td>
+          <td class="paramtype">ELightingRoutine&#160;</td>
+          <td class="paramname"><em>routine</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>colorGroupUsed</em> = <code>-1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">mode</td><td>the mode being sent to the LED system </td></tr>
+    <tr><td class="paramname">routine</td><td>the mode being sent to the LED system </td></tr>
+    <tr><td class="paramname">colorGroupUsed</td><td>-1 if single color routine, otherwise a EColorGroup. </td></tr>
   </table>
   </dd>
 </dl>

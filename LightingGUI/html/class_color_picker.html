@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.6.0</span>
+   &#160;<span id="projectnumber">v0.7.0</span>
    </div>
   </td>
  </tr>
@@ -55,7 +55,7 @@
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_color_picker.html" title="The ColorPicker class is an object that combines three LightsSliders and a color wheel to giver an in...">ColorPicker</a> class is an object that combines three LightsSliders and a color wheel to giver an interface for choosing colors.  
+<p>The <a class="el" href="class_color_picker.html" title="The ColorPicker class is an object that combines three LightsSliders and a color wheel to create an i...">ColorPicker</a> class is an object that combines three LightsSliders and a color wheel to create an interface for choosing colors.  
  <a href="class_color_picker.html#details">More...</a></p>
 
 <p><code>#include &quot;<a class="el" href="colorpicker_8h_source.html">colorpicker.h</a>&quot;</code></p>
@@ -72,7 +72,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ac7ccd368b621703353772390702d6709"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_color_picker.html#ac7ccd368b621703353772390702d6709">ColorPicker</a> (QWidget *parent=0)</td></tr>
-<tr class="memdesc:ac7ccd368b621703353772390702d6709"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_color_picker.html" title="The ColorPicker class is an object that combines three LightsSliders and a color wheel to giver an in...">ColorPicker</a> constructor.  <a href="#ac7ccd368b621703353772390702d6709">More...</a><br /></td></tr>
+<tr class="memdesc:ac7ccd368b621703353772390702d6709"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_color_picker.html" title="The ColorPicker class is an object that combines three LightsSliders and a color wheel to create an i...">ColorPicker</a> constructor.  <a href="#ac7ccd368b621703353772390702d6709">More...</a><br /></td></tr>
 <tr class="separator:ac7ccd368b621703353772390702d6709"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad431a9537f9fbb350f321abbe92c5f1a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad431a9537f9fbb350f321abbe92c5f1a"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_color_picker.html#ad431a9537f9fbb350f321abbe92c5f1a">~ColorPicker</a> ()</td></tr>
@@ -144,8 +144,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:aa4070d7983c06235a31537d556acc188"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Whenever a color is selected, it signals out a QColor representation of that color to all connected slots. Colors can be selected by by moving the sliders or by clicking anywhere on the color wheel. A timer is used to throttle the signals to prevent sending messages too frequently.</p>
-<p>A layout should be set in the constructor that owns a <a class="el" href="class_color_picker.html" title="The ColorPicker class is an object that combines three LightsSliders and a color wheel to giver an in...">ColorPicker</a>. This layout uses ELayoutColorPicker as a parameter and this can be used to hide the sliders, hide the color wheel, or move the color wheel from the top of the sliders to the left of them. </p>
+<div class="textblock"><p>Whenever a color is selected, it signals out a QColor of to all connected slots. Colors can be selected by by moving the sliders or by clicking anywhere on the color wheel. A timer is used to throttle the signals to prevent sending messages too frequently.</p>
+<p>A layout can be set during its construction, but cannot be changed on the fly. This layout uses ELayoutColorPicker as a parameter and this can be used to hide the sliders, hide the color wheel, or move the color wheel from the top of the sliders to the left of them. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac7ccd368b621703353772390702d6709"></a>
 <div class="memitem">

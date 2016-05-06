@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['fade',['fade',['../a00007.html#ga31c6135841267ab589f4145c0cf4019e',1,'RoutinesRGB']]],
-  ['fadespeed',['fadeSpeed',['../a00006.html#gacbbb97f67e668e7a639c52a07496c03d',1,'RoutinesRGB']]]
+  ['getters_20and_20setters',['Getters and Setters',['../a00006.html',1,'']]],
+  ['green',['green',['../a00006.html#ga4927718ce72ca077cbe62e4c84e1c015',1,'RoutinesRGB']]]
 ];
