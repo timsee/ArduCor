@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.7.0</span>
+   &#160;<span id="projectnumber">v0.8.0</span>
    </div>
   </td>
  </tr>
@@ -46,35 +46,27 @@
 <div class="header">
   <div class="summary">
 <a href="class_comm_layer-members.html">List of all members</a> &#124;
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a>  </div>
+<a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">CommLayer Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_comm_layer.html" title="The CommLayer class provides communication protocols that allow the user to connect and send packets ...">CommLayer</a> class provides communication protocols that allow the user to connect and send packets to an LED array. Currently it supports serial communication. In a future update it will also support UDP and HTTP.  
- <a href="class_comm_layer.html#details">More...</a></p>
+<p>The <a class="el" href="class_comm_layer.html" title="The CommLayer class provides communication protocols that allow the user to connect and send packets ...">CommLayer</a> class provides communication protocols that allow the user to connect and send packets to an LED array. Currently it supports serial, UDP, and HTTP.  
+</p>
 
 <p><code>#include &quot;<a class="el" href="commlayer_8h_source.html">commlayer.h</a>&quot;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1952ae47ddf75ce4e69838d0636cf94d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a1952ae47ddf75ce4e69838d0636cf94d">CommLayer</a> ()</td></tr>
-<tr class="memdesc:a1952ae47ddf75ce4e69838d0636cf94d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a1952ae47ddf75ce4e69838d0636cf94d">More...</a><br /></td></tr>
+<tr class="memitem:a1952ae47ddf75ce4e69838d0636cf94d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1952ae47ddf75ce4e69838d0636cf94d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a1952ae47ddf75ce4e69838d0636cf94d">CommLayer</a> ()</td></tr>
+<tr class="memdesc:a1952ae47ddf75ce4e69838d0636cf94d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:a1952ae47ddf75ce4e69838d0636cf94d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ae60a1d5e75464aad64843e8c6d4e36"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ae60a1d5e75464aad64843e8c6d4e36"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a0ae60a1d5e75464aad64843e8c6d4e36">~CommLayer</a> ()</td></tr>
 <tr class="memdesc:a0ae60a1d5e75464aad64843e8c6d4e36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deconstructor. <br /></td></tr>
 <tr class="separator:a0ae60a1d5e75464aad64843e8c6d4e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94b5e6ad5b6d7b7f021b25ebfc1541ea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94b5e6ad5b6d7b7f021b25ebfc1541ea"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a94b5e6ad5b6d7b7f021b25ebfc1541ea">connectSerialPort</a> (QString serialPortName)</td></tr>
-<tr class="memdesc:a94b5e6ad5b6d7b7f021b25ebfc1541ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">start up a serial port <br /></td></tr>
-<tr class="separator:a94b5e6ad5b6d7b7f021b25ebfc1541ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1895baa7af878d80e3efcd6335b9a588"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1895baa7af878d80e3efcd6335b9a588"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a1895baa7af878d80e3efcd6335b9a588">closeSerialPort</a> ()</td></tr>
-<tr class="memdesc:a1895baa7af878d80e3efcd6335b9a588"><td class="mdescLeft">&#160;</td><td class="mdescRight">closeSerialPort cleans up after the serial port. <br /></td></tr>
-<tr class="separator:a1895baa7af878d80e3efcd6335b9a588"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a45e0d7e8cd2d570418003bf4faef8ea2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a45e0d7e8cd2d570418003bf4faef8ea2">sendMainColorChange</a> (QColor color)</td></tr>
 <tr class="memdesc:a45e0d7e8cd2d570418003bf4faef8ea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendMainColorChange change the main color of the lighting settings in the GUI, this is the color displayed in the leftmost menu.  <a href="#a45e0d7e8cd2d570418003bf4faef8ea2">More...</a><br /></td></tr>
 <tr class="separator:a45e0d7e8cd2d570418003bf4faef8ea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -100,39 +92,38 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#acd0a6c012c226da845cd5d6cb5beed55">sendReset</a> ()</td></tr>
 <tr class="memdesc:acd0a6c012c226da845cd5d6cb5beed55"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendReset resets the board to its default settings. <br /></td></tr>
 <tr class="separator:acd0a6c012c226da845cd5d6cb5beed55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr class="memitem:a96f45f9d6cb496c71cc9e31c09a89e6a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a96f45f9d6cb496c71cc9e31c09a89e6a"></a>
-QList&lt; QSerialPortInfo &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a96f45f9d6cb496c71cc9e31c09a89e6a">serialList</a></td></tr>
-<tr class="memdesc:a96f45f9d6cb496c71cc9e31c09a89e6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">serialList list of possible serial ports for connection <br /></td></tr>
-<tr class="separator:a96f45f9d6cb496c71cc9e31c09a89e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee1e35a6f59788b8a687b1a0562d16cd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aee1e35a6f59788b8a687b1a0562d16cd"></a>
-std::shared_ptr&lt; QSerialPort &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#aee1e35a6f59788b8a687b1a0562d16cd">serial</a></td></tr>
-<tr class="memdesc:aee1e35a6f59788b8a687b1a0562d16cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">serial the serial port currently in use <br /></td></tr>
-<tr class="separator:aee1e35a6f59788b8a687b1a0562d16cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9185152c3242f86ece0818cc007df99"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_comm_type.html">CommType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#ae9185152c3242f86ece0818cc007df99">comm</a> ()</td></tr>
+<tr class="memdesc:ae9185152c3242f86ece0818cc007df99"><td class="mdescLeft">&#160;</td><td class="mdescRight">comm returns a pointer to the current connection  <a href="#ae9185152c3242f86ece0818cc007df99">More...</a><br /></td></tr>
+<tr class="separator:ae9185152c3242f86ece0818cc007df99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ce555df58a61d3f47dab59acfe8f38d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a1ce555df58a61d3f47dab59acfe8f38d">sendPacket</a> (QString packet)</td></tr>
+<tr class="memdesc:a1ce555df58a61d3f47dab59acfe8f38d"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendPacket sends the string over the currently active connection  <a href="#a1ce555df58a61d3f47dab59acfe8f38d">More...</a><br /></td></tr>
+<tr class="separator:a1ce555df58a61d3f47dab59acfe8f38d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Add UDP and HTTP. </dd></dl>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a1952ae47ddf75ce4e69838d0636cf94d"></a>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ae9185152c3242f86ece0818cc007df99"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">CommLayer::CommLayer </td>
+          <td class="memname"><a class="el" href="class_comm_type.html">CommType</a>* CommLayer::comm </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
-<dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the current connection </dd></dl>
 
 </div>
 </div>
-<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a2352cfaf8d78e776922c57bf08252612"></a>
 <div class="memitem">
 <div class="memproto">
@@ -226,6 +217,28 @@ std::shared_ptr&lt; QSerialPort &gt;&#160;</td><td class="memItemRight" valign="
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">color</td><td>a QColor representation of the color being used for single LED Routines. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a1ce555df58a61d3f47dab59acfe8f38d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CommLayer::sendPacket </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>packet</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">packet</td><td>a string that will be sent over the currently active connection. </td></tr>
   </table>
   </dd>
 </dl>

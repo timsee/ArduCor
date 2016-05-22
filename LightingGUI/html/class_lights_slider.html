@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.7.0</span>
+   &#160;<span id="projectnumber">v0.8.0</span>
    </div>
   </td>
  </tr>
@@ -83,6 +83,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af74be2a1971c006c02f7fcaf428560c5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_slider.html#af74be2a1971c006c02f7fcaf428560c5">setMinimumPossible</a> (bool useMinimumPossible, int minimumPossible)</td></tr>
 <tr class="memdesc:af74be2a1971c006c02f7fcaf428560c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">setMinimumPossible allows the user to set a value other than the minimum as the minimum possible value the slider can hit.  <a href="#af74be2a1971c006c02f7fcaf428560c5">More...</a><br /></td></tr>
 <tr class="separator:af74be2a1971c006c02f7fcaf428560c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d974b30ad6691482c323ce1d99edca2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_slider.html#a4d974b30ad6691482c323ce1d99edca2">setSliderHeight</a> (float percent)</td></tr>
+<tr class="memdesc:a4d974b30ad6691482c323ce1d99edca2"><td class="mdescLeft">&#160;</td><td class="mdescRight">setSliderHeight By default sliders take up all of the of the widget, but this covers ticks and leaves no room inbewtween sliders that are stacked. This function takes a value between 0.0 and 1.0 to scale the slider down, while keeping it centered in the widget.  <a href="#a4d974b30ad6691482c323ce1d99edca2">More...</a><br /></td></tr>
+<tr class="separator:a4d974b30ad6691482c323ce1d99edca2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -105,6 +108,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_slider.html#a98083db021dfbdd0d26df9ee33d47feb">paintEvent</a> (QPaintEvent *)</td></tr>
 <tr class="memdesc:a98083db021dfbdd0d26df9ee33d47feb"><td class="mdescLeft">&#160;</td><td class="mdescRight">paintEvent handles edge cases created by the having a QSlider and an elaborate stylesheet. Draws the application's background color and the slider's ticks. <br /></td></tr>
 <tr class="separator:a98083db021dfbdd0d26df9ee33d47feb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d7eb24c899d99a8af86226d09932519"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0d7eb24c899d99a8af86226d09932519"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_slider.html#a0d7eb24c899d99a8af86226d09932519">showEvent</a> (QShowEvent *)</td></tr>
+<tr class="memdesc:a0d7eb24c899d99a8af86226d09932519"><td class="mdescLeft">&#160;</td><td class="mdescRight">showEvent used to turn on the throttle timer <br /></td></tr>
+<tr class="separator:a0d7eb24c899d99a8af86226d09932519"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0da90f45d5a260e808fff68f2e297ba3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0da90f45d5a260e808fff68f2e297ba3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_slider.html#a0da90f45d5a260e808fff68f2e297ba3">hideEvent</a> (QHideEvent *)</td></tr>
+<tr class="memdesc:a0da90f45d5a260e808fff68f2e297ba3"><td class="mdescLeft">&#160;</td><td class="mdescRight">hideEvent used to turn off the throttle timer <br /></td></tr>
+<tr class="separator:a0da90f45d5a260e808fff68f2e297ba3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
@@ -186,6 +197,28 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">color</td><td>the color that will be put into a custom style sheet </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a4d974b30ad6691482c323ce1d99edca2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LightsSlider::setSliderHeight </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>percent</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">percent</td><td>a value between 0.0 and 1.0 that scales the slider to take up less of hte widget. </td></tr>
   </table>
   </dd>
 </dl>

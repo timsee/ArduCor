@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.7.0</span>
+   &#160;<span id="projectnumber">v0.8.0</span>
    </div>
   </td>
  </tr>
@@ -43,9 +43,7 @@
 <div class="textblock"><p>An overview of the backend classes of the Lighting GUI.</p>
 <div class="backendOverview"></div><div class="backendOverview">The backend handles communicating with the lights, storing data about the session, and generating the icons for the GUI.</div><div class="backendOverview"></div><h1><a class="anchor" id="sec_1"></a>
 CommLayer</h1>
-<div class="backendOverview"> The <a class="el" href="class_comm_layer.html" title="The CommLayer class provides communication protocols that allow the user to connect and send packets ...">CommLayer</a> class provides communication protocols that allow the user to connect and send packets to an LED array. Currently it supports serial communication. In a future update it will also support UDP and HTTP. <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Add UDP and HTTP. </dd></dl>
-</div><div class="backendOverview"></div><h1><a class="anchor" id="sec_2"></a>
+<div class="backendOverview"> The <a class="el" href="class_comm_layer.html" title="The CommLayer class provides communication protocols that allow the user to connect and send packets ...">CommLayer</a> class provides communication protocols that allow the user to connect and send packets to an LED array. Currently it supports serial, UDP, and HTTP.</div><div class="backendOverview"></div><h1><a class="anchor" id="sec_2"></a>
 DataLayer</h1>
 <div class="backendOverview"> The <a class="el" href="class_data_layer.html" title="The DataLayer class stores and maintains the data about the state and settings of the application...">DataLayer</a> class stores and maintains the data about the state and settings of the application. It also saves the settings sent to the LED hardware, such as the current brightness and current lighting routine. <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>Make this class save its data between sessions. </dd></dl>

@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.7.0</span>
+   &#160;<span id="projectnumber">v0.8.0</span>
    </div>
   </td>
  </tr>
@@ -127,6 +127,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a2e2670a7894b869aeb6cc9b60f786c11"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a2e2670a7894b869aeb6cc9b60f786c11">customColorUsed</a> ()</td></tr>
 <tr class="memdesc:a2e2670a7894b869aeb6cc9b60f786c11"><td class="mdescLeft">&#160;</td><td class="mdescRight">colorCount getter for the number of colors usd by the by the custom color routines. Will always be less than the total number of colors in the custom color array.  <a href="#a2e2670a7894b869aeb6cc9b60f786c11">More...</a><br /></td></tr>
 <tr class="separator:a2e2670a7894b869aeb6cc9b60f786c11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbf1c118cbf783c70cf1fd5d5fb8eba0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#adbf1c118cbf783c70cf1fd5d5fb8eba0">customColor</a> (int index, QColor color)</td></tr>
+<tr class="memdesc:adbf1c118cbf783c70cf1fd5d5fb8eba0"><td class="mdescLeft">&#160;</td><td class="mdescRight">customColor set an individual color in the custom color group  <a href="#adbf1c118cbf783c70cf1fd5d5fb8eba0">More...</a><br /></td></tr>
+<tr class="separator:adbf1c118cbf783c70cf1fd5d5fb8eba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0716275f4a79ee910f5ae7b20a0deb90"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0716275f4a79ee910f5ae7b20a0deb90"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_data_layer.html#a0716275f4a79ee910f5ae7b20a0deb90">resetToDefaults</a> ()</td></tr>
 <tr class="memdesc:a0716275f4a79ee910f5ae7b20a0deb90"><td class="mdescLeft">&#160;</td><td class="mdescRight">resetToDefaults resets the GUI and the arduino to the default values, as defined at compile time. <br /></td></tr>
@@ -238,6 +241,40 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
       </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>the current lighting routine getting displayed on the LED array. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="adbf1c118cbf783c70cf1fd5d5fb8eba0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool DataLayer::customColor </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QColor&#160;</td>
+          <td class="paramname"><em>color</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>the index of the custom color. must be less than the size of custom color group. </td></tr>
+    <tr><td class="paramname">color</td><td>the new color that you want to set for that index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise. </dd></dl>
 
 </div>
 </div>

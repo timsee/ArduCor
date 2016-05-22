@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.7.0</span>
+   &#160;<span id="projectnumber">v0.8.0</span>
    </div>
   </td>
  </tr>
@@ -55,7 +55,7 @@
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="class_lights_button.html" title="The LightsButton class provides a QPushbutton with some extra logic to generate its own IconData and ...">LightsButton</a> class provides a QPushbutton with some extra logic to generate its own <a class="el" href="class_icon_data.html" title="The IconData class creates all the pixel-y square icons that are seen throughout the app...">IconData</a> and custom signals.  
+<p>The <a class="el" href="class_lights_button.html" title="The LightsButton class provides all of the buttons used within the application. All buttons have an i...">LightsButton</a> class provides all of the buttons used within the application. All buttons have an icon, while some have labels or extra logic attached.  
  <a href="class_lights_button.html#details">More...</a></p>
 
 <p><code>#include &quot;<a class="el" href="lightsbutton_8h_source.html">lightsbutton.h</a>&quot;</code></p>
@@ -64,19 +64,29 @@
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="signals"></a>
 Signals</h2></td></tr>
-<tr class="memitem:a66746dc621f714564f0829b39e133e27"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a66746dc621f714564f0829b39e133e27"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a66746dc621f714564f0829b39e133e27">presetClicked</a> (int, int)</td></tr>
-<tr class="memdesc:a66746dc621f714564f0829b39e133e27"><td class="mdescLeft">&#160;</td><td class="mdescRight">presetClicked sent only when setupAsPresetButton has been called. <br /></td></tr>
-<tr class="separator:a66746dc621f714564f0829b39e133e27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2c41c1c95f4901ed47c3abf9c4eba8c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2c41c1c95f4901ed47c3abf9c4eba8c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#ae2c41c1c95f4901ed47c3abf9c4eba8c">buttonClicked</a> (int, int)</td></tr>
+<tr class="memdesc:ae2c41c1c95f4901ed47c3abf9c4eba8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">buttonClicked sent only when setupAsPresetButton has been called. <br /></td></tr>
+<tr class="separator:ae2c41c1c95f4901ed47c3abf9c4eba8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a010521abf8a97bbc26e3fa1bab575b11"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a010521abf8a97bbc26e3fa1bab575b11"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a010521abf8a97bbc26e3fa1bab575b11">menuButtonClicked</a> (int)</td></tr>
+<tr class="memdesc:a010521abf8a97bbc26e3fa1bab575b11"><td class="mdescLeft">&#160;</td><td class="mdescRight">menuButtonClicked sent out if and only if the button is set up as a menu button <br /></td></tr>
+<tr class="separator:a010521abf8a97bbc26e3fa1bab575b11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae68d92b5d8354db7b6ea47dd40917bb2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#ae68d92b5d8354db7b6ea47dd40917bb2">LightsButton</a> (QWidget *parent=0)</td></tr>
 <tr class="memdesc:ae68d92b5d8354db7b6ea47dd40917bb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ae68d92b5d8354db7b6ea47dd40917bb2">More...</a><br /></td></tr>
 <tr class="separator:ae68d92b5d8354db7b6ea47dd40917bb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48163f107fc3e9143e465023786f4c94"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a48163f107fc3e9143e465023786f4c94">setupAsMultiButton</a> (ELightingRoutine routine, EColorGroup <a class="el" href="class_lights_button.html#a93e1a4c442d4a6cee80a1a09b3bb2835">colorGroup</a>, std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt; dataLayer)</td></tr>
-<tr class="memdesc:a48163f107fc3e9143e465023786f4c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">setupAsMultiButton sets up the button for use with the PresetArrayPage. Assigns it a mode, a preset, and an icon. Whenever the button is clicked it will emit presetClicked and will send its mode and preset in that signal.  <a href="#a48163f107fc3e9143e465023786f4c94">More...</a><br /></td></tr>
-<tr class="separator:a48163f107fc3e9143e465023786f4c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2233db3a075aaea6794a690ecb061502"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a2233db3a075aaea6794a690ecb061502">setupAsStandardButton</a> (ELightingRoutine routine, EColorGroup <a class="el" href="class_lights_button.html#a93e1a4c442d4a6cee80a1a09b3bb2835">colorGroup</a>, std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt; dataLayer)</td></tr>
+<tr class="memdesc:a2233db3a075aaea6794a690ecb061502"><td class="mdescLeft">&#160;</td><td class="mdescRight">setupAsMultiButton sets up the button for use with the PresetArrayPage. Assigns it a mode, a preset, and an icon. Whenever the button is clicked it will emit presetClicked and will send its mode and preset in that signal.  <a href="#a2233db3a075aaea6794a690ecb061502">More...</a><br /></td></tr>
+<tr class="separator:a2233db3a075aaea6794a690ecb061502"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f2282311f9b861efdadb5a804bb6233"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a4f2282311f9b861efdadb5a804bb6233">setupAsLabeledButton</a> (QString label, ELightingRoutine routine, std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt; dataLayer, EColorGroup <a class="el" href="class_lights_button.html#a93e1a4c442d4a6cee80a1a09b3bb2835">colorGroup</a>=EColorGroup::eColorGroup_MAX)</td></tr>
+<tr class="memdesc:a4f2282311f9b861efdadb5a804bb6233"><td class="mdescLeft">&#160;</td><td class="mdescRight">setupAsLabeledButton QPushButtons with labels and icons are hard to configure, so this provides a (pretty hacky) alternative. It draws them as separate QPushButton and QLabel but treats them as a single object  <a href="#a4f2282311f9b861efdadb5a804bb6233">More...</a><br /></td></tr>
+<tr class="separator:a4f2282311f9b861efdadb5a804bb6233"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a564c4636140d4d4a5398808f4738bbc7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a564c4636140d4d4a5398808f4738bbc7">setupAsMenuButton</a> (int pageNumber, std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt; dataLayer)</td></tr>
+<tr class="memdesc:a564c4636140d4d4a5398808f4738bbc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">setupAsMenuButton Used by the mainWindow for the top menu. Buttons send out their page number whenever they are clicked.  <a href="#a564c4636140d4d4a5398808f4738bbc7">More...</a><br /></td></tr>
+<tr class="separator:a564c4636140d4d4a5398808f4738bbc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebf97d7ca465530e46c403489d395a17"><td class="memItemLeft" align="right" valign="top">ELightingRoutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#aebf97d7ca465530e46c403489d395a17">lightingRoutine</a> ()</td></tr>
 <tr class="memdesc:aebf97d7ca465530e46c403489d395a17"><td class="mdescLeft">&#160;</td><td class="mdescRight">lightingRoutine the ELightingRoutine assigned to the button by setupAsMultiButton.  <a href="#aebf97d7ca465530e46c403489d395a17">More...</a><br /></td></tr>
 <tr class="separator:aebf97d7ca465530e46c403489d395a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -90,6 +100,10 @@ Public Attributes</h2></td></tr>
 QPushButton *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a822abe38577b57d060cfff8071dee025">button</a></td></tr>
 <tr class="memdesc:a822abe38577b57d060cfff8071dee025"><td class="mdescLeft">&#160;</td><td class="mdescRight">button The QPushButton that this QWidget wraps. <br /></td></tr>
 <tr class="separator:a822abe38577b57d060cfff8071dee025"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d1350e107f7e8f12f7092fbb391328d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d1350e107f7e8f12f7092fbb391328d"></a>
+QLabel *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_lights_button.html#a1d1350e107f7e8f12f7092fbb391328d">buttonLabel</a></td></tr>
+<tr class="memdesc:a1d1350e107f7e8f12f7092fbb391328d"><td class="mdescLeft">&#160;</td><td class="mdescRight">buttonLabel label used when setup as a label button <br /></td></tr>
+<tr class="separator:a1d1350e107f7e8f12f7092fbb391328d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -100,7 +114,8 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
-<p>It can also be configured as a <code>presetButton</code>, which stores a ELightingMode and EColorPreset in the button and emits them as a signal whenever its clicked. </p>
+<p>There are currently three different ways you can set up a button. A standard button emits a EColorGroup and a ELightingRoutine and doesn't have a label. A labeled button emits a EColorGroup and a ELightingRoutine, and it also has a label at the bottom of the button. A menu button emits a page number, and is used by the main menu.</p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>clean up the <a class="el" href="class_lights_button.html" title="The LightsButton class provides all of the buttons used within the application. All buttons have an i...">LightsButton</a> so that it has a cleaner API. </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ae68d92b5d8354db7b6ea47dd40917bb2"></a>
 <div class="memitem">
@@ -160,12 +175,92 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 
 </div>
 </div>
-<a class="anchor" id="a48163f107fc3e9143e465023786f4c94"></a>
+<a class="anchor" id="a4f2282311f9b861efdadb5a804bb6233"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void LightsButton::setupAsMultiButton </td>
+          <td class="memname">void LightsButton::setupAsLabeledButton </td>
+          <td>(</td>
+          <td class="paramtype">QString&#160;</td>
+          <td class="paramname"><em>label</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ELightingRoutine&#160;</td>
+          <td class="paramname"><em>routine</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt;&#160;</td>
+          <td class="paramname"><em>dataLayer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">EColorGroup&#160;</td>
+          <td class="paramname"><em>colorGroup</em> = <code>EColorGroup::eColorGroup_MAX</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">label</td><td>the label for the label button </td></tr>
+    <tr><td class="paramname">routine</td><td>the routine for this button to signal out when its clicked. </td></tr>
+    <tr><td class="paramname">dataLayer</td><td>pointer to the data layer, which is used for creating the icon. </td></tr>
+    <tr><td class="paramname">colorGroup</td><td>the color group for this button to signal out when its clicked. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a564c4636140d4d4a5398808f4738bbc7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LightsButton::setupAsMenuButton </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>pageNumber</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt;&#160;</td>
+          <td class="paramname"><em>dataLayer</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pageNumber</td><td>the number that this menu button is getting set up to signal whenever its clicked. </td></tr>
+    <tr><td class="paramname">dataLayer</td><td>pointer to the data layer, which is used for creating the icon. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a2233db3a075aaea6794a690ecb061502"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void LightsButton::setupAsStandardButton </td>
           <td>(</td>
           <td class="paramtype">ELightingRoutine&#160;</td>
           <td class="paramname"><em>routine</em>, </td>
