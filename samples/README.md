@@ -5,9 +5,8 @@ The sample sketches for Adafruit NeoPixels, SeeedStudio Rainbowduino, and a sing
 The samples are split into three main folders:
 
 * `arduino` contains samples that should run on any arduino.
-* `yun/http` contains samples that work only on arduino Yuns, but require no extra configuration.
-* `yun/udp` contains samples that work only only on arduion Yuns and require extra configuration
-            to work.
+* `yun/http` contains samples that work only on arduino yuns, but require no extra configuration.
+* `yun/udp` contains samples that work only on arduino yuns and require extra configuration.
 
 For documentation for the Yun based samples, [check here](yun).
 
