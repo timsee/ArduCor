@@ -140,6 +140,15 @@ public:
     int customColorUsed();
 
     /*!
+     * \brief customColor set an individual color in the custom color group
+     * \param index the index of the custom color. must be less than the size of custom
+     *        color group.
+     * \param color the new color that you want to set for that index.
+     * \return true if successful, false otherwise.
+     */
+    bool customColor(int index, QColor color);
+
+    /*!
      * \brief resetToDefaults resets the GUI and the arduino to the default values,
      *        as defined at compile time.
      */

@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QSlider>
 #include <QLabel>
+#include <QLayout>
 #include <memory>
 
 /*!
@@ -69,6 +70,14 @@ public:
      */
     void setMinimumPossible(bool useMinimumPossible, int minimumPossible);
 
+    /*!
+     * \brief setSliderHeight By default sliders take up all of the of the widget, but this covers ticks
+     *        and leaves no room inbewtween sliders that are stacked. This function takes a value between
+     *        0.0 and 1.0 to  scale the slider down, while keeping it centered in the widget.
+     * \param percent a value between 0.0 and 1.0 that scales the slider to take up less of hte widget.
+     */
+    void setSliderHeight(float percent);
+
 signals:
     /*!
      * \brief Sends out the value that the slider has been set to after all the processing of snapping
@@ -82,6 +91,23 @@ private slots:
      */
     void receivedValue(int);
 
+    /*!
+     * \brief resetThrottleFlag called by the throttle timer to allow commands to
+     *        be sent again. This gets called on a loop whenever color picker is being
+     *        used in order to prevent clogging the communication stream.
+     */
+    void resetThrottleFlag();
+
+    /*!
+     * \brief releasedSlider uses the QSlider inside of the LightsSlider to pick up
+     *        when the slider is released. This always sets the color of the color picker.
+     *        This system is used to prevent an edge case with throttling with a timer.
+     *        Without it, its possible to change the UI without updating the lights if you are
+     *        quick enough.
+     */
+    void releasedSlider();
+
+
 protected:
     /*!
      * \brief resizeEvent makes sure that the QSlider resizes with the QWidget
@@ -94,7 +120,25 @@ protected:
      */
     void paintEvent(QPaintEvent *);
 
+    /*!
+     * \brief showEvent used to turn on the throttle timer
+     */
+    void showEvent(QShowEvent *);
+
+    /*!
+     * \brief hideEvent used to turn off the throttle timer
+     */
+    void hideEvent(QHideEvent *);
+
 private:
+
+    float mHeightScaleFactor;
+
+    /*!
+     * \brief mLayout layout of a lights slider
+     */
+    QVBoxLayout *mLayout;
+
     /*!
      * \brief mShouldSnap true if the slider should snap to the nearest ticks, false
      *        if it should use the value specified by the user.
@@ -136,6 +180,18 @@ private:
      * \return the final position of the slider.
      */
     int snapSliderToNearestTick(std::shared_ptr<QSlider> slider, int pos);
+
+    /*!
+     * \brief mThrottleTimer throttles the speed that the lights sliders update,
+     *        since without this it updates on each redraw which can really clog
+     *        nearly all communication streams.
+     */
+    QTimer *mThrottleTimer;
+
+    /*!
+     * \brief mThrottleFlag flag used to enforced the throttle timer's throttle.
+     */
+    bool mThrottleFlag;
 };
 
 #endif // LIGHTSSLIDER_H

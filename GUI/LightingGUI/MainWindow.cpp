@@ -8,18 +8,18 @@
  * License: MIT-License, LICENSE provided in root of git repo
  */
 
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
 #include <QDebug>
 #include <QPainter>
 #include <QSignalMapper>
-
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    this->setWindowTitle("LightingGUI");
+    this->setWindowTitle("Corluma");
 
     // --------------
     // Setup Backend
@@ -30,7 +30,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->customColorsPage->setup(mComm, mData);
     ui->presetColorsPage->setup(mComm, mData);
     ui->settingsPage->setup(mComm, mData);
-    ui->presetColorsPage->setupPresets();
+    ui->singleColorPage->setupButtons();
+    ui->customColorsPage->setupButtons();
+    ui->presetColorsPage->setupButtons();
 
     // --------------
     // Setup Pages
@@ -44,24 +46,22 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup Buttons
     // --------------
 
-    // add buttons to vector to make them easier to loop through
-    mPageButtons = std::shared_ptr<std::vector<QPushButton*> >(new std::vector<QPushButton*>(4, nullptr));
-    (*mPageButtons.get())[0] = ui->singleColorButton;
-    (*mPageButtons.get())[1] = ui->customArrayButton;
-    (*mPageButtons.get())[2] = ui->presetArrayButton;
-    (*mPageButtons.get())[3] = ui->settingsButton;
 
-    // loop through the buttons and set up their clicks to a mapper
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    for (uint i = 0; i < mPageButtons->size(); i++) {
-        QPushButton* button =(*mPageButtons.get())[i];
-        button->setCheckable(true);
-        connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
-        button->setStyleSheet("background-color: rgb(52, 52, 52); ");
-        signalMapper->setMapping(button, i);
-    }
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(pageChanged(int)));
+    std::vector<LightsButton *> buttons = {ui->singleColorButton,
+                                           ui->customArrayButton,
+                                           ui->presetArrayButton};
 
+    mPageButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(4, nullptr));
+    for (int i = 0; i < 3; ++i) {
+        (*mPageButtons.get())[i] = buttons[i];
+        (*mPageButtons.get())[i]->setupAsMenuButton(i, mData);
+        (*mPageButtons.get())[i]->button->setStyleSheet("background-color: rgb(52, 52, 52); ");
+        (*mPageButtons.get())[i]->button->setCheckable(true);
+        connect((*mPageButtons.get())[i], SIGNAL(menuButtonClicked(int)), this, SLOT(pageChanged(int)));
+   }
+
+    ui->settingsButton->setCheckable(true);
+    connect(ui->settingsButton, SIGNAL(clicked(bool)), this, SLOT(settingsPressed()));
 
     // --------------
     // Setup Brightness Slider
@@ -73,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->brightnessSlider->slider->setValue(50);
     ui->brightnessSlider->slider->setTickPosition(QSlider::TicksBelow);
     ui->brightnessSlider->slider->setTickInterval(20);
+    ui->brightnessSlider->setSliderHeight(0.4f);
     ui->brightnessSlider->setSliderColorBackground(QColor(255,255,255));
 
 
@@ -83,33 +84,33 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->onOffButton, SIGNAL(clicked(bool)), this, SLOT(toggleOnOff()));
 
     // setup the icons
-    mIconData = IconData(64, 64, mData);
+    mIconData = IconData(124, 124, mData);
     mIconData.setSolidColor(QColor(0,255,0));
     ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
-
-    // --------------
-    // Setup Remaining Page Button Icons
-    // --------------
-
-    mIconData.setSolidColor(QColor(0,255,0));
-    ui->singleColorButton->setIcon(mIconData.renderAsQPixmap());
-
-    mIconData.setMultiFade(EColorGroup::eCustom, true);
-    ui->customArrayButton->setIcon(mIconData.renderAsQPixmap());
-
-    mIconData.setMultiFade(EColorGroup::eSevenColor);
-    ui->presetArrayButton->setIcon(mIconData.renderAsQPixmap());
 
     // --------------
     // Final setup
     // --------------
 
+    mIsOn = true;
     // reset the LED array to defaults
     mComm->sendReset();
     // Start on SingleColorPage
     pageChanged(0);
     // setup the SingleColorPage
     ui->singleColorPage->chooseColor(mData->mainColor());
+
+    // --------------
+    // Layout Adjustments
+    // --------------
+    // Calling these fix the layout, even though they shouldn't directly...
+    // TODO: find the root cause of this problem...
+    mIconData.setSolidColor(mData->mainColor());
+    ui->singleColorButton->button->setIcon(mIconData.renderAsQPixmap());
+    mIconData.setMultiFade(mData->currentColorGroup());
+    ui->presetArrayButton->button->setIcon(mIconData.renderAsQPixmap());
+    mIconData.setMultiFade(EColorGroup::eCustom, true);
+    ui->customArrayButton->button->setIcon(mIconData.renderAsQPixmap());
 }
 
 MainWindow::~MainWindow() {
@@ -120,19 +121,16 @@ MainWindow::~MainWindow() {
 // ----------------------------
 // Slots
 // ----------------------------
-bool hackIsOn = true;
 void MainWindow::toggleOnOff() {
-    //TODO: why are we faking the on/off? why not use whats already
-    //      built in?
-    if (hackIsOn) {
+    if (mIsOn) {
         mIconData.setSolidColor(QColor(0,0,0));
         ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
-        hackIsOn = false;
+        mIsOn = false;
         mComm->sendBrightness(0);
     } else {
         mIconData.setLightingRoutine(mData->currentRoutine(), mData->currentColorGroup());
         ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
-        hackIsOn = true;
+        mIsOn = true;
         mComm->sendBrightness(mData->brightness());
     }
 }
@@ -140,37 +138,51 @@ void MainWindow::toggleOnOff() {
 void MainWindow::brightnessChanged(int newBrightness) {
    mData->brightness(newBrightness);
    mComm->sendBrightness(mData->brightness());
-   hackIsOn = true;
+   mIsOn = true;
 }
 
+
+void MainWindow::settingsPressed() {
+    for (uint i = 0; i < 3; i++) {
+        (*mPageButtons.get())[i]->button->setChecked(false);
+        (*mPageButtons.get())[i]->button->setStyleSheet("background-color: rgb(52, 52, 52); ");
+    }
+
+    ui->settingsButton->setChecked(true);
+    ui->settingsButton->setStyleSheet("background-color: rgb(80, 80, 80); ");
+
+    ui->stackedWidget->setCurrentIndex(3);
+}
 
 void MainWindow::pageChanged(int pageIndex) {
-    for (uint i = 0; i < mPageButtons->size(); i++) {
-        (*mPageButtons.get())[i]->setChecked(false);
-        (*mPageButtons.get())[i]->setStyleSheet("background-color: rgb(52, 52, 52); ");
+    for (uint i = 0; i < 3; i++) {
+        (*mPageButtons.get())[i]->button->setChecked(false);
+        (*mPageButtons.get())[i]->button->setStyleSheet("background-color: rgb(52, 52, 52); ");
     }
+    ui->settingsButton->setChecked(false);
+    ui->settingsButton->setStyleSheet("background-color: rgb(52, 52, 52); ");
+
+    (*mPageButtons.get())[pageIndex]->button->setChecked(true);
+    (*mPageButtons.get())[pageIndex]->button->setStyleSheet("background-color: rgb(80, 80, 80); ");
+
     ui->stackedWidget->setCurrentIndex(pageIndex);
-    (*mPageButtons.get())[pageIndex]->setChecked(true);
-    (*mPageButtons.get())[pageIndex]->setStyleSheet("background-color: rgb(80, 80, 80); ");
 }
+
 
 
 void MainWindow::updateMenuBar() {
-    if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
-        ui->brightnessSlider->setSliderColorBackground(mData->mainColor());
+    if (ui->stackedWidget->currentIndex() == 1) {
+        mIconData.setMultiFade(EColorGroup::eCustom, true);
+        ui->customArrayButton->button->setIcon(mIconData.renderAsQPixmap());
+        ui->brightnessSlider->setSliderColorBackground(mData->colorsAverage(EColorGroup::eCustom));
+    } else if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
         mIconData.setSolidColor(mData->mainColor());
-        ui->singleColorButton->setIcon(mIconData.renderAsQPixmap());
-        mIconData.setLightingRoutine(mData->currentRoutine());
+        ui->singleColorButton->button->setIcon(mIconData.renderAsQPixmap());
+        ui->brightnessSlider->setSliderColorBackground(mData->mainColor());
     } else {
+        mIconData.setMultiFade(mData->currentColorGroup());
+        ui->presetArrayButton->button->setIcon(mIconData.renderAsQPixmap());
         ui->brightnessSlider->setSliderColorBackground(mData->colorsAverage(mData->currentColorGroup()));
-        mIconData.setLightingRoutine(mData->currentRoutine(), mData->currentColorGroup());
-        if (mData->currentColorGroup() == EColorGroup::eCustom) {
-            mIconData.setMultiFade(EColorGroup::eCustom, true);
-           ui->customArrayButton->setIcon(mIconData.renderAsQPixmap());
-        } else {
-           mIconData.setMultiFade(mData->currentColorGroup());
-           ui->presetArrayButton->setIcon(mIconData.renderAsQPixmap());
-        }
     }
     ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
 }
@@ -187,4 +199,14 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(this->rect(), QBrush(QColor(48, 47, 47)));
+}
+
+
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    int min = std::min(ui->settingsButton->width(), ui->settingsButton->height()) * 0.85f;
+    ui->settingsButton->setIconSize(QSize(min, min));
+
+    int onOffSize = std::min(this->width(), this->height()) / 10;
+    ui->onOffButton->setIconSize(QSize(onOffSize, onOffSize));
+    ui->onOffButton->setMinimumHeight(onOffSize);
 }

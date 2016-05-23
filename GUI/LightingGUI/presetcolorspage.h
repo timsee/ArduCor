@@ -3,14 +3,13 @@
 #define PresetColorsPage_H
 
 #include "lightingpage.h"
+#include "lightsbutton.h"
 
 #include <QWidget>
 #include <QToolButton>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-
-#include "lightsbutton.h"
 
 namespace Ui {
 class PresetColorsPage;
@@ -49,10 +48,10 @@ public:
      */
     void highlightRoutineButton(ELightingRoutine routine, EColorGroup colorGroup);
     /*!
-     * \brief setupPresets sets up the preset buttons. Requires the DataLayer
+     * \brief setupButtons sets up the routine buttons. Requires the DataLayer
      *        of the application to be set up first.
      */
-    void setupPresets();
+    void setupButtons();
 
 signals:
     /*!

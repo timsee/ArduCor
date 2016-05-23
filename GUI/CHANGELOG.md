@@ -35,9 +35,17 @@
 
 ### **v0.7.0** 
 #### API and Bug Fixes Update
-* Refactored `EColorPreset` and `ELightingMode` to `EColorGroup` and `ELightingRoutine`.
+* Refactored names of enumerated types and API calls to be more uniform.
 * Polished menu bar.
 * Added Application Icon.
 * Fixed bugs in LightsSlider.
 * Fixed state management bugs.
 * Updated project documentation to reflect API changes. 
+
+### **v0.8.0** 
+#### Wireless, Android, and iOS Update
+* Extended the CommLayer to support HTTP and UDP.
+* Added support for Android and iOS builds.
+* Updated layout to support the new screen sizes.
+* Fixed bugs, probably created more. 
+

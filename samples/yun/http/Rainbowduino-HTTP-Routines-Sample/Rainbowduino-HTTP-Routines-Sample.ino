@@ -4,16 +4,18 @@
  *
  * Supports SeeedStudio Rainbowduino projects.
  *
- * Provides a serial interface to a set of lighting routines generated
+ * Provides a HTTP interface to a set of lighting routines.
  * by the RoutinesRGB library.
  *
- * Version 1.9.2
- * Date: May 5, 2016
+ * Version 1.9.5
+ * Date: May 22, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
 #include <RoutinesRGB.h>
 #include <Rainbowduino.h>
+#include <BridgeServer.h>
+#include <BridgeClient.h>
 
 //================================================================================
 // Settings
@@ -24,7 +26,8 @@ const int LED_COUNT          = 64;
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
 const byte FADE_SPEED        = 20;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
-const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
+
+const byte DELAY_VALUE       = 50;     // amount of sleep time between loops 
 
 const int DEFAULT_SPEED      = 300;    // default delay for LEDs update, suggested range: 10 (super fast) - 1000 (slow). 
 const int DEFAULT_TIMEOUT    = 120;    // number of minutes without packets until the arduino times out.
@@ -49,9 +52,16 @@ unsigned long last_message_time = 0;
 // when to update the LEDs.
 unsigned long loop_counter = 0;
 
+
 //=======================
 // String Parsing
 //=======================
+
+// the current packet being parsed by the loop() function
+String currentPacket;
+// flag ued by parsing system. if TRUE, continue parsing, if FALSE,
+// packet is either illegal, a repeat, or empty and parsing can be skipped.
+bool packetReceived = false;
 
 // delimiter used to break up values sent as strings over serial.
 char delimiter = ',';
@@ -82,6 +92,8 @@ ParsedIntPacket delimitedStringToIntArray(String message);
 RoutinesRGB routines = RoutinesRGB(LED_COUNT);
 
 
+BridgeServer server;
+
 //================================================================================
 // Setup and Loop
 //================================================================================
@@ -90,6 +102,9 @@ void setup()
 {
   Rb.init();
 
+  Bridge.begin();
+  server.listenOnLocalhost();
+  server.begin();
   // choose the default color for the single
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines. 
@@ -102,9 +117,14 @@ void setup()
 
 void loop()
 {
-  if (Serial.available()) {
-    String currentPacket = Serial.readStringUntil(';');
-    // remove any extraneous whitepsace or newline characters
+ packetReceived = false;
+  BridgeClient client = server.accept();
+  if (client) {
+    currentPacket = client.readStringUntil('/');
+    client.stop();
+    packetReceived = true;
+  }
+  if (packetReceived) {
     currentPacket.trim();
     parsed_packet = delimitedStringToIntArray(currentPacket);
     // parse a paceket only if its header is is in the correct range

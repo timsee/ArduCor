@@ -6,8 +6,8 @@
 #include "LightingProtocols.h"
 
 /*!
- * \version v1.9.2
- * \date May 5, 2016
+ * \version v1.9.5
+ * \date May 22, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -32,10 +32,9 @@
  *
  * The library produces lighting routines based on the functions used and stores the routine
  * in its internal buffers. These buffers can then be accessed by getters and displayed
- * on the LED hardware. For routines that change over time, this processed should be repeated
+ * on the LED hardware. For routines that change over time, this process should be repeated
  * on a loop. For example, here is how you would make a red blinking light with the library
  * and a Neopixels board:
- *
  * 
  * First, call this function to store the routine in the library's internal buffers:
  *
@@ -234,7 +233,7 @@ public:
      *  These routines use multiple colors. 
      *  They all take the parameter of `colorGroup` which is used to determine which set of 
      *  colors to use. The custom color array is eCustom, all other values for `colorGroup` 
-     *  come from presets color. Go to the project's github for a full list 
+     *  come from groups of preset colors. Go to the project's github for a full list 
      *  of the colorGroups and their corresponding values.
      *
      *  All routines except multiBarsSolid should be called repeatedly on a loop 

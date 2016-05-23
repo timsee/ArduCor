@@ -94,7 +94,6 @@ DataLayer::DataLayer() {
     mColors[i][6] = QColor(255, 60,  0);
     mColors[i][7] = QColor(255, 45,  0);
     mColors[i][8] = QColor(127, 127, 0);
-
     i++;
 
     //==========
@@ -151,7 +150,6 @@ DataLayer::DataLayer() {
     mColors[i][3] = QColor(127, 127, 127);
     mColors[i][4] = QColor(194, 30,  86);
     mColors[i][5] = QColor(194, 30,  30);
-
     i++;
 
     //==========
@@ -184,7 +182,6 @@ DataLayer::DataLayer() {
     mColors[i][0] = QColor(255, 0,   0);
     mColors[i][1] = QColor(0,   255, 0);
     mColors[i][2] = QColor(0,   0,   255);
-
     i++;
 
     //==========
@@ -195,7 +192,6 @@ DataLayer::DataLayer() {
     mColors[i][0] = QColor(255, 255, 0);
     mColors[i][1] = QColor(0,   255, 255);
     mColors[i][2] = QColor(255,   0, 255);
-
     i++;
 
     //==========
@@ -223,7 +219,6 @@ DataLayer::DataLayer() {
     mColors[i][4] = QColor(0,   0,   255);
     mColors[i][5] = QColor(255, 0,   255);
     mColors[i][6] = QColor(255, 255, 255);
-
     i++;
 
     //==========
@@ -347,7 +342,7 @@ EColorGroup DataLayer::currentColorGroup() {
 
 
 bool DataLayer::customColorsUsed(int count) {
-    if (count > 0 && count < (int)EColorGroup::eColorGroup_MAX) {
+    if ((count > 0) && (count <= mArraySizes[0])) {
         mCustomColorsUsed = count;
         return true;
     }
@@ -357,6 +352,14 @@ bool DataLayer::customColorsUsed(int count) {
 
 int DataLayer::customColorUsed() {
     return mCustomColorsUsed;
+}
+
+bool DataLayer::customColor(int index, QColor color) {
+    if ((index >= 0) && (index < mArraySizes[0])) {
+        mColors[0][index] = color;
+        return true;
+    }
+    return false;
 }
 
 
@@ -377,6 +380,7 @@ int DataLayer::speed() {
 
 void DataLayer::resetToDefaults() {
     mCurrentRoutine = ELightingRoutine::eSingleGlimmer;
+    mColorGroup  = EColorGroup::eSevenColor;
     mTimeOut = 120;
     mBrightness = 50;
     mCustomColorsUsed = 2;
@@ -399,5 +403,4 @@ void DataLayer::resetToDefaults() {
         }
         j++;
     }
-
 }

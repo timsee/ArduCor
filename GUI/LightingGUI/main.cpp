@@ -3,7 +3,9 @@
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
  */
+
 #include "mainwindow.h"
+
 #include <QApplication>
 #include <QFile>
 #include <QTextStream>

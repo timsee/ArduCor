@@ -59,14 +59,13 @@
 
 <div class="overviewSection">
   <div class="overviewTitle">
-    <h2>Color Picker</h2>      
+    <h2>Lights Button</h2>      
   </div>
   <div class="overviewImage">
-    \image html colorPickerPreview.png 
+    \image html lightsButtonPreview.png 
   </div>
-  \copydoc ColorPicker
+  \copydoc LightsButton
 </div>
-
 
 <div class="overviewSection">
   <div class="overviewTitle">
@@ -80,14 +79,13 @@
 
 <div class="overviewSection">
   <div class="overviewTitle">
-    <h2>Lights Button</h2>      
+    <h2>Color Picker</h2>      
   </div>
   <div class="overviewImage">
-    \image html lightsButtonPreview.png 
+    \image html colorPickerPreview.png 
   </div>
-  \copydoc LightsButton
+  \copydoc ColorPicker
 </div>
-
 
 </div>
 */

@@ -44,7 +44,7 @@ public:
     IconData(int width, int height, std::shared_ptr<DataLayer> data);
 
     /*!
-     * \brief setLightingRoutine use a lighting routine to set the colors of the icon instead of a function call
+     * \brief setLightingRoutine use a lighting routine and color group to set up the IconData.
      * \param routine the routine that you want to use for the icon
      * \param colorGroup the group that you want to use for the icon.
      */
@@ -207,6 +207,9 @@ private:
     QColor getMiddleColor(QColor first,
                           QColor second);
 
+    /*!
+     * \brief mRandomIndividual used by random
+     */
     int mRandomIndividual[16];
 };
 

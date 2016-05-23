@@ -7,6 +7,7 @@
 
 #include "lightingpage.h"
 #include "icondata.h"
+#include "lightsbutton.h"
 
 namespace Ui {
 class MainWindow;
@@ -55,10 +56,33 @@ public slots:
      *        which opens a different page on the QStackedWidget.
      */
     void pageChanged(int);
+
+    /*!
+     * \brief settingsPressed called whenever the settings button is pressed.
+     */
+    void settingsPressed();
+
     /*!
      * \brief updateMenuBar used to update the menu bar to app state changes.
      */
     void updateMenuBar();
+
+protected:
+    /*!
+     * \brief paintEvent called whenever there is a paint update. This is used
+     *        to draw the dark grey background, since using the stylesheet
+     *        for backgrounds makes some lesser features of GUI elements break.
+     *
+     * \param event event triggered that requires a repaint
+     */
+    void paintEvent(QPaintEvent *event);
+
+    /*!
+     * \brief resizeEvent called whenever the window resizes. This is used to override
+     *        the resizing of the icons of the menu bar.
+     */
+    virtual void resizeEvent(QResizeEvent *);
+
 
 private:
     /*!
@@ -82,20 +106,19 @@ private:
      * \brief mPageButtons pointers to all the main buttons, used
      *        to iterate through them quickly.
      */
-    std::shared_ptr<std::vector<QPushButton*> > mPageButtons;
+    std::shared_ptr<std::vector<LightsButton*> > mPageButtons;
 
-
+    /*!
+     * \brief mIconData used to generate the icons in the menu bar.
+     */
     IconData mIconData;
 
-protected:
     /*!
-     * \brief paintEvent called whenever there is a paint update. This is used
-     *        to draw the dark grey background, since using the stylesheet
-     *        for backgrounds makes some lesser features of GUI elements break.
-     *
-     * \param event event triggered that requires a repaint
+     * \brief mIsOn true if the LEDS are on, FALSE otherwise.
+     * \todo remove isOn flag and use the systems built into the arduino API.
      */
-    void paintEvent(QPaintEvent *event);
+    bool mIsOn;
+
 };
 
 #endif // MAINWINDOW_H

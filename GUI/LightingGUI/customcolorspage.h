@@ -5,6 +5,7 @@
 
 #include "lightingpage.h"
 #include "icondata.h"
+#include "lightsbutton.h"
 
 #include <QWidget>
 #include <QDebug>
@@ -53,6 +54,12 @@ public:
      */
     void highlightRoutineButton(ELightingRoutine routine);
 
+    /*!
+     * \brief setupButtons sets up the routine buttons. Requires the DataLayer
+     *        of the application to be set up first.
+     */
+    void setupButtons();
+
 signals:
     /*!
      * \brief used to signal back to the main page that it should update its top-left icon
@@ -80,6 +87,14 @@ public slots:
      *        as the color you can change with the color picker.
      */
     void selectArrayColor(int);
+
+    /*!
+     * \brief routineButtonClicked whenever a button is clicked, this signal
+     *        is called. The first argument is the routine itself, the second
+     *        is the color group. For this specific page, the color group will
+     *        always be the custom color group, since its the custom color page.
+     */
+    void routineButtonClicked(int, int);
 
 protected:
     /*!
@@ -113,7 +128,7 @@ private:
      * \brief mRoutineButtons pointers to all the routine changes that can
      *        use the custom color array.
      */
-    std::shared_ptr<std::vector<QToolButton *> > mRoutineButtons;
+    std::shared_ptr<std::vector<LightsButton *> > mRoutineButtons;
 
     /*!
      * \brief mCurrentColorPickerIndex current index being set by the GUI.

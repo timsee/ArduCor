@@ -1,4 +1,8 @@
-
+/*!
+ * @copyright
+ * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
+ *
+ */
 
 #include "colorpicker.h"
 
@@ -18,12 +22,8 @@ ColorPicker::ColorPicker(QWidget *parent) :
     // --------------
 
     colorWheel = new QLabel(this);
-    colorWheel->setScaledContents(false);
     colorWheel->setPixmap(QPixmap(":/images/color_wheel.png"));
     colorWheel->setAlignment(Qt::AlignCenter);
-
-    colorWheel->setMinimumSize(50,50);
-    colorWheel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     // --------------
     // Setup RGB Labels
@@ -32,33 +32,37 @@ ColorPicker::ColorPicker(QWidget *parent) :
     rLabel = new QLabel(this);
     rLabel->setText("R");
     rLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
-    rLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     gLabel = new QLabel(this);
     gLabel->setText("G");
     gLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
-    gLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     bLabel = new QLabel(this);
     bLabel->setText("B");
     bLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
-    bLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     // --------------
     // Setup Sliders
     // --------------
 
     rSlider = new LightsSlider(this);
-    rSlider->setSliderColorBackground(QColor(255, 0, 0));
+    rSlider->setSliderColorBackground(QColor(255, 0, 0));    
     rSlider->slider->setRange(0, 255);
+    rSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    rSlider->setSliderHeight(0.8f);
 
     gSlider = new LightsSlider(this);
     gSlider->setSliderColorBackground(QColor(0, 255, 0));
     gSlider->slider->setRange(0, 255);
+    gSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    gSlider->setSliderHeight(0.8f);
 
     bSlider = new LightsSlider(this);
     bSlider->slider->setRange(0, 255);
     bSlider->setSliderColorBackground(QColor(0, 0, 255));
+    bSlider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    bSlider->setSliderHeight(0.8f);
+
 
     connect(rSlider, SIGNAL(valueChanged(int)), this, SLOT(rSliderChanged(int)));
     connect(rSlider->slider.get(), SIGNAL(sliderReleased()), this, SLOT(releasedSlider()));
@@ -138,18 +142,25 @@ void ColorPicker::chooseLayout(ELayoutColorPicker layout) {
     // change the layout
     if (layout == ELayoutColorPicker::eCondensedLayout) {
         // setup the condensed layout
+        colorWheel->setFixedSize(0,0);
         mCondensedLayout = new QHBoxLayout;
         mCondensedLayout->addWidget(colorWheel,Qt::AlignCenter);
         mCondensedLayout->addLayout(mSliderLayout);
-        colorWheel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        mCondensedLayout->setStretch(0, 10);
+        mCondensedLayout->setStretch(1, 4);
         setLayout(mCondensedLayout);
     }
     else {
         // setup the full layout
         mFullLayout = new QVBoxLayout;
+       // QSpacerItem *item = new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Fixed);
+        colorWheel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         mFullLayout->addWidget(colorWheel,Qt::AlignCenter);
+        mFullLayout->setStretch(0, 10);
+        mFullLayout->setStretch(1, 4);
+        mFullLayout->setStretch(2, 4);
+        mFullLayout->setStretch(3, 4);
         mFullLayout->addLayout(mSliderLayout);
-        colorWheel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         setLayout(mFullLayout);
     }
 
@@ -214,7 +225,7 @@ void ColorPicker::releasedSlider() {
 
 void ColorPicker::showEvent(QShowEvent *event) {
     Q_UNUSED(event);
-    mThrottleTimer->start(50);
+    mThrottleTimer->start(100);
 }
 
 void ColorPicker::hideEvent(QHideEvent *event) {
@@ -248,12 +259,23 @@ void ColorPicker::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void ColorPicker::resizeEvent(QResizeEvent *event) {
-    Q_UNUSED(event);
-    QPixmap pixmap = QPixmap(":/images/color_wheel.png");
-    colorWheel->setPixmap(pixmap.scaled(colorWheel->height(),
-                                        colorWheel->height(),
-                                        Qt::KeepAspectRatio,
-                                        Qt::SmoothTransformation));
+    if (mCurrentLayoutColorPicker == ELayoutColorPicker::eFullLayout) {
+        QPixmap pixmap = QPixmap(":/images/color_wheel.png");
+        int wheelSize = (int)(std::min(this->size().height() - rSlider->size().height() - gSlider->size().height() - bSlider->size().height(),
+                                       this->size().width()) * 0.8f);
+        colorWheel->setPixmap(pixmap.scaled(wheelSize,
+                                            wheelSize,
+                                            Qt::KeepAspectRatio,
+                                            Qt::SmoothTransformation));
+    } else if (mCurrentLayoutColorPicker == ELayoutColorPicker::eCondensedLayout) {
+        int size = (int)(std::min(this->size().width() * 0.8f, this->size().height() * 0.8f));
+        colorWheel->setFixedSize(size,size);
+        QPixmap pixmap = QPixmap(":/images/color_wheel.png");
+        colorWheel->setPixmap(pixmap.scaled(size,
+                                           size,
+                                            Qt::KeepAspectRatio,
+                                            Qt::SmoothTransformation));
+    }
 }
 
 

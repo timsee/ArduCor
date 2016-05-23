@@ -5,10 +5,12 @@
  */
 
 #include "presetcolorspage.h"
+#include "icondata.h"
 #include "ui_PresetColorsPage.h"
+
 #include <QDebug>
 #include <QSignalMapper>
-#include "icondata.h"
+#include <QScroller>
 
 PresetColorsPage::PresetColorsPage(QWidget *parent) :
     QWidget(parent),
@@ -16,6 +18,8 @@ PresetColorsPage::PresetColorsPage(QWidget *parent) :
     ui->setupUi(this);
 
     ui->scrollArea->setStyleSheet("background-color:transparent;");
+    QScroller::grabGesture(ui->scrollArea->viewport(), QScroller::LeftMouseButtonGesture);
+
 }
 
 PresetColorsPage::~PresetColorsPage() {
@@ -24,8 +28,7 @@ PresetColorsPage::~PresetColorsPage() {
 
 
 void
-PresetColorsPage::setupPresets()
-{
+PresetColorsPage::setupButtons() {
     int colorGroupMax = (int)EColorGroup::eColorGroup_MAX - 1;
     mButtonCount = colorGroupMax * ((int)ELightingRoutine::eLightingRoutine_MAX - (int)ELightingRoutine::eMultiGlimmer);
     std::vector<std::string> labels = {"Water",
@@ -39,16 +42,19 @@ PresetColorsPage::setupPresets()
                                        "Poison",
                                        "Rose",
                                        "PinkGreen",
-                                       "RedWhiteBlue",
+                                       "RWB",
                                        "RGB",
                                        "CMY",
-                                       "SixColor",
-                                       "SevenColor",
+                                       "Six",
+                                       "Seven",
                                        "All"};
 
     mButtonLayout = new QGridLayout;
+    mButtonLayout->setSpacing(0);
     mPresetButtons = std::vector<LightsButton *>(mButtonCount, nullptr);
     mPresetLabels = std::vector<QLabel *>(colorGroupMax, nullptr);
+    this->grabGesture(Qt::SwipeGesture);
+    this->grabGesture(Qt::SwipeGesture);
 
     int modeIndex = 0;
     int groupIndex = 0;
@@ -57,7 +63,7 @@ PresetColorsPage::setupPresets()
         mPresetLabels[groupIndex] = new QLabel;
         mPresetLabels[groupIndex]->setText(labels[groupIndex].c_str());
         mPresetLabels[groupIndex]->setAlignment(Qt::AlignCenter);
-        mPresetLabels[groupIndex]->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        mPresetLabels[groupIndex]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
         layoutColumnIndex = 0;
         // add to layout
@@ -65,9 +71,9 @@ PresetColorsPage::setupPresets()
         layoutColumnIndex++;
         for (int routine = (int)ELightingRoutine::eMultiGlimmer; routine < (int)ELightingRoutine::eLightingRoutine_MAX; routine++) {
             mPresetButtons[modeIndex] = new LightsButton;
-            mPresetButtons[modeIndex]->setupAsMultiButton((ELightingRoutine)routine, (EColorGroup)preset, mData);
+            mPresetButtons[modeIndex]->setupAsStandardButton((ELightingRoutine)routine, (EColorGroup)preset, mData);
             mPresetButtons[modeIndex]->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            connect(mPresetButtons[modeIndex], SIGNAL(presetClicked(int, int)), this, SLOT(multiButtonClicked(int, int)));
+            connect(mPresetButtons[modeIndex], SIGNAL(buttonClicked(int, int)), this, SLOT(multiButtonClicked(int, int)));
 
             // add to layout
             mButtonLayout->addWidget(mPresetButtons[modeIndex], layoutColumnIndex, groupIndex);
@@ -79,7 +85,6 @@ PresetColorsPage::setupPresets()
 
     ui->scrollArea->setWidgetResizable(true);
     mButtonLayout->setVerticalSpacing(0);
-    ui->scrollAreaWidgetContents->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     ui->scrollAreaWidgetContents->setLayout(mButtonLayout);
 
     ui->scrollArea->setStyleSheet("background-color:transparent;");
@@ -119,5 +124,15 @@ void PresetColorsPage::multiButtonClicked(int routine, int colorGroup) {
 
 void PresetColorsPage::showEvent(QShowEvent *) {
     highlightRoutineButton(mData->currentRoutine(), mData->currentColorGroup());
+    // calculate the largest element size
+    int maxWidth = 0;
+    for (int i = 0; i < mButtonLayout->count(); i++) {
+        if (mButtonLayout->itemAt(i)->geometry().width() > maxWidth) {
+            maxWidth = mButtonLayout->itemAt(i)->geometry().width();
+        }
+    }
+    for (int i = 0; i < mButtonCount; i++) {
+         mPresetButtons[i]->setMinimumWidth(maxWidth);
+    }
 }
 
