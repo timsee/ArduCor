@@ -6,6 +6,7 @@
 
 #include "singlecolorpage.h"
 #include "ui_singlecolorpage.h"
+
 #include <QColorDialog>
 #include <QDebug>
 #include <QSignalMapper>
@@ -14,29 +15,6 @@ SingleColorPage::SingleColorPage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SingleColorPage) {
     ui->setupUi(this);
-
-    mIconData = IconData(ui->solidButton->iconSize().width(), ui->solidButton->iconSize().height());
-
-    mPageButtons = std::shared_ptr<std::vector<QToolButton*> >(new std::vector<QToolButton*>(4, nullptr));
-    (*mPageButtons.get())[0] = ui->solidButton;
-    (*mPageButtons.get())[1] = ui->blinkButton;
-    (*mPageButtons.get())[2] = ui->fadeButton;
-    (*mPageButtons.get())[3] = ui->glimmerButton;
-
-    // loop through the buttons and set up their clicks to a mapper
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    for (uint i = 0; i < mPageButtons->size(); i++) {
-        QToolButton* button =(*mPageButtons.get())[i];
-        button->setCheckable(true);
-        connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
-    }
-
-    signalMapper->setMapping(ui->solidButton, (int)ELightingRoutine::eSingleSolid);
-    signalMapper->setMapping(ui->blinkButton, (int)ELightingRoutine::eSingleBlink);
-    signalMapper->setMapping(ui->fadeButton, (int)ELightingRoutine::eSingleFade);
-    signalMapper->setMapping(ui->glimmerButton, (int)ELightingRoutine::eSingleGlimmer);
-
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(modeChanged(int)));
 
     ui->colorPicker->chooseLayout(ELayoutColorPicker::eFullLayout);
     connect(ui->colorPicker, SIGNAL(colorUpdate(QColor)), this, SLOT(colorChanged(QColor)));
@@ -51,28 +29,49 @@ void SingleColorPage::chooseColor(QColor color) {
   ui->colorPicker->chooseColor(color);
 }
 
+
+void SingleColorPage::setupButtons() {
+    mIconData = IconData(64,64, mData);
+
+    std::vector<std::string> labels = {"Solid",
+                                       "Blink",
+                                       "Fade",
+                                       "Glimmer"};
+
+    std::vector<LightsButton *> buttons = {ui->solidButton,
+                                           ui->blinkButton,
+                                           ui->fadeButton,
+                                           ui->glimmerButton};
+
+    mRoutineButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(4, nullptr));
+    for (int i = 0; i < 4; ++i) {
+        (*mRoutineButtons.get())[i] = buttons[i];
+        (*mRoutineButtons.get())[i]->setupAsLabeledButton(QString::fromStdString(labels[i]), (ELightingRoutine)(i + 1), mData);
+        connect((*mRoutineButtons.get())[i], SIGNAL(buttonClicked(int, int)), this, SLOT(modeChanged(int, int)));
+   }
+}
+
 void SingleColorPage::highlightRoutineButton(ELightingRoutine routine) {
-    for (uint i = 0; i < mPageButtons->size(); i++) {
-        QToolButton* button =(*mPageButtons.get())[i];
-        button->setChecked(false);
+    for (uint i = 0; i < mRoutineButtons->size(); i++) {
+        (*mRoutineButtons.get())[i]->button->setChecked(false);
     }
 
     if (routine == ELightingRoutine::eSingleSolid) {
-        ui->solidButton->setChecked(true);
+        ui->solidButton->button->setChecked(true);
     } else if (routine == ELightingRoutine::eSingleBlink) {
-        ui->blinkButton->setChecked(true);
+        ui->blinkButton->button->setChecked(true);
     } else if (routine == ELightingRoutine::eSingleFade) {
-        ui->fadeButton->setChecked(true);
+        ui->fadeButton->button->setChecked(true);
     } else if (routine == ELightingRoutine::eSingleGlimmer) {
-        ui->glimmerButton->setChecked(true);
+        ui->glimmerButton->button->setChecked(true);
     }
 }
 
 // ----------------------------
 // Slots
 // ----------------------------
-
-void SingleColorPage::modeChanged(int newMode) {
+// newGroup is ignored for single color routines
+void SingleColorPage::modeChanged(int newMode, int newGroup) {
     mData->currentRoutine((ELightingRoutine)newMode);
     mComm->sendRoutineChange((ELightingRoutine)newMode);
     highlightRoutineButton((ELightingRoutine)newMode);
@@ -92,19 +91,19 @@ void SingleColorPage::colorChanged(QColor color) {
     }
 
     mIconData.setSolidColor(color);
-    ui->solidButton->setIcon(mIconData.renderAsQPixmap());
+    ui->solidButton->button->setIcon(mIconData.renderAsQPixmap());
 
     mIconData.setSolidColor(color);
     mIconData.addFade();
-    ui->fadeButton->setIcon(mIconData.renderAsQPixmap());
+    ui->fadeButton->button->setIcon(mIconData.renderAsQPixmap());
 
     mIconData.setSolidColor(color);
     mIconData.addGlimmer();
-    ui->glimmerButton->setIcon(mIconData.renderAsQPixmap());
+    ui->glimmerButton->button->setIcon(mIconData.renderAsQPixmap());
 
     mIconData.setSolidColor(color);
     mIconData.addBlink();
-    ui->blinkButton->setIcon(mIconData.renderAsQPixmap());
+    ui->blinkButton->button->setIcon(mIconData.renderAsQPixmap());
 
     emit updateMainIcons();
 }

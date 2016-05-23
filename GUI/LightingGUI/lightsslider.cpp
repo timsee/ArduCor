@@ -12,14 +12,29 @@
 
 
 LightsSlider::LightsSlider(QWidget *parent) : QWidget(parent) {
+
+    mHeightScaleFactor = 1.0f;
+
+    // --------------
+    // Setup Thrrole Timer
+    // --------------
+    mThrottleTimer = new QTimer(this);
+    connect(mThrottleTimer, SIGNAL(timeout()), this, SLOT(resetThrottleFlag()));
+
     this->setAutoFillBackground(true);
     slider = std::shared_ptr<QSlider>(new QSlider(Qt::Horizontal, this));
     slider->setAutoFillBackground(true);
     slider->setGeometry(this->rect());
     setMinimumPossible(false, 0);
     setSnapToNearestTick(false);
-    slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     connect(slider.get(), SIGNAL(valueChanged(int)), this, SLOT(receivedValue(int)));
+    connect(slider.get(), SIGNAL(sliderReleased()),  this, SLOT(releasedSlider()));
+
+    mLayout = new QVBoxLayout;
+    mLayout->setSpacing(0);
+    mLayout->setContentsMargins(0,0,0,0);
+    mLayout->addWidget(slider.get());
+    setLayout(mLayout);
 }
 
 
@@ -47,7 +62,11 @@ void LightsSlider::receivedValue(int value) {
     value = jumpSliderToPosition(slider, value);
     slider->blockSignals(true);
     slider->setValue(value);
-    emit valueChanged(value);
+    if (!mThrottleFlag) {
+        emit valueChanged(value);
+        mThrottleFlag = true;
+    }
+
     slider->blockSignals(false);
 }
 
@@ -111,7 +130,22 @@ void LightsSlider::setMinimumPossible(bool useMinimumPossible, int minimumPossib
 
 void LightsSlider::resizeEvent(QResizeEvent *event) {
     Q_UNUSED (event);
-    slider->setGeometry(this->rect());
+    float newY = this->rect().height() * (1.0 - mHeightScaleFactor) / 2.0f;
+    slider->setGeometry(slider->rect().x(),
+                        newY,
+                        this->rect().width(),
+                        this->rect().height() * mHeightScaleFactor);
+}
+
+void LightsSlider::showEvent(QShowEvent *event) {
+    Q_UNUSED(event);
+    mThrottleTimer->start(200);
+}
+
+void LightsSlider::hideEvent(QHideEvent *event) {
+    Q_UNUSED(event);
+    mThrottleTimer->stop();
+    mThrottleFlag = false;
 }
 
 
@@ -149,7 +183,26 @@ void LightsSlider::paintEvent(QPaintEvent *event) {
 }
 
 
+void LightsSlider::setSliderHeight(float percent) {
+    mHeightScaleFactor = percent;
+    float newY = this->rect().height() * (1.0 - mHeightScaleFactor) / 2.0f;
+    slider->setGeometry(slider->rect().x(),
+                        newY,
+                        this->rect().width(),
+                        this->rect().height() * mHeightScaleFactor);
+}
+
+
 void LightsSlider::setSnapToNearestTick(bool shouldSnap) {
     mShouldSnap = shouldSnap;
 }
 
+
+void LightsSlider::resetThrottleFlag() {
+    mThrottleFlag = false;
+}
+
+
+void LightsSlider::releasedSlider() {
+    emit valueChanged(slider->value());
+}

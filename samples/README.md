@@ -2,6 +2,15 @@
 
 The sample sketches for Adafruit NeoPixels, SeeedStudio Rainbowduino, and a single RGB LED. 
 
+The samples are split into three main folders:
+
+* `arduino` contains samples that should run on any arduino.
+* `yun/http` contains samples that work only on arduino Yuns, but require no extra configuration.
+* `yun/udp` contains samples that work only only on arduion Yuns and require extra configuration
+            to work.
+
+For documentation for the Yun based samples, [check here](yun).
+
 ## <a name="toc"></a>Table of Contents
 
 * [Supported Hardware](#hardware)
@@ -17,7 +26,7 @@ The sample sketches for Adafruit NeoPixels, SeeedStudio Rainbowduino, and a sing
 
 #### <a name="rainbowduino-hardware"></a>Rainbowduino
 
-To use the project with a Rainbowduino, connect an 8x8x8 RGB LED array or a 4x4x4 RGB LED cube to your rainbowduino.  It is recommended that you sucessfully install a Rainbowduino sample project before trying to use our sample sketch. For more information on Rainbowduino, check out their [documentation](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0).
+To use the project with a Rainbowduino, connect an 8x8 RGB LED array or a 4x4x4 RGB LED cube to your rainbowduino.  It is recommended that you sucessfully install a Rainbowduino sample project before trying to use our sample sketch. For more information on Rainbowduino, check out their [documentation](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0).
 
 #### <a name="adafruit-hardware"></a>Adafruit NeoPixels
 
@@ -51,7 +60,7 @@ Header,param1,param2,param3,param4;
 **Example:** `0,1;` *(Header 0, New Routine 1)*
  `0,4,6;` *(Header 0, New Routine 4, New Color Group 6)* 
 
-*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). *
+*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). 
 
 #### Set Color for Single Color Routines
 

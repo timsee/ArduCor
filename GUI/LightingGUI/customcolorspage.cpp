@@ -19,24 +19,25 @@ CustomColorsPage::CustomColorsPage(QWidget *parent) :
     // Setup Array Count Slider
     // --------------
 
-    const int COLOR_ARRAY_PRESET = 10;
+    int customArraySize = 10;
     connect(ui->arraySlider, SIGNAL(valueChanged(int)), this, SLOT(customColorCountChanged(int)));
     ui->arraySlider->setSliderColorBackground(QColor(0,255,0));
-    ui->arraySlider->slider->setMaximum(COLOR_ARRAY_PRESET * 10);
+    ui->arraySlider->slider->setMaximum(customArraySize * 10);
     ui->arraySlider->slider->setTickInterval(10);
     ui->arraySlider->slider->setTickPosition(QSlider::TicksBelow);
     ui->arraySlider->setSnapToNearestTick(true);
     ui->arraySlider->setMinimumPossible(true, 20);
+    ui->arraySlider->setSliderHeight(0.6f);
 
     // --------------
     // Setup Color Array Array (array array  ... array array...)
     // --------------
 
-    mArrayColorsButtons = std::shared_ptr<std::vector<QToolButton*> >(new std::vector<QToolButton*>(COLOR_ARRAY_PRESET, nullptr));
+    mArrayColorsButtons = std::shared_ptr<std::vector<QToolButton*> >(new std::vector<QToolButton*>(customArraySize, nullptr));
     mIconData = IconData(80,80);
 
     QSignalMapper *arrayButtonsMapper = new QSignalMapper(this);
-    for (int i = 0; i < COLOR_ARRAY_PRESET; ++i) {
+    for (int i = 0; i < customArraySize; ++i) {
         (*mArrayColorsButtons.get())[i] = new QToolButton;
         (*mArrayColorsButtons.get())[i]->setIcon(mIconData.renderAsQPixmap());
         ui->arrayColorsLayout->addWidget((*mArrayColorsButtons.get())[i], 0 , i);
@@ -55,52 +56,64 @@ CustomColorsPage::CustomColorsPage(QWidget *parent) :
     ui->colorPicker->chooseLayout(ELayoutColorPicker::eCondensedLayout);
     connect(ui->colorPicker, SIGNAL(colorUpdate(QColor)), this, SLOT(colorChanged(QColor)));
     mCurrentColorPickerIndex = 0;
-
-    // --------------
-    // Setup Routine Buttons
-    // --------------
-
-    mRoutineButtons = std::shared_ptr<std::vector<QToolButton*> >(new std::vector<QToolButton*>(6, nullptr));
-    (*mRoutineButtons.get())[0] = ui->glimmerButton;
-    (*mRoutineButtons.get())[1] = ui->randomIndividualButton;
-    (*mRoutineButtons.get())[2] = ui->randomSolidButton;
-    (*mRoutineButtons.get())[3] = ui->fadeButton;
-    (*mRoutineButtons.get())[4] = ui->barsSolidButton;
-    (*mRoutineButtons.get())[5] = ui->barsMovingButton;
-
-    // loop through the buttons and set up their clicks to a mapper
-    QSignalMapper *signalMapper = new QSignalMapper(this);
-    for (uint i = 0; i < mRoutineButtons->size(); i++) {
-        QToolButton* button =(*mRoutineButtons.get())[i];
-        button->setCheckable(true);
-        connect(button, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
-    }
-
-    signalMapper->setMapping(ui->glimmerButton, (int)ELightingRoutine::eMultiGlimmer);
-    signalMapper->setMapping(ui->randomIndividualButton, (int)ELightingRoutine::eMultiRandomIndividual);
-    signalMapper->setMapping(ui->randomSolidButton, (int)ELightingRoutine::eMultiRandomSolid);
-    signalMapper->setMapping(ui->fadeButton, (int)ELightingRoutine::eMultiFade);
-    signalMapper->setMapping(ui->barsSolidButton, (int)ELightingRoutine::eMultiBarsSolid);
-    signalMapper->setMapping(ui->barsMovingButton, (int)ELightingRoutine::eMultiBarsMoving);
-
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(modeChanged(int)));
 }
 
 CustomColorsPage::~CustomColorsPage() {
     delete ui;
 }
 
+void CustomColorsPage::setupButtons() {
+    // --------------
+    // Setup Routine Buttons
+    // --------------
+    std::vector<std::string> labels = {"Glimmer",
+                                       "Fade",
+                                       "Random Solid",
+                                       "Random Individual",
+                                       "Bars Solid",
+                                       "Bars Moving"};
+
+    std::vector<LightsButton *> buttons = {ui->glimmerButton,
+                                           ui->fadeButton,
+                                           ui->randomIndividualButton,
+                                           ui->randomSolidButton,
+                                           ui->barsSolidButton,
+                                           ui->barsMovingButton};
+
+    mRoutineButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(6, nullptr));
+    int routineIndex = (int)ELightingRoutine::eMultiGlimmer;
+    for (int i = 0; i < 6; ++i) {
+        (*mRoutineButtons.get())[i] = buttons[i];
+        (*mRoutineButtons.get())[i]->setupAsLabeledButton(QString::fromStdString(labels[i]), (ELightingRoutine)(routineIndex + i), mData, EColorGroup::eCustom);
+        connect((*mRoutineButtons.get())[i], SIGNAL(buttonClicked(int, int)), this, SLOT(routineButtonClicked(int, int)));
+   }
+}
 
 void CustomColorsPage::highlightRoutineButton(ELightingRoutine routine) {
 
     for (uint i = 0; i < mRoutineButtons->size(); i++) {
-        QToolButton* button =(*mRoutineButtons.get())[i];
+        QPushButton* button = (*mRoutineButtons.get())[i]->button;
         button->setChecked(false);
     }
+
+    if (routine == ELightingRoutine::eMultiFade) {
+        ui->fadeButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eMultiGlimmer) {
+        ui->glimmerButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eMultiRandomSolid) {
+        ui->randomSolidButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eMultiRandomIndividual) {
+        ui->randomIndividualButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eMultiBarsSolid) {
+        ui->barsSolidButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eMultiBarsMoving) {
+        ui->barsMovingButton->button->setChecked(true);
+    }
+
     if (mData->currentColorGroup() == EColorGroup::eCustom) {
         for (int i = (int)ELightingRoutine::eSingleGlimmer + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
             mIconData.setLightingRoutine((ELightingRoutine)i, EColorGroup::eCustom);
-            (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleGlimmer - 1]->setIcon(mIconData.renderAsQPixmap());
+            (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleGlimmer - 1]->button->setIcon(mIconData.renderAsQPixmap());
         }
     }
 }
@@ -118,28 +131,13 @@ void CustomColorsPage::selectArrayColor(int index) {
     (*mArrayColorsButtons.get())[mCurrentColorPickerIndex]->setStyleSheet("border: 2px solid white");
 }
 
-void CustomColorsPage::updateColorArray() {
-    for (int i = 0; i < mData->groupSize(EColorGroup::eCustom); ++i) {
-        (*mArrayColorsButtons.get())[i]->setEnabled(true);
-        mIconData.setSolidColor(mData->colorGroup(EColorGroup::eCustom)[i]);
-        (*mArrayColorsButtons.get())[i]->setIcon(mIconData.renderAsQPixmap());
-    }
-
-    for (int i = mData->groupSize(EColorGroup::eCustom); i < mData->maxColorGroupSize(); ++i) {
-        (*mArrayColorsButtons.get())[i]->setIcon(mGreyIcon.renderAsQPixmap());
-        (*mArrayColorsButtons.get())[i]->setEnabled(false);
-    }
-     ui->arraySlider->setSliderColorBackground(mData->colorsAverage(EColorGroup::eCustom));
-}
-
-
 // ----------------------------
 // Slots
 // ----------------------------
 
 void CustomColorsPage::customColorCountChanged(int newCount) {
     int colorCount = newCount / 10;
-    if (colorCount <= mData->groupSize(EColorGroup::eCustom)) {
+    if (colorCount != mData->groupSize(EColorGroup::eCustom)) {
         mData->customColorsUsed(colorCount);
         updateColorArray();
         updateIcons();
@@ -158,15 +156,21 @@ void CustomColorsPage::modeChanged(int newMode) {
 }
 
 void CustomColorsPage::colorChanged(QColor color) {
-    mData->colorGroup(EColorGroup::eCustom)[mCurrentColorPickerIndex] = color;
-
+    mData->customColor(mCurrentColorPickerIndex, color);
     mComm->sendArrayColorChange(mCurrentColorPickerIndex, color);
     ui->arraySlider->setSliderColorBackground(mData->colorsAverage(EColorGroup::eCustom));
-
     updateIcons();
     emit updateMainIcons();
 }
 
+
+void CustomColorsPage::routineButtonClicked(int newRoutine, int newMode) {
+    mData->currentRoutine((ELightingRoutine)newRoutine);
+    mData->currentColorGroup(EColorGroup::eCustom);
+    mComm->sendRoutineChange(mData->currentRoutine(), (int)EColorGroup::eCustom);
+    highlightRoutineButton(mData->currentRoutine());
+    emit updateMainIcons();
+}
 
 // ----------------------------
 // Protected
@@ -195,7 +199,6 @@ void CustomColorsPage::showEvent(QShowEvent *event) {
 // ----------------------------
 
 void CustomColorsPage::updateIcons() {
-
     for (int i = 0; i < mData->groupSize(EColorGroup::eCustom); ++i) {
         mIconData.setSolidColor(mData->colorGroup(EColorGroup::eCustom)[i]);
         (*mArrayColorsButtons.get())[i]->setEnabled(true);
@@ -210,7 +213,21 @@ void CustomColorsPage::updateIcons() {
     mIconData = IconData(80, 80, mData);
     for (int i = (int)ELightingRoutine::eSingleGlimmer + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
         mIconData.setLightingRoutine((ELightingRoutine)i, EColorGroup::eCustom);
-        (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleGlimmer - 1]->setIcon(mIconData.renderAsQPixmap());
+        (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleGlimmer - 1]->button->setIcon(mIconData.renderAsQPixmap());
     }
+}
+
+void CustomColorsPage::updateColorArray() {
+    for (int i = 0; i < mData->groupSize(EColorGroup::eCustom); ++i) {
+        (*mArrayColorsButtons.get())[i]->setEnabled(true);
+        mIconData.setSolidColor(mData->colorGroup(EColorGroup::eCustom)[i]);
+        (*mArrayColorsButtons.get())[i]->setIcon(mIconData.renderAsQPixmap());
+    }
+
+    for (int i = mData->groupSize(EColorGroup::eCustom); i < mData->maxColorGroupSize(); ++i) {
+        (*mArrayColorsButtons.get())[i]->setIcon(mGreyIcon.renderAsQPixmap());
+        (*mArrayColorsButtons.get())[i]->setEnabled(false);
+    }
+     ui->arraySlider->setSliderColorBackground(mData->colorsAverage(EColorGroup::eCustom));
 }
 

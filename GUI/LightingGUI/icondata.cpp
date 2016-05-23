@@ -4,13 +4,13 @@
  *
  */
 
+#include "icondata.h"
+
 #include <qDebug>
 
 #include <stdlib.h>
 #include <ctime>
 #include <algorithm>
-
-#include "icondata.h"
 
 IconData::IconData() {
     setup(64, 64);
@@ -198,9 +198,13 @@ void IconData::setMultiGlimmer(EColorGroup group) {
         // the third element and the 8th element get their
         // color changed to simulate the multi glimmer effect.
         if (j == 3) {
-            mBuffer[i]     = colors[2].red();
-            mBuffer[i + 1] = colors[2].green();
-            mBuffer[i + 2] = colors[2].blue();
+            int color = 1;
+            if (colorCount > 2) {
+                color = colorCount - 1;
+            }
+            mBuffer[i]     = colors[color].red();
+            mBuffer[i + 1] = colors[color].green();
+            mBuffer[i + 2] = colors[color].blue();
         } else if (j == 8) {
             int color = 1;
             // only use this value if the colorCount allows it
@@ -226,20 +230,21 @@ void IconData::setMultiFade(EColorGroup group, bool showMore) {
     // feature. This handles a silly edge case.
     int colorCount;
     if (showMore) {
-        colorCount = mDataLayer->maxColorGroupSize();
+        colorCount = 10;
     } else {
         colorCount = mDataLayer->groupSize(group);
     }
     QColor *colors = mDataLayer->colorGroup(group);
 
     int k = 0;
-    int tempIndex = 0;
+    int tempIndex = -1;
     int *arrayIndices = new int[8];
     while (k < 8) {
         tempIndex = (tempIndex + 1) % colorCount;
         arrayIndices[k] = tempIndex;
         k++;
     }
+
     int count = 16;
     QColor *output = new QColor[count];
     int colorIndex = 0;
@@ -248,10 +253,10 @@ void IconData::setMultiFade(EColorGroup group, bool showMore) {
         output[i + 1] = getMiddleColor(colors[arrayIndices[colorIndex]], colors[arrayIndices[colorIndex + 1]]);
         colorIndex++;
     }
+
     // wrap the last value around
     output[count - 2] = colors[arrayIndices[colorIndex]];
     output[count - 1] = getMiddleColor(colors[arrayIndices[colorIndex]], colors[arrayIndices[0]]);
-
     int j = 0;
     for (uint i = 0; i < mBufferLength; i = i + 3) {
         mBuffer[i] = output[j].red();

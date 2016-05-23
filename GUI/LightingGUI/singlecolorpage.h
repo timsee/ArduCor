@@ -6,6 +6,7 @@
 #include "lightsslider.h"
 #include "lightingpage.h"
 #include "colorpicker.h"
+#include "lightsbutton.h"
 
 #include <QWidget>
 #include <QSlider>
@@ -57,6 +58,11 @@ public:
      */
     void chooseColor(QColor color);
 
+    /*!
+     * \brief setupButtons sets up the routine buttons. Requires the DataLayer
+     *        of the application to be set up first.
+     */
+    void setupButtons();
 
 signals:
     /*!
@@ -71,7 +77,7 @@ public slots:
      * \brief modeChanged signaled whenever a mode button is pressed, used to
      *        to tell the LEDs to update.
      */
-    void modeChanged(int);
+    void modeChanged(int, int);
     /*!
      * \brief colorChanged signaled whenever the ColorPicker chooses a new color.
      */
@@ -92,10 +98,10 @@ private:
     Ui::SingleColorPage *ui;
 
     /*!
-     * \brief mPageButtons pointers to all the main buttons, used
+     * \brief mRoutineButtons pointers to all the main buttons, used
      *        to iterate through them quickly.
      */
-    std::shared_ptr<std::vector<QToolButton*> > mPageButtons;
+    std::shared_ptr<std::vector<LightsButton*> > mRoutineButtons;
 
     /*!
      * \brief IconData for the Single Color Routine Icons

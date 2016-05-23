@@ -2,32 +2,33 @@
  * RGB-LED-Routines
  * Sample Sketch
  *
- * Supports a single RGB LED but can be easily hacked to support more.
+ * Supports Adafruit NeoPixels products.
  *
- * Provides a serial interface to a set of lighting routines generated
+ * Provides a HTTP interface to a set of lighting routines.
  * by the RoutinesRGB library.
  *
- * Version 1.9.2
- * Date: May 5, 2016
+ * Version 1.9.5
+ * Date: May 22, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
 #include <RoutinesRGB.h>
+#include <Adafruit_NeoPixel.h>
+#include <BridgeServer.h>
+#include <BridgeClient.h>
 
 //================================================================================
 // Settings
 //================================================================================
 
-const byte R_PIN             = 5;      // SINGLE_LED only
-const byte G_PIN             = 4;      // SINGLE_LED only
-const byte B_PIN             = 3;      // SINGLE_LED only
-const byte IS_COMMON_ANODE   = 1;      // SINGLE_LED only, 0 if common cathode, 1 if common anode
+const byte CONTROL_PIN       = 6;      // pin used by NeoPixels library
 const int LED_COUNT          = 64;
 
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
 const byte FADE_SPEED        = 20;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
-const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
+
+const byte DELAY_VALUE       = 50;     // amount of sleep time between loops 
 
 const int DEFAULT_SPEED      = 300;    // default delay for LEDs update, suggested range: 10 (super fast) - 1000 (slow). 
 const int DEFAULT_TIMEOUT    = 120;    // number of minutes without packets until the arduino times out.
@@ -52,9 +53,16 @@ unsigned long last_message_time = 0;
 // when to update the LEDs.
 unsigned long loop_counter = 0;
 
+
 //=======================
 // String Parsing
 //=======================
+
+// the current packet being parsed by the loop() function
+String currentPacket;
+// flag ued by parsing system. if TRUE, continue parsing, if FALSE,
+// packet is either illegal, a repeat, or empty and parsing can be skipped.
+bool packetReceived = false;
 
 // delimiter used to break up values sent as strings over serial.
 char delimiter = ',';
@@ -84,6 +92,14 @@ ParsedIntPacket delimitedStringToIntArray(String message);
 // Library used to generate the RGB LED routines.
 RoutinesRGB routines = RoutinesRGB(LED_COUNT);
 
+//=======================
+// Hardware Setup
+//=======================
+
+//NOTE: you may need to change the NEO_GRB or NEO_KHZ2800 for this sample to work with your lights. 
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
+
+BridgeServer server;
 
 //================================================================================
 // Setup and Loop
@@ -91,10 +107,11 @@ RoutinesRGB routines = RoutinesRGB(LED_COUNT);
 
 void setup()
 {
-  pinMode(R_PIN, OUTPUT);
-  pinMode(G_PIN, OUTPUT);
-  pinMode(B_PIN, OUTPUT);
+  pixels.begin();
 
+  Bridge.begin();
+  server.listenOnLocalhost();
+  server.begin();
   // choose the default color for the single
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines. 
@@ -107,9 +124,14 @@ void setup()
 
 void loop()
 {
-  if (Serial.available()) {
-    String currentPacket = Serial.readStringUntil(';');
-    // remove any extraneous whitepsace or newline characters
+ packetReceived = false;
+  BridgeClient client = server.accept();
+  if (client) {
+    currentPacket = client.readStringUntil('/');
+    client.stop();
+    packetReceived = true;
+  }
+  if (packetReceived) {
     currentPacket.trim();
     parsed_packet = delimitedStringToIntArray(currentPacket);
     // parse a paceket only if its header is is in the correct range
@@ -139,16 +161,12 @@ void loop()
 
 void updateLEDs()
 {
-  if (IS_COMMON_ANODE) {
-    analogWrite(R_PIN, 255 - routines.red(0));
-    analogWrite(G_PIN, 255 - routines.green(0));
-    analogWrite(B_PIN, 255 - routines.blue(0));
+  for (int x = 0; x < LED_COUNT; x++) {
+    pixels.setPixelColor(x, pixels.Color(routines.red(x),
+                                         routines.green(x),
+                                         routines.blue(x)));
   }
-  else {
-    analogWrite(R_PIN, routines.red(0));
-    analogWrite(G_PIN, routines.green(0));
-    analogWrite(B_PIN, routines.blue(0));
-  }
+  pixels.show();
 }
 
 

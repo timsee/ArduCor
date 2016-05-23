@@ -24,7 +24,8 @@ class SettingsPage;
  *
  * It also shows a list of the available serial connections
  * and clicking  on a serial connection will attempt to connect
- * to it.
+ * to it. In future updates, this list will be expanding to allow
+ * connections to HTTP, UDP, and BLE.
  *
  */
 class SettingsPage : public QWidget, public LightingPage

@@ -4,21 +4,37 @@
 
 #include "lightingprotocols.h"
 #include <QColor>
-#include <QSerialPort>
-#include <QSerialPortInfo>
-#include <QList>
 #include <memory>
+
+#ifndef MOBILE_BUILD
+#include "commserial.h"
+#endif //MOBILE_BUILD
+#include "commhttp.h"
+#include "commudp.h"
 
 /*!
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
- *
+ */
+
+/*!
+ * \brief The ECommType enum The connection types
+ *        supported by the GUI. For mobile builds,
+ *        serial is not supported.
+ */
+enum class ECommType {
+#ifndef MOBILE_BUILD
+    eSerial,
+#endif //MOBILE_BUILD
+    eHTTP,
+    eUDP
+};
+
+/*!
  * \brief The CommLayer class provides communication protocols
  *  that allow the user to connect and send packets to an LED
- *  array. Currently it supports serial communication. In a future
- *  update it will also support UDP and HTTP
+ *  array. Currently it supports serial, UDP, and HTTP.
  *
- * \todo Add UDP and HTTP.
  */
 class CommLayer
 {
@@ -31,27 +47,6 @@ public:
      * \brief Deconstructor
      */
     ~CommLayer();
-
-    /*!
-     * \brief serialList list of possible serial ports
-     *        for connection
-     */
-    QList<QSerialPortInfo> serialList;
-
-    /*!
-     * \brief serial the serial port currently in use
-     */
-    std::shared_ptr<QSerialPort> serial;
-
-    /*!
-     *  \brief start up a serial port
-     */
-    bool connectSerialPort(QString serialPortName);
-
-    /*!
-     * \brief closeSerialPort cleans up after the serial port.
-     */
-    void closeSerialPort();
 
     /*!
      * \brief sendMainColorChange change the main color of the lighting settings
@@ -77,9 +72,10 @@ public:
     void sendRoutineChange(ELightingRoutine routine, int colorGroupUsed = -1);
 
     /*!
-     * \brief sendCustomArrayCount sends a new custom array count to the LED array. This count determines
-     *        how many colors from the custom array should be used. It is different from the size of the custom array,
-     *        which provides a maximum possible amount of colors.
+     * \brief sendCustomArrayCount sends a new custom array count to the LED array. This count
+     *        determines how many colors from the custom array should be used. It is different
+     *        from the size of the custom array, which provides a maximum possible amount
+     *        of colors.
      * \param count a value less than the size of the custom color array.
      */
     void sendCustomArrayCount(int count);
@@ -108,6 +104,49 @@ public:
      * \brief sendReset resets the board to its default settings.
      */
     void sendReset();
+
+    /*!
+     * \brief comm returns a pointer to the current connection
+     * \return a pointer to the current connection
+     */
+    CommType *comm() { return mComm; }
+
+    /*!
+     * \brief sendPacket sends the string over the currently
+     *        active connection
+     * \param packet a string that will be sent over the currently
+     *        active connection.
+     */
+    void sendPacket(QString packet);
+
+private:
+
+#ifndef MOBILE_BUILD
+    /*!
+     * \brief mSerial Serial connection object
+     */
+    std::shared_ptr<CommSerial> mSerial;
+#endif //MOBILE_BUILD
+    /*!
+     * \brief mHTTP HTTP connection object
+     */
+    std::shared_ptr<CommHTTP> mHTTP;
+    /*!
+     * \brief mUDP UDP connection object
+     */
+    std::shared_ptr<CommUDP>  mUDP;
+
+    /*!
+     * \brief mCommType The currently active
+     *        connection type.
+     */
+    ECommType mCommType;
+
+    /*!
+     * \brief mComm pointer to the current connection
+     *        being used.
+     */
+    CommType *mComm;
 };
 
 #endif // COMMLAYER_H

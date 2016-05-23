@@ -4,7 +4,7 @@
 This project is based around an arduino library that generates a set of lighting routines for various arduino-based lighting arrays.
 
 Sample sketches are provided for Rainbowduino, a NeoPixel products, or a standard RGB LED. The samples
-provide an ASCII based serial interface to change the lighting routines, the brightness of the lights, and more. A Qt-based GUI is also provided which can control the arduino sketches. The GUI has been tested on Windows and Mac OS X and requires Qt 5.1 or later and C++11.
+provide an ASCII based serial interface to change the lighting routines, the brightness of the lights, and more. A Qt-based GUI is also provided which can control the arduino sketches. The GUI has been tested on Windows, Mac OS X, Android, and iOS. It requires Qt 5.2 or later and C++11.
 
 ## <a name="toc"></a>Table of Contents
 
@@ -14,9 +14,10 @@ provide an ASCII based serial interface to change the lighting routines, the bri
     * [Multi Color Routines](#multi-routines)
 * Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00001.html) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
 * [Sample Sketch Usage](samples)
+    * [Yun Samples](samples/yun)
 * [Qt Based GUI](GUI)
-    *  [Frontend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/front_overview.html)
-    *  [Backend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/backend_overview.html)
+    * [Frontend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/front_overview.html)
+    * [Backend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/backend_overview.html)
 * [Memory Usage](docs/MemoryUsage.md)
 * [Contributing](#contributing)
 * [License](#license)

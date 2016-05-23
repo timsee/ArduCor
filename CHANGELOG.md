@@ -50,11 +50,19 @@
 
 ### **v1.9.2** 
 #### API and Bug Fixes Update
-* Refactored `EColorPreset` and `ELightingMode` to `EColorGroup` and `ELightingRoutine`.
-* Updated API to be more uniform across projects. 
+* Refactored names of enumerated types and API calls to be more uniform.
 * Polished menu bar for the GUI.
 * Added Application Icon for the GUI. 
 * Cleaned code and fixed bugs across all projects.
 * Updated project documentation to reflect API changes. 
 * Cleaned code and fixed bugs across all projects.
+
+### **v1.9.5** 
+#### Wireless, Android, and iOS Update
+* Added 6 Arduino Yun samples, 3 for HTTP and 3 using UDP.
+* Extended the GUI's CommLayer to support HTTP and UDP.
+* Added support for Android and iOS builds.
+* Updated GUI's layout to support the new screen sizes.
+* Fixed bugs, probably created more. 
+
 

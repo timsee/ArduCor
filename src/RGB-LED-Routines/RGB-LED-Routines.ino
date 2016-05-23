@@ -2,7 +2,9 @@
 #define IS_NEOPIXELS 1 
 #define IS_SINGLE_LED 0 
 #define IS_CUSTOM 0 
-#define IS_YUN 0
+#define IS_SERIAL 1 
+#define IS_HTTP 0 
+#define IS_UDP 0 
 /*!
  * RGB-LED-Routines
  * Sample Sketch
@@ -12,8 +14,8 @@
  * COM_PLACEHOLDER
  * by the RoutinesRGB library.
  *
- * Version 1.9.2
- * Date: May 5, 2016
+ * Version 1.9.5
+ * Date: May 22, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -24,10 +26,12 @@
 #if IS_RAINBOWDUINO
 #include <Rainbowduino.h>
 #endif
-#if IS_YUN
+#if IS_HTTP
+#include <BridgeServer.h>
+#include <BridgeClient.h>
+#endif
+#if IS_UDP
 #include <Bridge.h>
-#include <YunServer.h>
-#include <YunClient.h>
 #endif
 #if IS_CUSTOM
 #include <SoftwareSerial.h>
@@ -60,7 +64,16 @@ const int LED_COUNT          = 64;
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
 const byte FADE_SPEED        = 20;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
+
+#if IS_SERIAL
 const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
+#endif
+#if IS_UDP
+const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
+#endif
+#if IS_HTTP
+const byte DELAY_VALUE       = 50;     // amount of sleep time between loops 
+#endif
 
 const int DEFAULT_SPEED      = 300;    // default delay for LEDs update, suggested range: 10 (super fast) - 1000 (slow). 
 const int DEFAULT_TIMEOUT    = 120;    // number of minutes without packets until the arduino times out.
@@ -85,9 +98,21 @@ unsigned long last_message_time = 0;
 // when to update the LEDs.
 unsigned long loop_counter = 0;
 
+#if IS_UDP
+// used for communication over the Bridge Library
+String lastString = "";
+char buffer[25];
+#endif
+
 //=======================
 // String Parsing
 //=======================
+
+// the current packet being parsed by the loop() function
+String currentPacket;
+// flag ued by parsing system. if TRUE, continue parsing, if FALSE,
+// packet is either illegal, a repeat, or empty and parsing can be skipped.
+bool packetReceived = false;
 
 // delimiter used to break up values sent as strings over serial.
 char delimiter = ',';
@@ -136,9 +161,9 @@ Adafruit_NeoPixel pixels_dresser = Adafruit_NeoPixel(60, CONTROL_PIN_2, NEO_GRB 
 
 SoftwareSerial cubeSerial(CUBE_IN, CUBE_OUT); // RX, TX
 #endif
-#if IS_YUN
+#if IS_HTTP
 
-YunServer server;
+BridgeServer server;
 #endif
 
 //================================================================================
@@ -162,13 +187,17 @@ void setup()
   pixels_desk.begin();
   pixels_dresser.begin(); 
   cubeSerial.begin(19200); 
+  while (!cubeSerial);
 #endif
-#if IS_YUN
+
+#if IS_HTTP
   Bridge.begin();
   server.listenOnLocalhost();
   server.begin();
 #endif
-
+#if IS_UDP
+  Bridge.begin();
+#endif
   // choose the default color for the single
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines. 
@@ -181,16 +210,32 @@ void setup()
 
 void loop()
 {
-#if IS_YUN
-  YunClient client = server.accept();
-  if (client) {
-    String command = client.readStringUntil('/');
-    client.stop();
+ packetReceived = false;
+#if IS_SERIAL
+  if (Serial.available()) {
+    currentPacket = Serial.readStringUntil(';');
+    // remove any extraneous whitepsace or newline characters
+    packetReceived = true;
   }
 #endif
-  if (Serial.available()) {
-    String currentPacket = Serial.readStringUntil(';');
-    // remove any extraneous whitepsace or newline characters
+#if IS_HTTP
+  BridgeClient client = server.accept();
+  if (client) {
+    currentPacket = client.readStringUntil('/');
+    client.stop();
+    packetReceived = true;
+  }
+#endif
+#if IS_UDP
+  Bridge.get("udp", buffer, 25); 
+  String tempString(buffer);
+  if (tempString != lastString) {
+    currentPacket = tempString; 
+    lastString = currentPacket;
+    packetReceived = true;
+  }
+#endif
+  if (packetReceived) {
     currentPacket.trim();
 #if IS_CUSTOM
     String repeatString = currentPacket + ";";

@@ -14,7 +14,6 @@
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  */
 
-
 /*!
  * \brief The ELayoutColorPicker enum contains
  * all possible layouts for the color picker.
@@ -189,7 +188,7 @@ private slots:
     /*!
      * \brief resetThrottleFlag called by the throttle timer to allow commands to
      *        be sent again. This gets called on a loop whenever color picker is being
-     *        used in order to prevent clogging the serial stream.
+     *        used in order to prevent clogging the communication stream.
      */
     void resetThrottleFlag();
 

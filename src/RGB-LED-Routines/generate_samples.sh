@@ -4,14 +4,10 @@
 # A script used to generate hardware-specific sample projects off of the 
 # main sample project. Since most users will only have one type of RGB LED 
 # array that they are working with, this simplifies the setup since they just
-# need to run the proper project. 
-#
-# If you are committing changes to the sample, the changes should be made on 
-# the main sample project that is used to generate all other samples.
+# need to run the proper project.
 #
 #
-#
-# Script Version: 1.2
+# Script Version: 1.3
 # Github repository: http://www.github.com/timsee/RGB-LED-Routines
 # License: MIT-License, LICENSE provided in root of git repo
 #
@@ -19,35 +15,15 @@
 #
 #------------------------------------------------------------------------------
 
-# Currently a variable set to 0 because we haven't implemented the yun samples yet
-# Eventually, we'll remove this variable.
-GENERATE_YUN_SAMPLES=0
-
 #----------------------------------------
-# Project Setup
+# Project Name Setup
 #----------------------------------------
-# When adding a new project, make sure that you maintain the order of these arrays.
-# This script is quick and dirty and assumes that all project's are in the same
-# order in each array.
 PROJECT_NAME=(
     "Rainbowduino"
     "Neopixels"
     "Single-LED"
     "Custom"
 )
-
-# Give the line that would overwrite the sketch's PLACEHOLDER_DESCRIPTION
-PROJECT_DESCRIPTION=(
-    " * Supports SeeedStudio Rainbowduino projects."
-    " * Supports Adafruit NeoPixels products."
-    " * Supports a single RGB LED but can be easily hacked to support more."
-    " * Custom Sketch."
-)
-
-# communication descriptions
-SERIAL_COMM_DESCRIPTION=" * Provides a serial interface to a set of lighting routines generated"
-UDP_COMM_DESCRIPTION=" * Provides a UDP interface to a set of lighting routines generated"
-
 # this array gets filled automatically based off of the
 # PROJECT_NAME array
 PROJECT_FLAG=()
@@ -57,11 +33,54 @@ do
     PROJECT_FLAG["${#PROJECT_FLAG[@]}"]="#if IS_${project_id}"
 done
 
+# Give the line that would overwrite the sketch's PLACEHOLDER_DESCRIPTION
+# the order should match the order in PROJECT_NAME, ie if the first PROJECT_NAME
+# variable is Rainbowduino, then the first description here should be RAINBOWDUINO.
+PROJECT_DESCRIPTION=(
+    " * Supports SeeedStudio Rainbowduino projects."
+    " * Supports Adafruit NeoPixels products."
+    " * Supports a single RGB LED but can be easily hacked to support more."
+    " * Custom Sketch."
+)
+
+
+
 #----------------------------------------
-# Variable Setup
+# Communication Type Setup
+#----------------------------------------
+COMM_TYPES=(
+    "Serial"
+    "HTTP"
+    "UDP"
+)
+# this array gets filled automatically based off of the
+# COMM_TYPES array
+COMM_FLAGS=()
+for comm_type in "${COMM_TYPES[@]}"
+do
+    comm_type=`echo ${comm_type} | tr [a-z] [A-Z] | tr '-' '_'`
+    COMM_FLAGS["${#COMM_FLAGS[@]}"]="#if IS_${comm_type}"
+done
+
+# Give the line that would overwrite the sketch's COMM_TYPES
+# the order should match the order in COMM_TYPES, ie if the second COMM_TYPES
+# variable is HTTP, then the second path here should be for HTTP projects.
+COMM_PATHS=(
+    "arduino"
+    "yun/http"
+    "yun/udp"
+)
+
+COMM_DESCRIPTION_START=" * Provides a "
+COMM_DESCRIPTION_END=" interface to a set of lighting routines."
+
+#----------------------------------------
+# Miscellaneous Setup
 #----------------------------------------
 
-# save possible descriptions
+# placeholders used as special cases. These take a line from the
+# PROJECT_DESCRIPTION or the COMM_DESCRIPTION instead of using
+# what is in the sample code.
 DESCRIPTION_PLACEHOLDER=" * DESCRIPTION_PLACEHOLDER"
 COM_PLACEHOLDER=" * COM_PLACEHOLDER"
 
@@ -69,10 +88,7 @@ COM_PLACEHOLDER=" * COM_PLACEHOLDER"
 PROJ_PATH="RGB-LED-Routines.ino"
 SAMPLES_PATH=../../samples
 
-# set up identifiers for the hacky preprocessor system
-YUN_FLAG="#if IS_YUN"
 END_FLAG="#endif"
-
 
 #----------------------------------------
 # Parsing Function
@@ -84,33 +100,24 @@ END_FLAG="#endif"
 function generate_hardware_specific_sample() 
 {
     # set the project-specific variables
-    WRITE_PROJ="${1}-Routines-Sample"
     FLAG="${PROJECT_FLAG[${2}]}"
     DESCRIPTION="${PROJECT_DESCRIPTION[${2}]}"
 
     # creates two sets of hardware samples and repeat the sketch
     # generation twice: once for serial communication and once for UDP
-    for (( i=1; i<=2; i++ )) ;
+    comm_num=0
+    for comm_id in "${COMM_TYPES[@]}"
     do
-        # determines what flags to use when generating the sample
-        WRITE_PATH_DIR=""
-        if [ $i -eq 1 ]
-        then
-            # setup the serial communication variables
-            COMM_DESCRIPTION="$SERIAL_COMM_DESCRIPTION"
-            WRITE_PATH_DIR="${SAMPLES_PATH}/${WRITE_PROJ}"
-        elif [ $i -eq 2 ] && [ $GENERATE_YUN_SAMPLES -eq 1 ]
-        then
-            # setup the UDP communication variables
-            COMM_DESCRIPTION="$UDP_COMM_DESCRIPTION"
-            WRITE_PATH_DIR="${SAMPLES_PATH}/yun/${WRITE_PROJ}"
-        fi
+        WRITE_PROJ="${1}-${comm_id}-Routines-Sample"
+        COMM_FLAG="${COMM_FLAGS[${comm_num}]}"
+        COMM_DESCRIPTION="${COMM_DESCRIPTION_START}${comm_id}${COMM_DESCRIPTION_END}"
+        WRITE_PATH_DIR="${SAMPLES_PATH}/${COMM_PATHS[${comm_num}]}/${WRITE_PROJ}"
 
         if [ "$WRITE_PATH_DIR" != "" ]
         then
 
             WRITE_PATH=${WRITE_PATH_DIR}/${WRITE_PROJ}.ino
-            rm -rf $WRITE_PATH_DIR                  # remove the old version of the sketch
+            rm -r $WRITE_PATH_DIR                   # remove the old version of the sketch
             mkdir $WRITE_PATH_DIR                   # remake the directory
             SHOULD_WRITE=1
             cat $PROJ_PATH.temp | while read line   # parse the master project line by line
@@ -121,8 +128,8 @@ function generate_hardware_specific_sample()
                 # check for any flags, don't write the actual line that contains them
                 # first it checks if line exists in the PROJECT_FLAG array, then it checks
                 # our special case variables.
-                if  [[ "${PROJECT_FLAG[@]}" =~ "$line" ]]  \
-                    || [ "$line" == "${YUN_FLAG}" ] \
+                if  [[ "${PROJECT_FLAG[@]}" =~ "$line" ]]   \
+                    || [[ "${COMM_FLAGS[@]}" =~ "$line" ]]  \
                     || [ "$line" == "${END_FLAG}" ];
                 then
                     SHOULD_WRITE=0
@@ -131,14 +138,15 @@ function generate_hardware_specific_sample()
                 #---------------------
                 # Write Line, if write flag is set
                 #---------------------
-                # check for placeholder special case
+                # check for description placeholder special case
                 if [ "$line" == "$DESCRIPTION_PLACEHOLDER" ]
                 then
                     echo "${DESCRIPTION}" >> $WRITE_PATH
+                # check for communication placeholder special case
                 elif [ "$line" == "$COM_PLACEHOLDER" ]
                 then
                     echo "$COMM_DESCRIPTION" >> $WRITE_PATH
-                # check if line belongs in sample code
+                # DEFAULT: check if line belongs in the current sample
                 elif [ "${SHOULD_WRITE}" -eq 1 ]
                 then
                     echo "$line" >> $WRITE_PATH
@@ -148,18 +156,15 @@ function generate_hardware_specific_sample()
                 # Reset write flag, if needed
                 #---------------------
                 # write future lines if out of a preprocessor or in the proper preprocessor
-                if  [ "$line" == "$FLAG" ] || [ "$line" == "$END_FLAG" ];
-                then
-                    SHOULD_WRITE=1
-                fi
-
-                # if its a yun sample, include yun code
-                if [ "$COMM_DESCRIPTION" == "$UDP_COMM_DESCRIPTION" ] && [ "$line" == "$YUN_FLAG" ];
+                if  [ "$line" == "$FLAG" ]        \
+                    || [ "$line" == "$END_FLAG" ] \
+                    || [ "$line" == "$COMM_FLAG" ];
                 then
                     SHOULD_WRITE=1
                 fi
             done
         fi
+        comm_num=$(($comm_num+1))
     done
 }
 
@@ -190,21 +195,33 @@ unset IFS # always unset IFS after you're done using it!
 #----------------------------------------
 
 # Not really necessary, but useful for consistency. Reverts any testing done
-# on the main project and reset it so that its always set to NeoPixels
+# on the main project and reset it so that its always set to NeoPixels and serial
 line_num=1
 for project_id in "${PROJECT_NAME[@]}"
 do
     # setup project name in preprocessor style
     PROJECT=`echo ${project_id} | tr [a-z] [A-Z] | tr '-' '_'`
-    sed "${line_num}s/.*/#define IS_${PROJECT} 0 /" $PROJ_PATH > temp.txt ; mv temp.txt $PROJ_PATH
+    sed "${line_num}s/.*/#define IS_${PROJECT} 0 /" $PROJ_PATH > temp.txt
+    mv temp.txt $PROJ_PATH
     line_num=$(($line_num+1))
 done
 
+for comm_id in "${COMM_TYPES[@]}"
+do
+    # setup project name in preprocessor style
+    COMM=`echo ${comm_id} | tr [a-z] [A-Z] | tr '-' '_'`
+    sed "${line_num}s/.*/#define IS_${COMM} 0 /" $PROJ_PATH > temp.txt
+    mv temp.txt $PROJ_PATH
+    line_num=$(($line_num+1))
+done
+
+
 # reset the second line to be #define IS_NEOPIXELS 1 since thats the default testing environment
 sed "2s/.*/#define IS_NEOPIXELS 1 /" $PROJ_PATH > temp.txt ; mv temp.txt $PROJ_PATH
+sed "5s/.*/#define IS_SERIAL 1 /" $PROJ_PATH > temp.txt ; mv temp.txt $PROJ_PATH
 
 # remove temporary data
-rm -rf $PROJ_PATH.temp
+rm -r $PROJ_PATH.temp
 
 
 

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QLayout>
 #include <QPushButton>
+#include <QLabel>
 #include "datalayer.h"
 #include "icondata.h"
 #include "lightingprotocols.h"
@@ -12,12 +13,15 @@
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
  *
- * \brief The LightsButton class provides a QPushbutton with some extra
- * logic to generate its own IconData and custom signals.
+ * \brief The LightsButton class provides all of the buttons used within the application.
+ *        All buttons have an icon, while some have labels or extra logic attached.
  *
- * It can also be configured as a `presetButton`, which stores a ELightingMode and
- * EColorPreset in the button and emits them as a signal whenever its clicked.
+ * There are currently three different ways you can set up a button. A standard button
+ * emits a EColorGroup and a ELightingRoutine and doesn't have a label. A labeled button
+ * emits a EColorGroup and a ELightingRoutine, and it also has a label at the bottom of
+ * the button. A menu button emits a page number, and is used by the main menu.
  *
+ * \todo clean up the LightsButton so that it has a cleaner API.
  */
 class LightsButton : public QWidget
 {
@@ -36,7 +40,33 @@ public:
      * \param colorGroup The EColorGroup that emits when this button is pushed.
      * \param dataLayer used to create the icon for the button
      */
-    void setupAsMultiButton(ELightingRoutine routine, EColorGroup colorGroup, std::shared_ptr<DataLayer> dataLayer);
+    void setupAsStandardButton(ELightingRoutine routine,
+                               EColorGroup colorGroup,
+                               std::shared_ptr<DataLayer> dataLayer);
+
+    /*!
+     * \brief setupAsLabeledButton QPushButtons with labels and icons are hard to configure, so this
+     *        provides a (pretty hacky) alternative. It draws them as separate QPushButton and QLabel
+     *        but treats them as a single object
+     * \param label the label for the label button
+     * \param routine the routine for this button to signal out when its clicked.
+     * \param dataLayer pointer to the data layer, which is used for creating the icon.
+     * \param colorGroup the color group for this button to signal out when its clicked.
+     */
+    void setupAsLabeledButton(QString label,
+                              ELightingRoutine routine,
+                              std::shared_ptr<DataLayer> dataLayer,
+                              EColorGroup colorGroup = EColorGroup::eColorGroup_MAX);
+
+    /*!
+     * \brief setupAsMenuButton Used by the mainWindow for the top menu. Buttons send out
+     *        their page number whenever they are clicked.
+     * \param pageNumber the number that this menu button is getting set up to signal whenever
+     *        its clicked.
+     * \param dataLayer pointer to the data layer, which is used for creating the icon.
+     */
+    void setupAsMenuButton(int pageNumber,
+                           std::shared_ptr<DataLayer> dataLayer);
 
     /*!
      * \brief lightingRoutine the ELightingRoutine assigned to the button by setupAsMultiButton.
@@ -55,17 +85,28 @@ public:
      */
     QPushButton *button;
 
+    /*!
+     * \brief buttonLabel label used when setup as a label button
+     */
+    QLabel *buttonLabel;
+
 signals:
     /*!
-     * \brief presetClicked sent only when setupAsPresetButton has been called.
+     * \brief buttonClicked sent only when setupAsPresetButton has been called.
      */
-    void presetClicked(int, int);
+    void buttonClicked(int, int);
+
+    /*!
+     * \brief menuButtonClicked sent out if and only if the button is set up
+     *        as a menu button
+     */
+    void menuButtonClicked(int);
 
 private slots:
     /*!
-     * \brief buttonClicked listens for a click on the button->
+     * \brief handleButton listens for a click on the button.
      */
-    void buttonClicked();
+    void handleButton();
 
 protected:
     /*!
@@ -77,7 +118,7 @@ private:
     /*!
      * \brief mLayout layout of a lights button
      */
-    QHBoxLayout *mLayout;
+    QVBoxLayout *mLayout;
 
     /*!
      * \brief mIconData icon data used by the button's
@@ -86,9 +127,21 @@ private:
     IconData mIconData;
 
     /*!
-     * \brief mIsPresetButton true if setupAsPresetButton() is called, false otherwise.
+     * \brief mSetupHasBeenCalled prevents illegal calls before its been set up
+     *        as a specific button
      */
-    bool mIsPresetButton;
+    bool mSetupHasBeenCalled;
+
+    /*!
+     * \brief mIsMenuButton true if setupAsMenuButton is called, false otherwise.
+     */
+    bool mIsMenuButton;
+
+    /*!
+     * \brief mPageNumber set as the page number that gets sent out if the button is
+     *        setup as a menuButton.
+     */
+    int mPageNumber;
 
     /*!
      * \brief mLightingRoutine stored lighting routine. can only be
