@@ -74,7 +74,8 @@ SOURCES += main.cpp\
     presetcolorspage.cpp \
     commserial.cpp \
     commhttp.cpp \
-    commudp.cpp
+    commudp.cpp \
+    commtype.cpp
 
 HEADERS  += mainwindow.h \
     singlecolorpage.h \

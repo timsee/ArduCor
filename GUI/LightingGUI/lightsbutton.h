@@ -21,7 +21,6 @@
  * emits a EColorGroup and a ELightingRoutine, and it also has a label at the bottom of
  * the button. A menu button emits a page number, and is used by the main menu.
  *
- * \todo clean up the LightsButton so that it has a cleaner API.
  */
 class LightsButton : public QWidget
 {
@@ -42,21 +41,8 @@ public:
      */
     void setupAsStandardButton(ELightingRoutine routine,
                                EColorGroup colorGroup,
-                               std::shared_ptr<DataLayer> dataLayer);
-
-    /*!
-     * \brief setupAsLabeledButton QPushButtons with labels and icons are hard to configure, so this
-     *        provides a (pretty hacky) alternative. It draws them as separate QPushButton and QLabel
-     *        but treats them as a single object
-     * \param label the label for the label button
-     * \param routine the routine for this button to signal out when its clicked.
-     * \param dataLayer pointer to the data layer, which is used for creating the icon.
-     * \param colorGroup the color group for this button to signal out when its clicked.
-     */
-    void setupAsLabeledButton(QString label,
-                              ELightingRoutine routine,
-                              std::shared_ptr<DataLayer> dataLayer,
-                              EColorGroup colorGroup = EColorGroup::eColorGroup_MAX);
+                               std::shared_ptr<DataLayer> dataLayer,
+                               QString label = QString(""));
 
     /*!
      * \brief setupAsMenuButton Used by the mainWindow for the top menu. Buttons send out
@@ -65,8 +51,12 @@ public:
      *        its clicked.
      * \param dataLayer pointer to the data layer, which is used for creating the icon.
      */
-    void setupAsMenuButton(int pageNumber,
-                           std::shared_ptr<DataLayer> dataLayer);
+    void setupAsMenuButton(int pageNumber, std::shared_ptr<DataLayer> dataLayer);
+
+    /*!
+     * \brief updateIcon update the icon of the of the lightsbutton.
+     */
+    void updateIcon();
 
     /*!
      * \brief lightingRoutine the ELightingRoutine assigned to the button by setupAsMultiButton.
@@ -125,6 +115,17 @@ private:
      *        icon.
      */
     IconData mIconData;
+
+    /*!
+     * \brief mDataLayer pointer to the data layer of the application
+     */
+    std::shared_ptr<DataLayer> mDataLayer;
+
+    /*!
+     * the string representation of the text of the QLabel of the button
+     * If the button doesn't have any label, this is set as a blank string.
+     */
+    QString mLabel;
 
     /*!
      * \brief mSetupHasBeenCalled prevents illegal calls before its been set up

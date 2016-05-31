@@ -19,13 +19,10 @@ public:
      * \brief CommUDP Constructor
      */
     CommUDP();
-
     /*!
-     * \brief setup setup the UDP port on a specific IP Address.
-     *        The port is assumed and hardcoded.
-     * \param param1 the IP Address for the UDP connection.
+     * \brief CommUDP Deconstructor
      */
-    void setup(QString param1);
+    ~CommUDP();
 
     /*!
      * \brief sendPacket sends the packet over UDP to a specified
@@ -47,6 +44,7 @@ private:
      * \brief mSocket Qt's UDP object
      */
     QUdpSocket *mSocket;
+
 };
 
 #endif // COMMUDP_H

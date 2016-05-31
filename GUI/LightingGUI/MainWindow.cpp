@@ -37,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // --------------
     // Setup Pages
     // --------------
-
     connect(ui->singleColorPage, SIGNAL(updateMainIcons()),  this, SLOT(updateMenuBar()));
     connect(ui->customColorsPage, SIGNAL(updateMainIcons()), this, SLOT(updateMenuBar()));
     connect(ui->presetColorsPage, SIGNAL(updateMainIcons()), this, SLOT(updateMenuBar()));
@@ -45,8 +44,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // --------------
     // Setup Buttons
     // --------------
-
-
     std::vector<LightsButton *> buttons = {ui->singleColorButton,
                                            ui->customArrayButton,
                                            ui->presetArrayButton};
@@ -66,21 +63,18 @@ MainWindow::MainWindow(QWidget *parent) :
     // --------------
     // Setup Brightness Slider
     // --------------
-
     connect(ui->brightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(brightnessChanged(int)));
     // setup the slider that controls the LED's brightness
     ui->brightnessSlider->slider->setRange(0,100);
     ui->brightnessSlider->slider->setValue(50);
     ui->brightnessSlider->slider->setTickPosition(QSlider::TicksBelow);
     ui->brightnessSlider->slider->setTickInterval(20);
-    ui->brightnessSlider->setSliderHeight(0.4f);
+    ui->brightnessSlider->setSliderHeight(0.5f);
     ui->brightnessSlider->setSliderColorBackground(QColor(255,255,255));
-
 
     // --------------
     // Setup Preview Button
     // --------------
-
     connect(ui->onOffButton, SIGNAL(clicked(bool)), this, SLOT(toggleOnOff()));
 
     // setup the icons
@@ -91,7 +85,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // --------------
     // Final setup
     // --------------
-
     mIsOn = true;
     // reset the LED array to defaults
     mComm->sendReset();
@@ -99,18 +92,6 @@ MainWindow::MainWindow(QWidget *parent) :
     pageChanged(0);
     // setup the SingleColorPage
     ui->singleColorPage->chooseColor(mData->mainColor());
-
-    // --------------
-    // Layout Adjustments
-    // --------------
-    // Calling these fix the layout, even though they shouldn't directly...
-    // TODO: find the root cause of this problem...
-    mIconData.setSolidColor(mData->mainColor());
-    ui->singleColorButton->button->setIcon(mIconData.renderAsQPixmap());
-    mIconData.setMultiFade(mData->currentColorGroup());
-    ui->presetArrayButton->button->setIcon(mIconData.renderAsQPixmap());
-    mIconData.setMultiFade(EColorGroup::eCustom, true);
-    ui->customArrayButton->button->setIcon(mIconData.renderAsQPixmap());
 }
 
 MainWindow::~MainWindow() {
@@ -126,12 +107,18 @@ void MainWindow::toggleOnOff() {
         mIconData.setSolidColor(QColor(0,0,0));
         ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
         mIsOn = false;
-        mComm->sendBrightness(0);
+        mComm->sendRoutineChange(ELightingRoutine::eOff);
     } else {
-        mIconData.setLightingRoutine(mData->currentRoutine(), mData->currentColorGroup());
+        if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
+            mIconData.setSolidColor(mData->mainColor());
+        } else if (mData->currentColorGroup() > EColorGroup::eCustom) {
+            mIconData.setLightingRoutine(ELightingRoutine::eMultiFade, mData->currentColorGroup());
+        } else {
+            mIconData.setMultiFade(EColorGroup::eCustom, true);
+        }
         ui->onOffButton->setIcon(mIconData.renderAsQPixmap());
+        mComm->sendRoutineChange(mData->currentRoutine());
         mIsOn = true;
-        mComm->sendBrightness(mData->brightness());
     }
 }
 
@@ -173,15 +160,15 @@ void MainWindow::pageChanged(int pageIndex) {
 void MainWindow::updateMenuBar() {
     if (ui->stackedWidget->currentIndex() == 1) {
         mIconData.setMultiFade(EColorGroup::eCustom, true);
-        ui->customArrayButton->button->setIcon(mIconData.renderAsQPixmap());
+        ui->customArrayButton->updateIcon();
         ui->brightnessSlider->setSliderColorBackground(mData->colorsAverage(EColorGroup::eCustom));
     } else if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
         mIconData.setSolidColor(mData->mainColor());
-        ui->singleColorButton->button->setIcon(mIconData.renderAsQPixmap());
+        ui->singleColorButton->updateIcon();
         ui->brightnessSlider->setSliderColorBackground(mData->mainColor());
     } else {
         mIconData.setMultiFade(mData->currentColorGroup());
-        ui->presetArrayButton->button->setIcon(mIconData.renderAsQPixmap());
+        ui->presetArrayButton->updateIcon();
         ui->brightnessSlider->setSliderColorBackground(mData->colorsAverage(mData->currentColorGroup()));
     }
     ui->onOffButton->setIcon(mIconData.renderAsQPixmap());

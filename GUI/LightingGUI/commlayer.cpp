@@ -7,53 +7,60 @@
 #include "commlayer.h"
 #include <QDebug>
 
-/*!
- * \todo save the previous IP address and have it set through the GUI
- *       instead of as a hardcoded value
- */
-#define SERVER_IP "192.168.0.125"
-
 // set this as what you want your GUI to default to.
-#define DEFAULT_COMM_TYPE ECommType::eUDP
+#define DEFAULT_COMM_TYPE ECommType::eSerial
 
 CommLayer::CommLayer() {
-    mCommType = DEFAULT_COMM_TYPE;
+    mUDP  = std::shared_ptr<CommUDP>(new CommUDP());
+    mHTTP = std::shared_ptr<CommHTTP>(new CommHTTP());
 
 #ifndef MOBILE_BUILD
     mSerial = std::shared_ptr<CommSerial>(new CommSerial());
-    bool serialSetup = false;
 #endif //MOBILE_BUILD
-    mHTTP = std::shared_ptr<CommHTTP>(new CommHTTP());
-    mUDP  = std::shared_ptr<CommUDP>(new CommUDP());
-
-    switch (mCommType)
-    {
-#ifndef MOBILE_BUILD
-        case ECommType::eSerial:
-            mSerial->setup("");
-            mComm = (CommType*)mSerial.get();
-            serialSetup = true;
-            break;
-#endif //MOBILE_BUILD
-        case ECommType::eHTTP:
-            mHTTP->setup(QString(SERVER_IP));
-            mComm = (CommType*)mHTTP.get();
-            break;
-        case ECommType::eUDP:
-            mUDP->setup(QString(SERVER_IP));
-            mComm = (CommType*)mUDP.get();
-            break;
-    }
-
-#ifndef MOBILE_BUILD
-    if (!serialSetup) {
-        mSerial->setup("");
-    }
-#endif //MOBILE_BUILD
+    currentCommType(DEFAULT_COMM_TYPE);
 }
 
 CommLayer::~CommLayer() {
 
+}
+
+#ifndef MOBILE_BUILD
+
+void CommLayer::changeSerialPort(QString serialPort) {
+    mSerial->connectSerialPort(serialPort);
+}
+
+#endif //MOBILE_BUILD
+
+void CommLayer::currentCommType(ECommType commType) {
+    mCommType = commType;
+    switch (mCommType)
+    {
+#ifndef MOBILE_BUILD
+        case ECommType::eSerial:
+            mSerial->discoverSerialPorts();
+            mComm = (CommType*)mSerial.get();
+            break;
+#endif //MOBILE_BUILD
+        case ECommType::eHTTP:
+            mComm = (CommType*)mHTTP.get();
+            break;
+        case ECommType::eUDP:
+            mComm = (CommType*)mUDP.get();
+            break;
+    }
+}
+
+void CommLayer::closeCurrentConnection() {
+#ifndef MOBILE_BUILD
+    if (mCommType == ECommType::eSerial) {
+        mSerial->closeConnection();
+    }
+#endif //MOBILE_BUILD
+}
+
+ECommType CommLayer::currentCommType() {
+    return mCommType;
 }
 
 void CommLayer::sendMainColorChange(QColor color) {

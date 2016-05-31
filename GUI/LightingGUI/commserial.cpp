@@ -10,17 +10,21 @@
 
 #include <QDebug>
 
-CommSerial::CommSerial()
-{
-
+CommSerial::CommSerial() {
+    setupConnectionList(ECommType::eSerial);
+    serial = std::shared_ptr<QSerialPort>(new QSerialPort);
+    mIsConnected = false;
 }
 
-void CommSerial::setup(QString param1)
-{
-    bool waitingForConnection = true;
-    serial = std::shared_ptr<QSerialPort>(new QSerialPort);
+CommSerial::~CommSerial() {
+    saveConnectionList();
+    if (mIsConnected) {
+        closeConnection();
+    }
+}
 
-    // Example use QSerialPortInfo
+
+void CommSerial::discoverSerialPorts() {
     for (const QSerialPortInfo &info : QSerialPortInfo::availablePorts()) {
         bool serialPortFound = false;
         for (QSerialPortInfo savedInfo : serialList) {
@@ -48,12 +52,20 @@ void CommSerial::setup(QString param1)
         qDebug() << "Name : " << info.portName();
         qDebug() << "Description : " << info.description();
         qDebug() << "Manufacturer: " << info.manufacturer();
-        if (waitingForConnection && !isSpecialCase) {
-            if (connectSerialPort(info.portName())) waitingForConnection = false;
+        if (!isSpecialCase) {
+            addConnection(info.portName());
+        }
+    }
+    // if none is connected, attempt automatic connection
+    if (!mIsConnected && (numberOfConnections() > 0)) {
+        int index = 0;
+        while (!mIsConnected && index < numberOfConnections()) {
+            selectConnection(index);
+            mIsConnected = connectSerialPort(currentConnection());
+            index++;
         }
     }
 }
-
 
 void CommSerial::sendPacket(QString packet) {
     QString packetString = packet + ";";
@@ -70,6 +82,10 @@ void CommSerial::closeConnection() {
 
 
 bool CommSerial::connectSerialPort(QString serialPortName) {
+    // close a preexisting connection if it exists
+    if (mIsConnected) {
+        closeConnection();
+    }
     bool serialPortFound = false;
     QSerialPortInfo connectInfo;
     if (!QString::compare(serial->portName(), serialPortName)) {
@@ -95,10 +111,9 @@ bool CommSerial::connectSerialPort(QString serialPortName) {
         serial->setDataBits(QSerialPort::Data8);
         serial->setFlowControl(QSerialPort::NoFlowControl);
         qDebug() << "Serial Port Connected!" << connectInfo.portName();
-        name(connectInfo.portName());
         return true;
     } else {
-        qDebug() << "serial port failed" << serial->errorString() << "\n";
+        qDebug() << "serial port failed" << serial->errorString();
         return false;
     }
 }

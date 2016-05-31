@@ -18,19 +18,6 @@
  */
 
 /*!
- * \brief The ECommType enum The connection types
- *        supported by the GUI. For mobile builds,
- *        serial is not supported.
- */
-enum class ECommType {
-#ifndef MOBILE_BUILD
-    eSerial,
-#endif //MOBILE_BUILD
-    eHTTP,
-    eUDP
-};
-
-/*!
  * \brief The CommLayer class provides communication protocols
  *  that allow the user to connect and send packets to an LED
  *  array. Currently it supports serial, UDP, and HTTP.
@@ -47,6 +34,11 @@ public:
      * \brief Deconstructor
      */
     ~CommLayer();
+
+#ifndef MOBILE_BUILD
+
+    void changeSerialPort(QString serialPort);
+#endif //MOBILE_BUILD
 
     /*!
      * \brief sendMainColorChange change the main color of the lighting settings
@@ -118,6 +110,24 @@ public:
      *        active connection.
      */
     void sendPacket(QString packet);
+
+    /*!
+     * \brief currentCommType sets the current comm type
+     * \param commType the desired comm type
+     */
+    void currentCommType(ECommType commType);
+
+    /*!
+     * \brief closeCurrentConnection required only for serial connections, closes
+     *        the current connectio before trying to open a new one.
+     */
+    void closeCurrentConnection();
+
+    /*!
+     * \brief currentCommType getting for the current comm type.
+     * \return
+     */
+    ECommType currentCommType();
 
 private:
 

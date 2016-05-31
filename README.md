@@ -18,7 +18,6 @@ provide an ASCII based serial interface to change the lighting routines, the bri
 * [Qt Based GUI](GUI)
     * [Frontend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/front_overview.html)
     * [Backend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/backend_overview.html)
-* [Memory Usage](docs/MemoryUsage.md)
 * [Contributing](#contributing)
 * [License](#license)
 * [Version Notes](CHANGELOG.md)
@@ -55,6 +54,7 @@ These routines use groups of colors saved in an array to execute the routine. Th
 * Multi Fade
 * Multi Bars Solid
 * Multi Bars Moving
+
 
 ## <a name="contributing"></a>Contributing
 

@@ -103,6 +103,12 @@ protected:
      */
     void showEvent(QShowEvent *);
 
+    /*!
+     * \brief resizeEvent used to update the size of the custom color picker slider
+     *        and buttons.
+     */
+    void resizeEvent(QResizeEvent *);
+
 private:
     /*!
      * \brief ui pointer to Qt UI form.
@@ -112,7 +118,7 @@ private:
     /*!
      * \brief mArrayColorsButtons buttons for changing the lighting mode.
      */
-    std::shared_ptr<std::vector<QToolButton *> > mArrayColorsButtons;
+    std::shared_ptr<std::vector<QPushButton *> > mArrayColorsButtons;
 
     /*!
      * \brief IconData for the Single Color Routine Icons
@@ -134,6 +140,12 @@ private:
      * \brief mCurrentColorPickerIndex current index being set by the GUI.
      */
     int mCurrentColorPickerIndex;
+
+    /*!
+     * \brief mCustomArraySize size of the custom color array, used to initialize
+     *        and access vectors throughout this page.
+     */
+    int mCustomArraySize;
 
     /*!
      * \brief updateColorArray called whenever the color array experiences

@@ -132,6 +132,10 @@ protected:
 
 private:
 
+    /*!
+     * \brief mHeightScaleFactor used to scale the slider inside of its qwidget so it takes up
+     *        less than 100% of the widget
+     */
     float mHeightScaleFactor;
 
     /*!
@@ -160,14 +164,15 @@ private:
      *        clicks instead of jumping up by a page value. This gives the slider a more
      *        "mobile like" experience than the standard QSlider.
      *
-     * solution based on this stack overflow response:
-     * http://stackoverflow.com/a/15321654
+     *        solution based on this stack overflow response:
+     *        http://stackoverflow.com/a/15321654
      *
      * \param slider the slider that was clicked
      * \param newPos the position that user clicked.
      * \return the new position of the slider.
      */
     int jumpSliderToPosition(std::shared_ptr<QSlider> slider, int newPos);
+
     /*!
      * \brief snapSliderToNearestTick checks the value that the slider is
      *        is getting changed to and, if its not exactly over one of the
@@ -192,6 +197,16 @@ private:
      * \brief mThrottleFlag flag used to enforced the throttle timer's throttle.
      */
     bool mThrottleFlag;
+
+    /*!
+     * \brief mSliderColorSet true if the slider color has been changed, false otherwise
+     */
+    bool mSliderColorSet;
+
+    /*!
+     * \brief mSliderColor the current slider color
+     */
+    QColor mSliderColor;
 };
 
 #endif // LIGHTSSLIDER_H

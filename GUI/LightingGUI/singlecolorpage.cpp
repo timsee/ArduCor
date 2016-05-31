@@ -31,7 +31,7 @@ void SingleColorPage::chooseColor(QColor color) {
 
 
 void SingleColorPage::setupButtons() {
-    mIconData = IconData(64,64, mData);
+    mIconData = IconData(128,128, mData);
 
     std::vector<std::string> labels = {"Solid",
                                        "Blink",
@@ -46,7 +46,7 @@ void SingleColorPage::setupButtons() {
     mRoutineButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(4, nullptr));
     for (int i = 0; i < 4; ++i) {
         (*mRoutineButtons.get())[i] = buttons[i];
-        (*mRoutineButtons.get())[i]->setupAsLabeledButton(QString::fromStdString(labels[i]), (ELightingRoutine)(i + 1), mData);
+        (*mRoutineButtons.get())[i]->setupAsStandardButton((ELightingRoutine)(i + 1), mData->currentColorGroup(), mData, QString::fromStdString(labels[i]));
         connect((*mRoutineButtons.get())[i], SIGNAL(buttonClicked(int, int)), this, SLOT(modeChanged(int, int)));
    }
 }
@@ -70,8 +70,8 @@ void SingleColorPage::highlightRoutineButton(ELightingRoutine routine) {
 // ----------------------------
 // Slots
 // ----------------------------
-// newGroup is ignored for single color routines
 void SingleColorPage::modeChanged(int newMode, int newGroup) {
+    Q_UNUSED(newGroup); // newGroup is ignored for single color routines
     mData->currentRoutine((ELightingRoutine)newMode);
     mComm->sendRoutineChange((ELightingRoutine)newMode);
     highlightRoutineButton((ELightingRoutine)newMode);
@@ -90,20 +90,10 @@ void SingleColorPage::colorChanged(QColor color) {
         mComm->sendRoutineChange(ELightingRoutine::eSingleGlimmer);
     }
 
-    mIconData.setSolidColor(color);
-    ui->solidButton->button->setIcon(mIconData.renderAsQPixmap());
-
-    mIconData.setSolidColor(color);
-    mIconData.addFade();
-    ui->fadeButton->button->setIcon(mIconData.renderAsQPixmap());
-
-    mIconData.setSolidColor(color);
-    mIconData.addGlimmer();
-    ui->glimmerButton->button->setIcon(mIconData.renderAsQPixmap());
-
-    mIconData.setSolidColor(color);
-    mIconData.addBlink();
-    ui->blinkButton->button->setIcon(mIconData.renderAsQPixmap());
+    ui->solidButton->updateIcon();
+    ui->fadeButton->updateIcon();
+    ui->glimmerButton->updateIcon();
+    ui->blinkButton->updateIcon();
 
     emit updateMainIcons();
 }

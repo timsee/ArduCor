@@ -65,4 +65,11 @@
 * Updated GUI's layout to support the new screen sizes.
 * Fixed bugs, probably created more. 
 
+### **v1.9.6** 
+#### Settings Page Update
+* Upgraded the GUI's settings screen.
+* Optimized the arduino library.
+* Fixed GUI layout issues on certain devices.
+* Fixed bugs.
+
 

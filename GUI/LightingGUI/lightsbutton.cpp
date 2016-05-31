@@ -19,43 +19,9 @@ LightsButton::LightsButton(QWidget *parent) : QWidget(parent) {
     connect(button, SIGNAL(clicked(bool)), this, SLOT(handleButton()));
 }
 
-void LightsButton::setupAsStandardButton(ELightingRoutine routine, EColorGroup colorGroup, std::shared_ptr<DataLayer> dataLayer) {
-    mIconData = IconData(64, 64, dataLayer);
-    button->setIcon(mIconData.renderAsQPixmap());
-    mSetupHasBeenCalled = true;
-    bool renderIcon = false;
-    switch(routine) {
-        case ELightingRoutine::eMultiGlimmer:
-        case ELightingRoutine::eMultiFade:
-        case ELightingRoutine::eMultiRandomSolid:
-        case ELightingRoutine::eMultiRandomIndividual:
-        case ELightingRoutine::eMultiBarsSolid:
-        case ELightingRoutine::eMultiBarsMoving:
-            renderIcon = true;
-            break;
-        default:
-            break;
-    }
-
-    if (renderIcon) {
-        mIconData.setLightingRoutine(routine, colorGroup);
-        button->setIcon(mIconData.renderAsQPixmap());
-    }
-
-    mLightingRoutine = routine;
-    mColorGroup = colorGroup;
-
-    mLayout = new QVBoxLayout;
-    mLayout->addWidget(button);
-    mLayout->setContentsMargins(5,5,5,5);
-    button->setMinimumWidth(75);
-    button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setLayout(mLayout);
-}
-
 
 void LightsButton::setupAsMenuButton(int pageNumber, std::shared_ptr<DataLayer> dataLayer) {
-    mIconData = IconData(64, 64, dataLayer);
+    mIconData = IconData(256, 256, dataLayer);
     if (pageNumber == 0) {
         mIconData.setSolidColor(QColor(0,255,0));
     } else if (pageNumber == 1) {
@@ -64,11 +30,10 @@ void LightsButton::setupAsMenuButton(int pageNumber, std::shared_ptr<DataLayer> 
         mIconData.setMultiFade(EColorGroup::eSevenColor);
     }
     button->setIcon(mIconData.renderAsQPixmap());
-
+    mDataLayer = dataLayer;
     mSetupHasBeenCalled = true;
     mIsMenuButton = true;
     mPageNumber = pageNumber;
-    //this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mLayout = new QVBoxLayout;
     mLayout->setSpacing(0);
     mLayout->setContentsMargins(0,0,0,0);
@@ -77,9 +42,8 @@ void LightsButton::setupAsMenuButton(int pageNumber, std::shared_ptr<DataLayer> 
     setLayout(mLayout);
 }
 
-void LightsButton::setupAsLabeledButton(QString label, ELightingRoutine routine, std::shared_ptr<DataLayer> dataLayer, EColorGroup colorGroup) {
-    mIconData = IconData(64, 64, dataLayer);
-    button->setIcon(mIconData.renderAsQPixmap());
+void LightsButton::setupAsStandardButton(ELightingRoutine routine, EColorGroup colorGroup, std::shared_ptr<DataLayer> dataLayer, QString label) {
+    mIconData = IconData(256, 256, dataLayer);
     mSetupHasBeenCalled = true;
     bool renderIcon = false;
     switch(routine) {
@@ -100,19 +64,26 @@ void LightsButton::setupAsLabeledButton(QString label, ELightingRoutine routine,
         button->setIcon(mIconData.renderAsQPixmap());
     }
 
-    buttonLabel = new QLabel;
-    buttonLabel->setText(label);
-    buttonLabel->setAlignment(Qt::AlignCenter);
 
     mLightingRoutine = routine;
     mColorGroup = colorGroup;
+    mDataLayer = dataLayer;
 
     mLayout = new QVBoxLayout;
+    mLayout->setSpacing(2);
+    mLayout->setContentsMargins(0,0,0,0);
     mLayout->addWidget(button);
-    mLayout->addWidget(buttonLabel);
-    mLayout->setContentsMargins(3,3,3,3);
-    button->setMinimumWidth(75);
-    button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    mLabel = label;
+    if (mLabel.compare(QString("")) != 0) {
+        buttonLabel = new QLabel;
+        buttonLabel->setText(label);
+        buttonLabel->setFont(QFont(buttonLabel->font().styleName(), 10, 0));
+
+        buttonLabel->setAlignment(Qt::AlignCenter);
+        mLayout->addWidget(buttonLabel);
+        button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    }
+    button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mLayout->setStretch(0, 50);
     mLayout->setStretch(1, 1);
     setLayout(mLayout);
@@ -127,15 +98,39 @@ EColorGroup LightsButton::colorGroup() {
 }
 
 void LightsButton::resizeEvent(QResizeEvent *event) {
+    int size = (int)(std::min(this->size().width(), this->size().height()));
     if (mIsMenuButton) {
-        button->setIconSize(QSize(button->rect().size().height() * 0.8f,
-                                  button->rect().size().height() * 0.8f));
+        button->setMinimumSize(size,size);        
+        button->setIconSize(QSize(this->size().height() * 0.8f,
+                                  this->size().height() * 0.8f));
     } else {
-        button->setIconSize(QSize(this->size().height() * 0.6f,
-                                  this->size().height() * 0.6f));
+        if (mLabel.compare(QString("")) != 0) {
+            buttonLabel->setMinimumSize(0, buttonLabel->size().height());
+            button->setIconSize(QSize(size * 0.8f,
+                                      (size - buttonLabel->size().height()) * 0.8f));
+        } else {
+            button->setMinimumSize(size, size);
+            button->setIconSize(QSize(size * 0.8f,
+                                      size * 0.8f));
+        }
     }
 }
 
+void LightsButton::updateIcon() {
+    if (!mIsMenuButton) {
+        mIconData.setLightingRoutine(mLightingRoutine, mColorGroup);
+        button->setIcon(mIconData.renderAsQPixmap());
+    } else {
+        if (mPageNumber == 0) {
+            mIconData.setSolidColor(mDataLayer->mainColor());
+        } else if (mPageNumber == 1) {
+            mIconData.setMultiFade(EColorGroup::eCustom, true);
+        } else {
+            mIconData.setMultiFade(mDataLayer->currentColorGroup());
+        }
+        button->setIcon(mIconData.renderAsQPixmap());
+    }
+}
 
 void LightsButton::handleButton() {
     if (mSetupHasBeenCalled) {

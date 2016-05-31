@@ -7,8 +7,8 @@
  * Provides a UDP interface to a set of lighting routines.
  * by the RoutinesRGB library.
  *
- * Version 1.9.5
- * Date: May 22, 2016
+ * Version 1.9.6
+ * Date: May 30, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -24,7 +24,7 @@ const byte CONTROL_PIN       = 6;      // pin used by NeoPixels library
 const int LED_COUNT          = 64;
 
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
-const byte FADE_SPEED        = 20;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
+const byte FADE_SPEED        = 50;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
 
 const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
@@ -42,7 +42,7 @@ EColorGroup  current_group = eCustom;
 
 // contrary to popular belief, light_speed != MC^2. Instead, it is the delay
 // between updates of the LEDs. Calculate it by DEFAULT_SPEED * 10msec
-int light_speed = (1000 / DELAY_VALUE) / (DEFAULT_SPEED / 100);
+int light_speed = (int)((1000.0f / DELAY_VALUE) / (DEFAULT_SPEED / 100.0f));
 
 // timeout variables
 unsigned long idle_timeout = (unsigned long)DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
@@ -321,7 +321,7 @@ void parsePacket(int header)
       if (parsed_packet.count == 2) {
         success = true;
         // convert from 100 * FPS to real data 
-        light_speed = (1000 / DELAY_VALUE) / (parsed_packet.values[1] / 100);
+        light_speed = (int)((1000.0f / DELAY_VALUE) / (parsed_packet.values[1] / 100.0f));
       }
       break;
     case eIdleTimeoutChange:

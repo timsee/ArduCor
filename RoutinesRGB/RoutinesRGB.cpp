@@ -1,6 +1,6 @@
 /*!
- * \version v1.9.5
- * \date May 22, 2016
+ * \version v1.9.6
+ * \date May 30, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -72,7 +72,7 @@ void RoutinesRGB::resetToDefaults()
     m_current_group = eCustom;
     m_current_routine = eSingleGlimmer;
     
-    m_bright_level = DEFAULT_BRIGHTNESS;
+    brightness(DEFAULT_BRIGHTNESS);
     m_fade_speed   = DEFAULT_FADE_SPEED;
     m_blink_speed  = DEFAULT_BLINK_SPEED;
     m_custom_count = DEFAULT_CUSTOM_COUNT;
@@ -83,6 +83,9 @@ void RoutinesRGB::resetToDefaults()
     m_temp_counter = 0;
     m_temp_bool = true;
     m_temp_color = {0, 0, 0};
+    m_scale_factor = 0;
+    m_difference = 0;
+    m_possible_array_color = 0;
     
     // set routine specific variables
     m_goal_color = {0, 0, 0};
@@ -90,12 +93,12 @@ void RoutinesRGB::resetToDefaults()
 
     
     // set custom colors to default colors
-    for (int i = 0; i < 10; i = i + 5) {
-        m_custom_colors[i]     = {0,   255, 0};     // green
-        m_custom_colors[i + 1] = {125, 0,   255};   // teal
-        m_custom_colors[i + 2] = {0,   0,   255};   // blue
-        m_custom_colors[i + 3] = {40,  127, 40};    // light green
-        m_custom_colors[i + 4] = {60,  0,   160};   // purple
+    for (x = 0; x < 10; x = x + 5) {
+        m_custom_colors[x]     = {0,   255, 0};     // green
+        m_custom_colors[x + 1] = {125, 0,   255};   // teal
+        m_custom_colors[x + 2] = {0,   0,   255};   // blue
+        m_custom_colors[x + 3] = {40,  127, 40};    // light green
+        m_custom_colors[x + 4] = {60,  0,   160};   // purple
     }  
 }
 
@@ -141,6 +144,7 @@ RoutinesRGB::brightness(uint8_t brightness)
 {
     if (brightness <= 100) {
         m_bright_level = brightness;
+        m_max_brightness = 255 * m_bright_level / 100;
     }
 }
 
@@ -179,7 +183,6 @@ RoutinesRGB::color(uint16_t i)
         return (Color){0,0,0};
     }
 }
-
 
 uint8_t
 RoutinesRGB::red(uint16_t i)
@@ -294,8 +297,8 @@ RoutinesRGB::setupColorGroup(EColorGroup colorGroup)
     } else if (colorGroup == eAll) {
         // create a random color for every color in the temp array.
         m_temp_size = (sizeof(m_temp_array) / sizeof(Color));
-        for (int i = 0 ; i < (sizeof(m_temp_array) / sizeof(Color)); i++) {
-            m_temp_array[i] = { (uint8_t)random(0, 256),
+        for (x = 0 ; x < (sizeof(m_temp_array) / sizeof(Color)); ++x) {
+            m_temp_array[x] = { (uint8_t)random(0, 256),
                                 (uint8_t)random(0, 256),
                                 (uint8_t)random(0, 256)};
         }
@@ -319,7 +322,7 @@ void
 RoutinesRGB::postProcess()
 {
     // loop again to apply global effects
-    for(uint16_t x = 0; x < m_LED_count; x++) {
+    for(x = 0; x < m_LED_count; x++) {
         // apply brightness
         r_buffer[x] = applyBrightness(r_buffer[x]);
         g_buffer[x] = applyBrightness(g_buffer[x]);
@@ -329,9 +332,9 @@ RoutinesRGB::postProcess()
 
 
 uint8_t
-RoutinesRGB::applyBrightness(uint8_t value)
-{
-    return (uint8_t)round((value * (m_bright_level / 100.0f)));
+RoutinesRGB::applyBrightness(uint16_t value)
+{ 
+    return (uint8_t)(value * m_max_brightness / 255);
 }
 
 
@@ -344,11 +347,9 @@ void
 RoutinesRGB::singleSolid(uint8_t red, uint8_t green, uint8_t blue)
 {
     preProcess(eSingleSolid, m_current_group);
-    for (uint16_t x = 0; x < m_LED_count; x++) {
-        r_buffer[x] = red;
-        g_buffer[x] = green;
-        b_buffer[x] = blue;
-    }
+    memset(r_buffer, red, m_LED_count);
+    memset(g_buffer, green, m_LED_count);
+    memset(b_buffer, blue, m_LED_count);
     postProcess();
 }
 
@@ -360,17 +361,13 @@ RoutinesRGB::singleBlink(uint8_t red, uint8_t green, uint8_t blue)
     // switches states between on/off based off of m_blink_speed
     if (!(m_temp_counter % m_blink_speed)) {
         if (m_temp_bool) {
-            for (uint16_t x = 0; x < m_LED_count; x++) {
-                r_buffer[x] = red;
-                g_buffer[x] = green;
-                b_buffer[x] = blue;
-            }
+            memset(r_buffer, red, m_LED_count);
+            memset(g_buffer, green, m_LED_count);
+            memset(b_buffer, blue, m_LED_count);
         } else {
-            for (uint16_t x = 0; x < m_LED_count; x++) {
-                r_buffer[x] = 0;
-                g_buffer[x] = 0;
-                b_buffer[x] = 0;
-            }
+            memset(r_buffer, 0, m_LED_count);
+            memset(g_buffer, 0, m_LED_count);
+            memset(b_buffer, 0, m_LED_count);
         }
         m_temp_bool = !m_temp_bool;
         postProcess();
@@ -383,7 +380,9 @@ RoutinesRGB::singleBlink(uint8_t red, uint8_t green, uint8_t blue)
 void
 RoutinesRGB::singleFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)
 {
-    preProcess(eSingleFade, m_current_group);
+    preProcess(eSingleFade, m_current_group);    
+    uint16_t maxFadeSpeed =  255 * fadeSpeed / 100;
+    
     if (shouldUpdate) {
         // catch illegal argument and fix it
         if (fadeSpeed == 0) fadeSpeed = 1;
@@ -397,36 +396,35 @@ RoutinesRGB::singleFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSp
         else if (m_temp_counter == 0)    m_temp_bool = true;
     }
     
-    // set up the buffers
-    for (int x = 0; x < m_LED_count; x++) {
-        r_buffer[x] = (uint8_t)(red   * (m_temp_counter / (float)fadeSpeed));
-        g_buffer[x] = (uint8_t)(green * (m_temp_counter / (float)fadeSpeed));
-        b_buffer[x] = (uint8_t)(blue  * (m_temp_counter / (float)fadeSpeed));
-    }
+    // draws the current state of the fade to the buffers
+    memset(r_buffer, (uint8_t)(red * m_temp_counter / maxFadeSpeed), m_LED_count);
+    memset(g_buffer, (uint8_t)(green * m_temp_counter / maxFadeSpeed), m_LED_count);
+    memset(b_buffer, (uint8_t)(blue * m_temp_counter / maxFadeSpeed), m_LED_count);
+    
     postProcess();
 }
 
 
 
 void
-RoutinesRGB::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate)
+RoutinesRGB::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, uint8_t percent, boolean shouldUpdate)
 {
     preProcess(eSingleGlimmer, m_current_group);
-    for (uint16_t x = 0; x < m_LED_count; x++) {
-        // a random number is generated. If its less than the percent,
-        // treat this as an LED that gets a glimmer effect
-        if (random(1,101) < percent && percent != 0 && shouldUpdate) {
-            // set a random level for the LED to be dimmed by.
-            byte scaleFactor = (byte)random(2,6);
-            
-            r_buffer[x] = m_temp_color.red / scaleFactor;
-            g_buffer[x] = m_temp_color.green / scaleFactor;
-            b_buffer[x] = m_temp_color.blue / scaleFactor;
-        } else {
-            r_buffer[x] = red;
-            g_buffer[x] = green;
-            b_buffer[x] = blue;
-        }  
+    memset(r_buffer, red, m_LED_count);
+    memset(g_buffer, green, m_LED_count);
+    memset(b_buffer, blue, m_LED_count);
+    if (shouldUpdate) {
+        for (x = 0; x < m_LED_count; ++x) {
+            // a random number is generated. If its less than the percent,
+            // treat this as an LED that gets a glimmer effect
+            if (random(1,101) < percent && percent != 0) {
+                // set a random level for the LED to be dimmed by.
+                m_scale_factor = (uint8_t)random(2,6);
+                r_buffer[x] = red / m_scale_factor;
+                g_buffer[x] = green / m_scale_factor;
+                b_buffer[x] = blue / m_scale_factor;
+            } 
+        }
     }
     postProcess();
 }
@@ -437,11 +435,13 @@ RoutinesRGB::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, long percen
 //================================================================================
 
 void
-RoutinesRGB::multiGlimmer(EColorGroup colorGroup, long percent)
+RoutinesRGB::multiGlimmer(EColorGroup colorGroup, uint8_t percent)
 {
     preProcess(eMultiGlimmer, colorGroup);
-    
-    for (uint16_t x = 0; x < m_LED_count; x++) {
+    memset(r_buffer, m_temp_color.red, m_LED_count);
+    memset(g_buffer, m_temp_color.green, m_LED_count);
+    memset(b_buffer, m_temp_color.blue, m_LED_count);
+    for (x = 0; x < m_LED_count; ++x) {
         m_temp_color = m_temp_array[0];
         if (random(1,101) < percent && percent != 0) {
             // m_temp_color is set in chooseRandomFromArray
@@ -452,14 +452,10 @@ RoutinesRGB::multiGlimmer(EColorGroup colorGroup, long percent)
         // treat this as an LED that gets a glimmer effect
         if (random(1,101) < percent && percent != 0) {
             // chooses how much to divide the input by
-            byte scaleFactor = (byte)random(2,6);
-            r_buffer[x] = m_temp_color.red / scaleFactor;
-            g_buffer[x] = m_temp_color.green / scaleFactor;
-            b_buffer[x] = m_temp_color.blue / scaleFactor;
-        } else {
-            r_buffer[x] = m_temp_color.red;
-            g_buffer[x] = m_temp_color.green;
-            b_buffer[x] = m_temp_color.blue;
+            m_scale_factor = (uint8_t)random(2,6);
+            r_buffer[x] = m_temp_color.red / m_scale_factor;
+            g_buffer[x] = m_temp_color.green / m_scale_factor;
+            b_buffer[x] = m_temp_color.blue / m_scale_factor;
         }
     }
     postProcess();
@@ -489,13 +485,11 @@ RoutinesRGB::multiFade(EColorGroup colorGroup)
     m_temp_color.green = fadeBetweenValues(m_temp_color.green, m_goal_color.green);
     m_temp_color.blue = fadeBetweenValues(m_temp_color.blue, m_goal_color.blue);
     m_start_next_fade = m_temp_bool;
-
+    
     // draws to buffer
-    for (uint16_t x = 0; x < m_LED_count; x++) {
-        r_buffer[x] = m_temp_color.red;
-        g_buffer[x] = m_temp_color.green;
-        b_buffer[x] = m_temp_color.blue;
-    }
+    memset(r_buffer, m_temp_color.red, m_LED_count);
+    memset(g_buffer, m_temp_color.green, m_LED_count);
+    memset(b_buffer, m_temp_color.blue, m_LED_count);
     postProcess();
 }
 
@@ -511,20 +505,17 @@ RoutinesRGB::multiRandomSolid(EColorGroup colorGroup)
                 m_temp_color = {(uint8_t)random(0, 256),
                                 (uint8_t)random(0, 256),
                                 (uint8_t)random(0, 256)};
-                for (uint16_t x = 0; x < m_LED_count; x++) {
+                for (x = 0; x < m_LED_count; ++x) {
                     r_buffer[x] = m_temp_color.red;
                     g_buffer[x] = m_temp_color.green;
                     b_buffer[x] = m_temp_color.blue;
                 }
                 break;
             default:
-            
                 chooseRandomFromArray(m_temp_array, m_temp_size, true);
-                for (uint16_t x = 0; x < m_LED_count; x++) {
-                    r_buffer[x] = m_temp_color.red;
-                    g_buffer[x] = m_temp_color.green;
-                    b_buffer[x] = m_temp_color.blue;
-                }
+                memset(r_buffer, m_temp_color.red, m_LED_count);
+                memset(g_buffer, m_temp_color.green, m_LED_count);
+                memset(b_buffer, m_temp_color.blue, m_LED_count);
                 break;
             }
          postProcess();
@@ -541,14 +532,14 @@ RoutinesRGB::multiRandomIndividual(EColorGroup colorGroup)
         case eAll:
             // uses random values for each individual LED
             // instead of the m_temp_array buffer. 
-            for (uint16_t x = 0; x < m_LED_count; x++) {
+            for (x = 0; x < m_LED_count; ++x) {
                 r_buffer[x] = (uint8_t)random(0, 256);
                 g_buffer[x] = (uint8_t)random(0, 256);
                 b_buffer[x] = (uint8_t)random(0, 256);
             }
             break;
         default:
-            for (uint16_t x = 0; x < m_LED_count; x++) {
+            for (x = 0; x < m_LED_count; ++x) {
                 // chooses a random color from m_temp_array
                 chooseRandomFromArray(m_temp_array, m_temp_size, true);
                 // draws the random color to the buffer.
@@ -571,7 +562,7 @@ RoutinesRGB::multiBarsSolid(EColorGroup colorGroup, uint8_t barSize)
      
     m_temp_counter = 0;
     m_temp_index = 0;
-    for(uint16_t x = 0; x < m_LED_count; x++) {
+    for(x = 0; x < m_LED_count; ++x) {
         r_buffer[x] = m_temp_array[m_temp_index].red;
         g_buffer[x] = m_temp_array[m_temp_index].green;
         b_buffer[x] = m_temp_array[m_temp_index].blue;
@@ -591,19 +582,19 @@ RoutinesRGB::multiBarsMoving(EColorGroup colorGroup, uint8_t barSize)
     m_bar_size =  barSize;
     preProcess(eMultiBarsMoving, colorGroup);
     
-    uint16_t repeat_index = 0;
+    m_repeat_index = 0;
     // loop through all the values between 0 and m_loop_index m_loop_count times.
-    for (uint16_t x = 0; x < (m_loop_count * m_loop_index); x++) {
+    for (x = 0; x < (m_loop_count * m_loop_index); ++x) {
         // if we are computing values above m_LED_count, ignore.
         if (x < m_LED_count) {
             // m_temp_counter holds the index in this instance of a repeat through
             // the looped values.
-            m_temp_counter = (repeat_index + m_temp_index) % m_loop_index;
+            m_temp_counter = (m_repeat_index + m_temp_index) % m_loop_index;
             r_buffer[x] = m_temp_array[m_temp_buffer[m_temp_counter]].red;
             g_buffer[x] = m_temp_array[m_temp_buffer[m_temp_counter]].green;
             b_buffer[x] = m_temp_array[m_temp_buffer[m_temp_counter]].blue;
             // if a loop is pushing a repeat_index over m_loop_index, go back to 0
-            repeat_index = (x + 1) % m_loop_index;
+            m_repeat_index = (x + 1) % m_loop_index;
         }
     }
     m_temp_index = (m_temp_index + 1) % m_loop_index;
@@ -620,8 +611,8 @@ uint16_t
 RoutinesRGB::fadeBetweenValues(uint16_t fadeChannel, uint16_t destinationChannel)
 {
     if (fadeChannel < destinationChannel) {
-        uint16_t difference = destinationChannel - fadeChannel;
-        if (difference < m_fade_speed) {
+        m_difference = destinationChannel - fadeChannel;
+        if (m_difference < m_fade_speed) {
             fadeChannel = destinationChannel;
         } else {
             fadeChannel = fadeChannel + m_fade_speed;
@@ -629,8 +620,8 @@ RoutinesRGB::fadeBetweenValues(uint16_t fadeChannel, uint16_t destinationChannel
         }
     }
     else if (fadeChannel > destinationChannel) {
-        uint16_t difference = fadeChannel - destinationChannel;
-        if (difference < m_fade_speed) {
+        m_difference = fadeChannel - destinationChannel;
+        if (m_difference < m_fade_speed) {
             fadeChannel = destinationChannel;
         } else {
             fadeChannel = fadeChannel - m_fade_speed;
@@ -655,7 +646,7 @@ RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t barSize)
     m_loop_count = ((m_LED_count / m_loop_index) + 1); 
     
     //the buffer from 0 to m_loop_index with the proper bars
-    for (uint16_t x = 0; x < m_loop_index; x++) {
+    for (x = 0; x < m_loop_index; ++x) {
         m_temp_buffer[x] = m_temp_index;
         m_temp_counter++;
         if (m_temp_counter == barSize) {
@@ -671,13 +662,12 @@ RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t barSize)
 void
 RoutinesRGB::chooseRandomFromArray(Color* array, uint8_t max_index, boolean canRepeat)
 {   
-    uint16_t possible_array_color = random(0, max_index);
+    m_possible_array_color = random(0, max_index);
     if (!canRepeat && max_index > 2) {
-      while (possible_array_color == m_temp_index) {
-         possible_array_color = random(0, max_index);
+      while (m_possible_array_color == m_temp_index) {
+         m_possible_array_color = random(0, max_index);
       }
     }
-    m_temp_index = possible_array_color;
+    m_temp_index = m_possible_array_color;
     m_temp_color = array[m_temp_index];
 }
-

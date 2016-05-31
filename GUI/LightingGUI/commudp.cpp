@@ -12,26 +12,17 @@
 #define PORT 10008
 
 CommUDP::CommUDP() {
-
-}
-
-
-void CommUDP::setup(QString param1) {
+    setupConnectionList(ECommType::eUDP);
     mSocket = new QUdpSocket();
-    // assign the IP address to the name parameter.
-    name(param1);
 }
 
+CommUDP::~CommUDP() {
+    saveConnectionList();
+}
 
 void CommUDP::sendPacket(QString packet) {
-    // Wow, it doesn't take much code to write UDP packets in Qt...
-    mSocket->writeDatagram(packet.toUtf8().data(),   // payload
-                           QHostAddress(name()),     // IP address
-                           PORT);                    // Port
-}
-
-
-void CommUDP::closeConnection() {
-    // UDP is connection-less so nothing needs to be done here,
-    // This function is just added to comply with being a CommType.
+    // Wow, it doesn't take much code to send UDP packets in Qt...
+    mSocket->writeDatagram(packet.toUtf8().data(),              // payload
+                           QHostAddress(currentConnection()),   // IP address
+                           PORT);                               // Port
 }

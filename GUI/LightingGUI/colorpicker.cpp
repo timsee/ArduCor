@@ -26,22 +26,6 @@ ColorPicker::ColorPicker(QWidget *parent) :
     colorWheel->setAlignment(Qt::AlignCenter);
 
     // --------------
-    // Setup RGB Labels
-    // --------------
-
-    rLabel = new QLabel(this);
-    rLabel->setText("R");
-    rLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
-
-    gLabel = new QLabel(this);
-    gLabel->setText("G");
-    gLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
-
-    bLabel = new QLabel(this);
-    bLabel->setText("B");
-    bLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
-
-    // --------------
     // Setup Sliders
     // --------------
 
@@ -64,6 +48,25 @@ ColorPicker::ColorPicker(QWidget *parent) :
     bSlider->setSliderHeight(0.8f);
 
 
+    // --------------
+    // Setup RGB Labels
+    // --------------
+
+    rLabel = new QLabel(this);
+    rLabel->setText("R");
+    rLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    rLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
+
+    gLabel = new QLabel(this);
+    gLabel->setText("G");
+    gLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    gLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
+
+    bLabel = new QLabel(this);
+    bLabel->setText("B");
+    bLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    bLabel->setFont(QFont(rLabel->font().styleName(), 12, 0));
+
     connect(rSlider, SIGNAL(valueChanged(int)), this, SLOT(rSliderChanged(int)));
     connect(rSlider->slider.get(), SIGNAL(sliderReleased()), this, SLOT(releasedSlider()));
 
@@ -73,13 +76,12 @@ ColorPicker::ColorPicker(QWidget *parent) :
     connect(bSlider, SIGNAL(valueChanged(int)), this, SLOT(bSliderChanged(int)));
     connect(bSlider->slider.get(), SIGNAL(sliderReleased()), this, SLOT(releasedSlider()));
 
-
     // --------------
     // Setup Slider/Label Layout
     // --------------
 
     mSliderLayout = new QGridLayout;
-    mSliderLayout->addWidget(rLabel,1,0, Qt::AlignTop);
+    mSliderLayout->addWidget(rLabel,1,0);
     mSliderLayout->addWidget(rSlider,1,1);
     mSliderLayout->addWidget(gLabel,2,0);
     mSliderLayout->addWidget(gSlider,2,1);
@@ -146,8 +148,9 @@ void ColorPicker::chooseLayout(ELayoutColorPicker layout) {
         mCondensedLayout = new QHBoxLayout;
         mCondensedLayout->addWidget(colorWheel,Qt::AlignCenter);
         mCondensedLayout->addLayout(mSliderLayout);
-        mCondensedLayout->setStretch(0, 10);
-        mCondensedLayout->setStretch(1, 4);
+        mCondensedLayout->setStretch(0, 8);
+        mCondensedLayout->setStretch(1, 1);
+        mCondensedLayout->setStretch(2, 8);
         setLayout(mCondensedLayout);
     }
     else {
@@ -156,10 +159,6 @@ void ColorPicker::chooseLayout(ELayoutColorPicker layout) {
        // QSpacerItem *item = new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Fixed);
         colorWheel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         mFullLayout->addWidget(colorWheel,Qt::AlignCenter);
-        mFullLayout->setStretch(0, 10);
-        mFullLayout->setStretch(1, 4);
-        mFullLayout->setStretch(2, 4);
-        mFullLayout->setStretch(3, 4);
         mFullLayout->addLayout(mSliderLayout);
         setLayout(mFullLayout);
     }
@@ -261,18 +260,26 @@ void ColorPicker::mouseReleaseEvent(QMouseEvent *event) {
 void ColorPicker::resizeEvent(QResizeEvent *event) {
     if (mCurrentLayoutColorPicker == ELayoutColorPicker::eFullLayout) {
         QPixmap pixmap = QPixmap(":/images/color_wheel.png");
-        int wheelSize = (int)(std::min(this->size().height() - rSlider->size().height() - gSlider->size().height() - bSlider->size().height(),
-                                       this->size().width()) * 0.8f);
+        int wheelSize = (int)(std::min((int)((this->size().height() - rSlider->size().height() - gSlider->size().height() - bSlider->size().height()) * 0.9f),
+                                       this->size().width()) * 0.9f);
+        rSlider->setMinimumHeight(wheelSize * 0.1f);
+        gSlider->setMinimumHeight(wheelSize * 0.1f);
+        bSlider->setMinimumHeight(wheelSize * 0.1f);
         colorWheel->setPixmap(pixmap.scaled(wheelSize,
                                             wheelSize,
                                             Qt::KeepAspectRatio,
                                             Qt::SmoothTransformation));
     } else if (mCurrentLayoutColorPicker == ELayoutColorPicker::eCondensedLayout) {
-        int size = (int)(std::min(this->size().width() * 0.8f, this->size().height() * 0.8f));
-        colorWheel->setFixedSize(size,size);
+        int size =  this->size().height() * 0.8f;
+        // handles some phone edge cases where the wheel and sliders overlap ever so slightly
+        // TODO: debug the root cause of this...
+        if (size * 2.5f > this->size().width()) {
+            size = size * 0.9f;
+        }
+        colorWheel->setFixedSize(size, size);
         QPixmap pixmap = QPixmap(":/images/color_wheel.png");
-        colorWheel->setPixmap(pixmap.scaled(size,
-                                           size,
+        colorWheel->setPixmap(pixmap.scaled(size - size * 0.1f,
+                                            size - size * 0.1f,
                                             Qt::KeepAspectRatio,
                                             Qt::SmoothTransformation));
     }
