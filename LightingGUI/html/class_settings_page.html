@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.8.0</span>
+   &#160;<span id="projectnumber">v0.8.5</span>
    </div>
   </td>
  </tr>
@@ -75,6 +75,21 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_settings_page.html#a2834619870fa16f97f1b2fddad189eb7">listClicked</a> (QListWidgetItem *)</td></tr>
 <tr class="memdesc:a2834619870fa16f97f1b2fddad189eb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">listClicked signaled whenever the serial list is clicked. It attempts to connect to the serial device that is clicked, if its not already connected. <br /></td></tr>
 <tr class="separator:a2834619870fa16f97f1b2fddad189eb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37925265d4bfe36f8ab1b68ecc50dc37"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_settings_page.html#a37925265d4bfe36f8ab1b68ecc50dc37">highlightButton</a> (ECommType currentCommType)</td></tr>
+<tr class="memdesc:a37925265d4bfe36f8ab1b68ecc50dc37"><td class="mdescLeft">&#160;</td><td class="mdescRight">highlightButton highlight the commtype button of the desired ECommType  <a href="#a37925265d4bfe36f8ab1b68ecc50dc37">More...</a><br /></td></tr>
+<tr class="separator:a37925265d4bfe36f8ab1b68ecc50dc37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc81cf9d3a9becf1491ac4bb109759b8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc81cf9d3a9becf1491ac4bb109759b8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_settings_page.html#adc81cf9d3a9becf1491ac4bb109759b8">commTypeSelected</a> (int)</td></tr>
+<tr class="memdesc:adc81cf9d3a9becf1491ac4bb109759b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">commTypeSelected called when the comm type updates and changes <br /></td></tr>
+<tr class="separator:adc81cf9d3a9becf1491ac4bb109759b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c1f0cce7608c863bc0499b3fdef4016"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1c1f0cce7608c863bc0499b3fdef4016"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_settings_page.html#a1c1f0cce7608c863bc0499b3fdef4016">plusButtonClicked</a> ()</td></tr>
+<tr class="memdesc:a1c1f0cce7608c863bc0499b3fdef4016"><td class="mdescLeft">&#160;</td><td class="mdescRight">plusButtonClicked called whenever the plus button is clicked <br /></td></tr>
+<tr class="separator:a1c1f0cce7608c863bc0499b3fdef4016"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a562dddf7846e0be2017ab2c4c059738b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a562dddf7846e0be2017ab2c4c059738b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_settings_page.html#a562dddf7846e0be2017ab2c4c059738b">minusButtonClicked</a> ()</td></tr>
+<tr class="memdesc:a562dddf7846e0be2017ab2c4c059738b"><td class="mdescLeft">&#160;</td><td class="mdescRight">minusButtonClicked called whenever the minus button is clicked <br /></td></tr>
+<tr class="separator:a562dddf7846e0be2017ab2c4c059738b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -115,8 +130,8 @@ std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed.</dd></dl>
-<p>It currently provides the ability to change the speed the LEDs update and the amount of minutes it takes for the LEDs to timeout.</p>
-<p>It also shows a list of the available serial connections and clicking on a serial connection will attempt to connect to it. In future updates, this list will be expanding to allow connections to HTTP, UDP, and BLE. </p>
+<p>It provides the ability to change the speed the LEDs update and the amount of minutes it takes for the LEDs to timeout.</p>
+<p>It also provides a way to switch between different communication types such as Serial and UDP. This interface automatically populates serial connections, but allows users to add and remove connections for UDP and HTTP. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a2f7b734cd4b293694140ed7504d19a55"></a>
 <div class="memitem">
@@ -140,6 +155,37 @@ std::shared_ptr&lt; <a class="el" href="class_data_layer.html">DataLayer</a> &gt
 </table>
 </div><div class="memdoc">
 <dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed. </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a37925265d4bfe36f8ab1b68ecc50dc37"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SettingsPage::highlightButton </td>
+          <td>(</td>
+          <td class="paramtype">ECommType&#160;</td>
+          <td class="paramname"><em>currentCommType</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">slot</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">currentCommType</td><td>the button that you want to highlight </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

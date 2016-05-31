@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.5</span>
+   &#160;<span id="projectnumber">v1.9.6</span>
    </div>
   </td>
  </tr>
@@ -83,8 +83,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga199e9f5b52bc70146bf8c0a60645540d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#ga199e9f5b52bc70146bf8c0a60645540d">RoutinesRGB::multiGlimmer</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup, long percent)</td></tr>
-<tr class="separator:ga199e9f5b52bc70146bf8c0a60645540d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga189c22dd3d944229c1827822eff6e050"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#ga189c22dd3d944229c1827822eff6e050">RoutinesRGB::multiGlimmer</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup, uint8_t percent=20)</td></tr>
+<tr class="separator:ga189c22dd3d944229c1827822eff6e050"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6096f9640196d6bff7b033766971e3af"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#ga6096f9640196d6bff7b033766971e3af">RoutinesRGB::multiFade</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup)</td></tr>
 <tr class="separator:ga6096f9640196d6bff7b033766971e3af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9f8210245eceeabfea41ddd46ea5f8e7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#ga9f8210245eceeabfea41ddd46ea5f8e7">RoutinesRGB::multiRandomIndividual</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup)</td></tr>
@@ -191,7 +191,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga199e9f5b52bc70146bf8c0a60645540d"></a>
+<a class="anchor" id="ga189c22dd3d944229c1827822eff6e050"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -204,8 +204,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>percent</em>&#160;</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>percent</em> = <code>20</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -218,7 +218,7 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">colorGroup</td><td>the color group to use for the routine. eCustom is the custom array, all other values are preset groups. </td></tr>
-    <tr><td class="paramname">percent</td><td>percent of LEDs that will get the glimmer applied </td></tr>
+    <tr><td class="paramname">percent</td><td>percent of LEDs that will get the glimmer applied, between 0 and 100 </td></tr>
   </table>
   </dd>
 </dl>

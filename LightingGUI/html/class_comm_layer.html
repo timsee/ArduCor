@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.8.0</span>
+   &#160;<span id="projectnumber">v0.8.5</span>
    </div>
   </td>
  </tr>
@@ -53,7 +53,7 @@
 <div class="contents">
 
 <p>The <a class="el" href="class_comm_layer.html" title="The CommLayer class provides communication protocols that allow the user to connect and send packets ...">CommLayer</a> class provides communication protocols that allow the user to connect and send packets to an LED array. Currently it supports serial, UDP, and HTTP.  
-</p>
+ <a href="class_comm_layer.html#details">More...</a></p>
 
 <p><code>#include &quot;<a class="el" href="commlayer_8h_source.html">commlayer.h</a>&quot;</code></p>
 <table class="memberdecls">
@@ -98,8 +98,20 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a1ce555df58a61d3f47dab59acfe8f38d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a1ce555df58a61d3f47dab59acfe8f38d">sendPacket</a> (QString packet)</td></tr>
 <tr class="memdesc:a1ce555df58a61d3f47dab59acfe8f38d"><td class="mdescLeft">&#160;</td><td class="mdescRight">sendPacket sends the string over the currently active connection  <a href="#a1ce555df58a61d3f47dab59acfe8f38d">More...</a><br /></td></tr>
 <tr class="separator:a1ce555df58a61d3f47dab59acfe8f38d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b3e663fb72572ca3d1086479984d8df"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a9b3e663fb72572ca3d1086479984d8df">currentCommType</a> (ECommType commType)</td></tr>
+<tr class="memdesc:a9b3e663fb72572ca3d1086479984d8df"><td class="mdescLeft">&#160;</td><td class="mdescRight">currentCommType sets the current comm type  <a href="#a9b3e663fb72572ca3d1086479984d8df">More...</a><br /></td></tr>
+<tr class="separator:a9b3e663fb72572ca3d1086479984d8df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9674bd2b0711709897ed24bb1754e2e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac9674bd2b0711709897ed24bb1754e2e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#ac9674bd2b0711709897ed24bb1754e2e">closeCurrentConnection</a> ()</td></tr>
+<tr class="memdesc:ac9674bd2b0711709897ed24bb1754e2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">closeCurrentConnection required only for serial connections, closes the current connectio before trying to open a new one. <br /></td></tr>
+<tr class="separator:ac9674bd2b0711709897ed24bb1754e2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a141d8ff9a99cdb9df246b336358afac0"><td class="memItemLeft" align="right" valign="top">ECommType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_layer.html#a141d8ff9a99cdb9df246b336358afac0">currentCommType</a> ()</td></tr>
+<tr class="memdesc:a141d8ff9a99cdb9df246b336358afac0"><td class="mdescLeft">&#160;</td><td class="mdescRight">currentCommType getting for the current comm type.  <a href="#a141d8ff9a99cdb9df246b336358afac0">More...</a><br /></td></tr>
+<tr class="separator:a141d8ff9a99cdb9df246b336358afac0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><dl class="section copyright"><dt>Copyright</dt><dd>Copyright (C) 2015 - 2016. All Rights MIT Licensed. </dd></dl>
+</div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="ae9185152c3242f86ece0818cc007df99"></a>
 <div class="memitem">
 <div class="memproto">
@@ -121,6 +133,44 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the current connection </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9b3e663fb72572ca3d1086479984d8df"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void CommLayer::currentCommType </td>
+          <td>(</td>
+          <td class="paramtype">ECommType&#160;</td>
+          <td class="paramname"><em>commType</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">commType</td><td>the desired comm type </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a141d8ff9a99cdb9df246b336358afac0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ECommType CommLayer::currentCommType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
 </div>
 </div>

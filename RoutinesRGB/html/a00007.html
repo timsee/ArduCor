@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.5</span>
+   &#160;<span id="projectnumber">v1.9.6</span>
    </div>
   </td>
  </tr>
@@ -87,10 +87,10 @@ Functions</h2></td></tr>
 <tr class="separator:ga0fe5d4476e192ab9345b73974a58ffd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5d430afe930ba13f4ad7a2254d0a3851"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#ga5d430afe930ba13f4ad7a2254d0a3851">RoutinesRGB::singleBlink</a> (uint8_t red, uint8_t green, uint8_t blue)</td></tr>
 <tr class="separator:ga5d430afe930ba13f4ad7a2254d0a3851"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga784971d65f5846ac2c87a3340a0b8949"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#ga784971d65f5846ac2c87a3340a0b8949">RoutinesRGB::singleFade</a> (uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)</td></tr>
-<tr class="separator:ga784971d65f5846ac2c87a3340a0b8949"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gafca211590303b12a4956dcd3fa0d9e4c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#gafca211590303b12a4956dcd3fa0d9e4c">RoutinesRGB::singleGlimmer</a> (uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate)</td></tr>
-<tr class="separator:gafca211590303b12a4956dcd3fa0d9e4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac553795366d030f32c2808d109818b72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#gac553795366d030f32c2808d109818b72">RoutinesRGB::singleFade</a> (uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed=50, boolean shouldUpdate=true)</td></tr>
+<tr class="separator:gac553795366d030f32c2808d109818b72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7ba054273bc5f1b44deffbf2bb4e1645"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00007.html#ga7ba054273bc5f1b44deffbf2bb4e1645">RoutinesRGB::singleGlimmer</a> (uint8_t red, uint8_t green, uint8_t blue, uint8_t percent=20, boolean shouldUpdate=true)</td></tr>
+<tr class="separator:ga7ba054273bc5f1b44deffbf2bb4e1645"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>These routines each take a R, G, and B value as parameters to generate a color. This color is the only color used by the routine.</p>
@@ -137,7 +137,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ga784971d65f5846ac2c87a3340a0b8949"></a>
+<a class="anchor" id="gac553795366d030f32c2808d109818b72"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -163,13 +163,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>fadeSpeed</em>, </td>
+          <td class="paramname"><em>fadeSpeed</em> = <code>50</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>shouldUpdate</em>&#160;</td>
+          <td class="paramname"><em>shouldUpdate</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -191,7 +191,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gafca211590303b12a4956dcd3fa0d9e4c"></a>
+<a class="anchor" id="ga7ba054273bc5f1b44deffbf2bb4e1645"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -216,14 +216,14 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>percent</em>, </td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>percent</em> = <code>20</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>shouldUpdate</em>&#160;</td>
+          <td class="paramname"><em>shouldUpdate</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -238,7 +238,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">red</td><td>strength of red LED, between 0 and 255 </td></tr>
     <tr><td class="paramname">green</td><td>strength of green LED, between 0 and 255 </td></tr>
     <tr><td class="paramname">blue</td><td>strength of blue LED, between 0 and 255 </td></tr>
-    <tr><td class="paramname">percent</td><td>determines how many LEDs will be slightly dimmer than the rest </td></tr>
+    <tr><td class="paramname">percent</td><td>determines how many LEDs will be slightly dimmer than the rest, between 0 and 100 </td></tr>
   </table>
   </dd>
 </dl>
