@@ -19,13 +19,13 @@ class SettingsPage;
  * \brief The SettingsPage provides a way to configure the
  * application settings.
  *
- * It currently provides the ability to change the speed the LEDs update
+ * It provides the ability to change the speed the LEDs update
  * and the amount of minutes it takes for the LEDs to timeout.
  *
- * It also shows a list of the available serial connections
- * and clicking  on a serial connection will attempt to connect
- * to it. In future updates, this list will be expanding to allow
- * connections to HTTP, UDP, and BLE.
+ * It also provides a way to switch between different communication types
+ * such as Serial and UDP. This interface automatically populates serial
+ * connections, but allows users to add and remove connections for UDP
+ * and HTTP.
  *
  */
 class SettingsPage : public QWidget, public LightingPage
@@ -60,12 +60,34 @@ public slots:
      */
     void listClicked(QListWidgetItem *);
 
+    /*!
+     * \brief highlightButton highlight the commtype button of the desired ECommType
+     * \param currentCommType the button that you want to highlight
+     */
+    void highlightButton(ECommType currentCommType);
+
+    /*!
+     * \brief commTypeSelected called when the comm type updates and changes
+     */
+    void commTypeSelected(int);
+
+    /*!
+     * \brief plusButtonClicked called whenever the plus button is clicked
+     */
+    void plusButtonClicked();
+
+    /*!
+     * \brief minusButtonClicked called whenever the minus button is clicked
+     */
+    void minusButtonClicked();
+
 protected:
     /*!
      * \brief showEvent called before the this page is shown. Used to sync up
      *        any changes that may have happened on other pages.
      */
     void showEvent(QShowEvent *);
+
 
 private:
     /*!
@@ -74,10 +96,22 @@ private:
     Ui::SettingsPage *ui;
 
     /*!
-     * \brief updateSerialList updates the serial list based on the information
-     *        found in the CommLayer. Does not search for new serial devices.
+     * \brief updateConnectionList updates the GUI elements that display the
+     *        CommLayer's connection list.
      */
-    void updateSerialList();
+    void updateConnectionList();
+
+    /*!
+     * \brief mCurrentListString name of the current comm list connection
+     */
+    QString mCurrentListString;
+
+    /*!
+     * \brief mSliderSpeedValue storage for the current slider value, which
+     *        differs from the actual slider speed saved in the data layer.
+     */
+    int mSliderSpeedValue;
+
 };
 
 #endif // SETTINGSPAGE_H

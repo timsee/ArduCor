@@ -6,8 +6,8 @@
 #include "LightingProtocols.h"
 
 /*!
- * \version v1.9.5
- * \date May 22, 2016
+ * \version v1.9.6
+ * \date May 30, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -210,7 +210,7 @@ public:
      * \param blue strength of blue LED, between 0 and 255
      * \param fadeSpeed how many ticks it takes to fade. Higher numbers are slower.
      */
-    void singleFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate);
+    void singleFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed = 50, boolean shouldUpdate = true);
     
     /*!
      * Set every LED to the provided color. A subset of the LEDs
@@ -220,9 +220,9 @@ public:
      * \param red strength of red LED, between 0 and 255
      * \param green strength of green LED, between 0 and 255
      * \param blue strength of blue LED, between 0 and 255
-     * \param percent determines how many LEDs will be slightly dimmer than the rest
+     * \param percent determines how many LEDs will be slightly dimmer than the rest, between 0 and 100
      */
-    void singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, long percent, boolean shouldUpdate);
+    void singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, uint8_t percent = 20, boolean shouldUpdate = true);
     
     /*! @} */
     //================================================================================
@@ -249,9 +249,9 @@ public:
      *
      * \param colorGroup the color group to use for the routine. eCustom is the custom array, 
      *        all other values are preset groups.
-     * \param percent percent of LEDs that will get the glimmer applied
+     * \param percent percent of LEDs that will get the glimmer applied, between 0 and 100
      */
-    void multiGlimmer(EColorGroup colorGroup, long percent);
+    void multiGlimmer(EColorGroup colorGroup, uint8_t percent = 20);
         
     /*!
      * Fades between all the colors used by the color group.
@@ -323,6 +323,7 @@ private:
     uint16_t m_LED_count;
     uint16_t m_bar_size;
     uint8_t  m_bright_level;
+    uint16_t m_max_brightness;
     uint8_t  m_fade_speed;
     uint8_t  m_blink_speed;
     boolean  m_preprocess_flag;
@@ -340,7 +341,14 @@ private:
     boolean  m_start_next_fade;
     uint16_t m_loop_index;
     uint8_t  m_loop_count;
-
+    uint8_t  m_scale_factor;
+    uint8_t  m_difference;
+    uint8_t  m_repeat_index;
+    uint8_t  m_possible_array_color;
+    
+    // index for loops and other iterators
+    uint16_t x;
+    
     /*!
      * Called before every function. Used to update the library state tracking
      * and to reset any necessary variables when a state changes.
@@ -361,7 +369,7 @@ private:
     /*!
      * Helper used to apply the brightness level to any value.
      */
-    uint8_t applyBrightness(byte value);
+    uint8_t applyBrightness(uint16_t value);
     
     /*!
      * Sets two colors alternating in patches the size of barSize.

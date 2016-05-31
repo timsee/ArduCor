@@ -22,14 +22,10 @@ public:
      * \brief CommHTTP Constructor
      */
     CommHTTP();
-
     /*!
-     * \brief setup sets up the connection to send to
-     *        IP Address provided as param1
-     * \param param1 the IP Address to make a connection
-     *        to.
+     * \brief CommHTTP Deconstructor
      */
-    void setup(QString param1);
+    ~CommHTTP();
 
     /*!
      * \brief sendPacket sends a packet in a way similar to am

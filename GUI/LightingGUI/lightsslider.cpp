@@ -24,7 +24,7 @@ LightsSlider::LightsSlider(QWidget *parent) : QWidget(parent) {
     this->setAutoFillBackground(true);
     slider = std::shared_ptr<QSlider>(new QSlider(Qt::Horizontal, this));
     slider->setAutoFillBackground(true);
-    slider->setGeometry(this->rect());
+    slider->setFixedSize(0,0);
     setMinimumPossible(false, 0);
     setSnapToNearestTick(false);
     connect(slider.get(), SIGNAL(valueChanged(int)), this, SLOT(receivedValue(int)));
@@ -35,25 +35,38 @@ LightsSlider::LightsSlider(QWidget *parent) : QWidget(parent) {
     mLayout->setContentsMargins(0,0,0,0);
     mLayout->addWidget(slider.get());
     setLayout(mLayout);
+    mSliderColorSet = false;
 }
 
 
 void LightsSlider::setSliderColorBackground(QColor color) {
+    mSliderColor = color;
+    mSliderColorSet = true;
     // compute a darker version for our gradient
     QColor darkColor = QColor((uint8_t)(color.red()   / 4),
                               (uint8_t)(color.green() / 4),
                               (uint8_t)(color.blue()  / 4));
 
+    // slider handle is only controllable via stylesheets but the values needed for style sheets
+    // breaks in some environments (such as high pixel density android screens). to get around this,
+    // we always set the handle size programmatically whenever we udpate the stylesheet.
+    int sliderHandleSize = (int)std::min(this->size().width() / 12.0f, (float)slider->size().height());
+
     // generate a stylesheet based off of the color with a gradient
     QString styleSheetString = QString("QSlider::sub-page:horizontal{ "
                                        " background:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgb(%1, %2, %3), stop: 1 rgb(%4, %5, %6));"
                                        " background: qlineargradient(x1: 0, y1: 0.2, x2: 1, y2: 1, stop: 0 rgb(%1, %2, %3), stop: 1 rgb(%4, %5, %6));"
-                                       "}").arg(QString::number(darkColor.red()),
+                                       "}"
+                                       "QSlider::handle:horizontal {"
+                                        "width: %7px;"
+                                        "}"
+                                       ).arg(QString::number(darkColor.red()),
                                                 QString::number(darkColor.green()),
                                                 QString::number(darkColor.blue()),
                                                 QString::number(color.red()),
                                                 QString::number(color.green()),
-                                                QString::number(color.blue()));
+                                                QString::number(color.blue()),
+                                                QString::number(sliderHandleSize));
     slider->setStyleSheet(styleSheetString);
 }
 
@@ -130,11 +143,16 @@ void LightsSlider::setMinimumPossible(bool useMinimumPossible, int minimumPossib
 
 void LightsSlider::resizeEvent(QResizeEvent *event) {
     Q_UNUSED (event);
+    slider->setFixedSize(this->rect().width(), this->rect().height() * mHeightScaleFactor);
     float newY = this->rect().height() * (1.0 - mHeightScaleFactor) / 2.0f;
     slider->setGeometry(slider->rect().x(),
                         newY,
                         this->rect().width(),
                         this->rect().height() * mHeightScaleFactor);
+    if (mSliderColorSet) {
+        setSliderColorBackground(mSliderColor);
+    }
+
 }
 
 void LightsSlider::showEvent(QShowEvent *event) {

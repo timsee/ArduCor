@@ -49,3 +49,11 @@
 * Updated layout to support the new screen sizes.
 * Fixed bugs, probably created more. 
 
+### **v0.8.5** 
+#### Settings Page Update
+* Added the option to switch to different connections on the settings screen.
+* Cleaned up the settings sliders. 
+* Added the ability to store previous connections between sessions.
+* Fixed connection issues.
+* Fixed layout issues on certain devices.
+

@@ -19,7 +19,6 @@ PresetColorsPage::PresetColorsPage(QWidget *parent) :
 
     ui->scrollArea->setStyleSheet("background-color:transparent;");
     QScroller::grabGesture(ui->scrollArea->viewport(), QScroller::LeftMouseButtonGesture);
-
 }
 
 PresetColorsPage::~PresetColorsPage() {

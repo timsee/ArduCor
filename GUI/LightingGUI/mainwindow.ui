@@ -44,7 +44,7 @@
      <height>0</height>
     </size>
    </property>
-   <layout class="QGridLayout" name="gridLayout" rowstretch="3,4,20">
+   <layout class="QGridLayout" name="gridLayout" rowstretch="3,3,30">
     <property name="horizontalSpacing">
      <number>0</number>
     </property>
@@ -156,7 +156,7 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>0</height>
+        <height>50</height>
        </size>
       </property>
       <property name="maximumSize">

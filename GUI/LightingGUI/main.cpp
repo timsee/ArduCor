@@ -14,7 +14,14 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    
+    QCoreApplication::setOrganizationName("Corluma");
+    QCoreApplication::setApplicationName("Corluma");
+
+    // used to override settings that are persisent
+    // between sessions and clear them out, useful for debugging
+//    QSettings mSettings;
+//    mSettings.clear();
+
     // load the style sheet
     QFile f(":qdarkstyle/style.qss");
     if (!f.exists()) {

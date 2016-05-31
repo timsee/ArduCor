@@ -28,6 +28,10 @@ public:
      * \brief CommSerial Constructor
      */
     CommSerial();
+    /*!
+     * \brief CommSerial Deconstructor
+     */
+    ~CommSerial();
 
     /*!
      * \brief serialList list of possible serial ports
@@ -36,17 +40,13 @@ public:
     QList<QSerialPortInfo> serialList;
 
     /*!
-     * \brief setup sets up the serial connection to the
-     *        provided serial port, if possible. If not possible,
-     *        it defaults to the first serial port that connects
-     *        successfully.
-     * \param param1 The preferred serial port to connect to.
+     * \brief discoverSerialPorts looks for new serial ports and adds it them to
+     *        the connections page, if they are found.
      */
-    void setup(QString param1);
+    void discoverSerialPorts();
 
     /*!
-     * \brief connectSerialPort connect to a specific serial port,
-     *        if possible.
+     * \brief connectSerialPort connect to a specific serial port, if possible.
      * \param serialPortName The name of the serial port that you want
      *        to connect to.
      * \return true if connection is successful, false otherwise.
@@ -74,6 +74,9 @@ private:
      * \brief serial the serial port currently in use
      */
     std::shared_ptr<QSerialPort> serial;
+
+    bool mIsConnected;
+
 };
 
 #endif // MOBILE_BUILD
