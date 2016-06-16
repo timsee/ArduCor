@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['green',['green',['../a00006.html#ga4927718ce72ca077cbe62e4c84e1c015',1,'RoutinesRGB']]]
+  ['drawcolor',['drawColor',['../a00001.html#a80dea9024c6dd8770188a9cc05cde732',1,'RoutinesRGB']]]
 ];

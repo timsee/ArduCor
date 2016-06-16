@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.6</span>
+   &#160;<span id="projectnumber">v1.9.7</span>
    </div>
   </td>
  </tr>
@@ -97,8 +97,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Enumerations</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><dl class="section version"><dt>Version</dt><dd>v1.9.6 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>May 30, 2016 </dd></dl>
+<div class="textblock"><dl class="section version"><dt>Version</dt><dd>v1.9.7 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>June 15, 2016 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Tim Seemann </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd><a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">MIT License </a></dd></dl>
 <p>This file defines the protocols used for the Arduino libraries and the GUI.</p>
@@ -214,7 +214,7 @@ Enumerations</h2></td></tr>
 <p><b>2</b><br />
  <em>Alternates between showing a single color at a fixed brightness and turning the LEDs completely off.</em> </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8ab96848a16fd63d347dae1c8cfeb4b512"></a>eSingleFade&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8aebd7a9af0dab00f80613b7cc1995ae49"></a>eSingleWave&#160;</td><td class="fielddoc">
 <p><b>3</b><br />
  <em>Linear fade of the brightness of the LEDs.</em> </p>
 </td></tr>
@@ -222,28 +222,44 @@ Enumerations</h2></td></tr>
 <p><b>4</b><br />
  <em> Randomly dims some of the LEDs to give a glimmer effect.</em> </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8aaa694153abcd60913c5877c206de20b3"></a>eMultiGlimmer&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a2942c8228a93e9c428c95aa12965cf1c"></a>eSingleLinearFade&#160;</td><td class="fielddoc">
 <p><b>5</b><br />
+ <em>Linear fade of the brightness of the LEDs.</em> </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a5a8cb12ea841dc4b4b8faf9e6e7558b8"></a>eSingleSawtoothFadeIn&#160;</td><td class="fielddoc">
+<p><b>6</b><br />
+ <em>fades in starting at 0 brightness and increases a constant rate. Once it reaches full brightness, it resets back to zero and repeats.</em> </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a6eb4b6fd31bb5190c5d3ecc024890de3"></a>eSingleSawtoothFadeOut&#160;</td><td class="fielddoc">
+<p><b>7</b><br />
+ <em>fades out starting at 0 brightness and decreases at a constant rate. Once it reaches 0, it resets back to full brightness and repeats.</em> </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a027c9bddc351f1e64160a07a06469783"></a>eSingleSineFade&#160;</td><td class="fielddoc">
+<p><b>8</b><br />
+ <em>Uses a sine function to fade in and out. This makes it spend more time near the extremes of full brightness and very dim light, and less time in the mid range. of the LEDs.</em> </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8aaa694153abcd60913c5877c206de20b3"></a>eMultiGlimmer&#160;</td><td class="fielddoc">
+<p><b>9</b><br />
  <em> Uses the first color of the array as the base color and uses the other colors for a glimmer effect.</em> </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a8742a6a6c73f4956caee09a11c2a35cd"></a>eMultiFade&#160;</td><td class="fielddoc">
-<p><b>6</b><br />
+<p><b>10</b><br />
  <em>Fades slowly between each color in the array.</em> </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a0376de0614ec71ea4e1dbc59f9657c63"></a>eMultiRandomSolid&#160;</td><td class="fielddoc">
-<p><b>7</b><br />
+<p><b>11</b><br />
  <em>Chooses a random color from the array and lights all all LEDs to match that color.</em> </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a1afeaffed521d72acd0486eb95383b95"></a>eMultiRandomIndividual&#160;</td><td class="fielddoc">
-<p><b>8</b><br />
+<p><b>12</b><br />
  <em>Chooses a random color from the array for each individual LED.</em> </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a2dff719aba045de53046627a4f6ad2c1"></a>eMultiBarsSolid&#160;</td><td class="fielddoc">
-<p><b>9</b><br />
+<p><b>13</b><br />
  <em>Draws the colors of the array in alternating groups of equal size.</em> </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ab4ffd9d347807927a73f5c5f6a888da8a500fa06cb68b740e774a0f1703b87a0e"></a>eMultiBarsMoving&#160;</td><td class="fielddoc">
-<p><b>10</b><br />
+<p><b>14</b><br />
  <em>Draws the colors of the array in alternating groups of equal size. On each update, it moves those groups one index to the right, creating a scrolling effect.</em> </p>
 </td></tr>
 </table>

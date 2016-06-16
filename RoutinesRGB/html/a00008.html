@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.6</span>
+   &#160;<span id="projectnumber">v1.9.7</span>
    </div>
   </td>
  </tr>
@@ -91,16 +91,16 @@ Functions</h2></td></tr>
 <tr class="separator:ga9f8210245eceeabfea41ddd46ea5f8e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3944a78179df0e7950b86c9e01f58255"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#ga3944a78179df0e7950b86c9e01f58255">RoutinesRGB::multiRandomSolid</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup)</td></tr>
 <tr class="separator:ga3944a78179df0e7950b86c9e01f58255"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadf64ac1de541fde2606afa1da35593b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#gadf64ac1de541fde2606afa1da35593b7">RoutinesRGB::multiBarsSolid</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup, byte barSize)</td></tr>
-<tr class="separator:gadf64ac1de541fde2606afa1da35593b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8e58804f0f3a08c4183590f5d3426f72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#ga8e58804f0f3a08c4183590f5d3426f72">RoutinesRGB::multiBarsMoving</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup, byte barSize)</td></tr>
-<tr class="separator:ga8e58804f0f3a08c4183590f5d3426f72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7444f8e89f0b1ebbe57ce64459053052"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#ga7444f8e89f0b1ebbe57ce64459053052">RoutinesRGB::multiBarsSolid</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup, uint8_t barSizeSetting)</td></tr>
+<tr class="separator:ga7444f8e89f0b1ebbe57ce64459053052"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadea289f0f6380ea246cb9ac40cc17b73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00008.html#gadea289f0f6380ea246cb9ac40cc17b73">RoutinesRGB::multiBarsMoving</a> (<a class="el" href="a00003.html#aacfa5db0b5684d40790252d6a2df61d6">EColorGroup</a> colorGroup, uint8_t barSizeSetting)</td></tr>
+<tr class="separator:gadea289f0f6380ea246cb9ac40cc17b73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>These routines use multiple colors. They all take the parameter of <code>colorGroup</code> which is used to determine which set of colors to use. The custom color array is eCustom, all other values for <code>colorGroup</code> come from groups of preset colors. Go to the project's github for a full list of the colorGroups and their corresponding values.</p>
 <p>All routines except multiBarsSolid should be called repeatedly on a loop for their full effect. The speed of the loop determines how fast the LEDs update. </p>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ga8e58804f0f3a08c4183590f5d3426f72"></a>
+<a class="anchor" id="gadea289f0f6380ea246cb9ac40cc17b73"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -113,8 +113,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">byte&#160;</td>
-          <td class="paramname"><em>barSize</em>&#160;</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>barSizeSetting</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -134,7 +134,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="gadf64ac1de541fde2606afa1da35593b7"></a>
+<a class="anchor" id="ga7444f8e89f0b1ebbe57ce64459053052"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -147,8 +147,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">byte&#160;</td>
-          <td class="paramname"><em>barSize</em>&#160;</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>barSizeSetting</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

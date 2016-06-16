@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fadespeed',['fadeSpeed',['../a00006.html#gacbbb97f67e668e7a639c52a07496c03d',1,'RoutinesRGB']]]
+  ['drawcolor',['drawColor',['../a00001.html#a80dea9024c6dd8770188a9cc05cde732',1,'RoutinesRGB']]]
 ];

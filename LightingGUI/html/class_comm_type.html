@@ -20,7 +20,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">LightingGUI
-   &#160;<span id="projectnumber">v0.8.5</span>
+   &#160;<span id="projectnumber">v0.9.0</span>
    </div>
   </td>
  </tr>
@@ -87,8 +87,11 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <tr class="memdesc:af070055c2e7714c8f84f749ef1b65887"><td class="mdescLeft">&#160;</td><td class="mdescRight">addConnection attempts to add the connection to the connection list  <a href="#af070055c2e7714c8f84f749ef1b65887">More...</a><br /></td></tr>
 <tr class="separator:af070055c2e7714c8f84f749ef1b65887"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3dee0f3a680c795ff21466f016952a96"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_type.html#a3dee0f3a680c795ff21466f016952a96">selectConnection</a> (QString connection)</td></tr>
-<tr class="memdesc:a3dee0f3a680c795ff21466f016952a96"><td class="mdescLeft">&#160;</td><td class="mdescRight">selectConnection attempts to set the connction as the current conneciton in use  <a href="#a3dee0f3a680c795ff21466f016952a96">More...</a><br /></td></tr>
+<tr class="memdesc:a3dee0f3a680c795ff21466f016952a96"><td class="mdescLeft">&#160;</td><td class="mdescRight">selectConnection attempts to set the connction as the current conneciton in use.  <a href="#a3dee0f3a680c795ff21466f016952a96">More...</a><br /></td></tr>
 <tr class="separator:a3dee0f3a680c795ff21466f016952a96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a968b21fceabbae08b2e6d163bb7ea88d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_type.html#a968b21fceabbae08b2e6d163bb7ea88d">selectConnection</a> (int connectionIndex)</td></tr>
+<tr class="memdesc:a968b21fceabbae08b2e6d163bb7ea88d"><td class="mdescLeft">&#160;</td><td class="mdescRight">selectConnection attempts to the use the connection from the connection list at the given index.  <a href="#a968b21fceabbae08b2e6d163bb7ea88d">More...</a><br /></td></tr>
+<tr class="separator:a968b21fceabbae08b2e6d163bb7ea88d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38b1cfe7fe30b19d84e0e7bec006d960"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_comm_type.html#a38b1cfe7fe30b19d84e0e7bec006d960">removeConnection</a> (QString connection)</td></tr>
 <tr class="memdesc:a38b1cfe7fe30b19d84e0e7bec006d960"><td class="mdescLeft">&#160;</td><td class="mdescRight">removeConnection attempts to remove the connection from the connection list  <a href="#a38b1cfe7fe30b19d84e0e7bec006d960">More...</a><br /></td></tr>
 <tr class="separator:a38b1cfe7fe30b19d84e0e7bec006d960"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -238,6 +241,29 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the connection exists and setup was successful, false otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a968b21fceabbae08b2e6d163bb7ea88d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool CommType::selectConnection </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>connectionIndex</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">connectionIndex</td><td>the index of the connection name that you want you want to connect to. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the index is valid, false otherwise. </dd></dl>
 
 </div>
 </div>

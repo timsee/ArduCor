@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.6</span>
+   &#160;<span id="projectnumber">v1.9.7</span>
    </div>
   </td>
  </tr>
@@ -97,6 +97,8 @@ Functions</h2></td></tr>
 <tr class="separator:gacbbb97f67e668e7a639c52a07496c03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaae31d0ae306f854b99b10efd87a3d9c0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#gaae31d0ae306f854b99b10efd87a3d9c0">RoutinesRGB::blinkSpeed</a> (uint8_t blinkSpeed)</td></tr>
 <tr class="separator:gaae31d0ae306f854b99b10efd87a3d9c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9b856be82de7997abef6b6863b2e8808"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga9b856be82de7997abef6b6863b2e8808">RoutinesRGB::barSize</a> (uint8_t barSize)</td></tr>
+<tr class="separator:ga9b856be82de7997abef6b6863b2e8808"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7ff0f29a3b5e37f0c2f52284382f459f"><td class="memItemLeft" align="right" valign="top">Color&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga7ff0f29a3b5e37f0c2f52284382f459f">RoutinesRGB::mainColor</a> ()</td></tr>
 <tr class="separator:ga7ff0f29a3b5e37f0c2f52284382f459f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga531ab764e3ebb8285b74b5b113084ca6"><td class="memItemLeft" align="right" valign="top">Color&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00006.html#ga531ab764e3ebb8285b74b5b113084ca6">RoutinesRGB::color</a> (uint16_t i)</td></tr>
@@ -111,6 +113,24 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>These are the getters and setters for <a class="el" href="a00001.html" title="An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware...">RoutinesRGB</a> that are used to control the settings and the colors. </p>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="ga9b856be82de7997abef6b6863b2e8808"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void RoutinesRGB::barSize </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>barSize</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sets the size of bars in routines that use them. Bars are groups of LEDs that all display the same color. The routines SingleWave, MultiBarsSolid, and MultiBarsMoving use them.</p>
+<p>a number greater than 0 and less than the number of LEDs being used. </p>
+
+</div>
+</div>
 <a class="anchor" id="gaae31d0ae306f854b99b10efd87a3d9c0"></a>
 <div class="memitem">
 <div class="memproto">

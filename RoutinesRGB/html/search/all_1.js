@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['color',['color',['../a00006.html#ga531ab764e3ebb8285b74b5b113084ca6',1,'RoutinesRGB']]],
-  ['colorpresets_2eh',['ColorPresets.h',['../a00002.html',1,'']]],
-  ['customcolorcount',['customColorCount',['../a00006.html#gafe92a925b68f773e9ad3148a329ac4a9',1,'RoutinesRGB']]]
+  ['barsize',['barSize',['../a00006.html#ga9b856be82de7997abef6b6863b2e8808',1,'RoutinesRGB']]],
+  ['blinkspeed',['blinkSpeed',['../a00006.html#gaae31d0ae306f854b99b10efd87a3d9c0',1,'RoutinesRGB']]],
+  ['blue',['blue',['../a00006.html#gaf1866df58e05ea30f3979d8c6f89e94b',1,'RoutinesRGB']]],
+  ['brightness',['brightness',['../a00006.html#ga06861d759557dec5efd6a334cce25aa0',1,'RoutinesRGB']]]
 ];
