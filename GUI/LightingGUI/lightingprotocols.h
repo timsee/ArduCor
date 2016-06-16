@@ -40,7 +40,7 @@ enum class ELightingRoutine
      * <b>3</b><br>
      * <i>Linear fade of the brightness of the LEDs.</i>
      */
-    eSingleFade,
+    eSingleWave,
     /*!
      * <b>4</b><br>
      * <i> Randomly dims some of the LEDs to give a glimmer effect.</i>
@@ -48,35 +48,59 @@ enum class ELightingRoutine
     eSingleGlimmer,
     /*!
      * <b>5</b><br>
+     * <i>Linear fade of the brightness of the LEDs.</i>
+     */
+    eSingleLinearFade,
+    /*!
+     * <b>6</b><br>
+     * <i>fades in starting at 0 brightness and  increases a constant rate.
+     * Once it reaches  full brightness, it resets back to zero and repeats.</i>
+     */
+    eSingleSawtoothFadeIn,
+    /*!
+     * <b>7</b><br>
+     * <i>fades out starting at 0 brightness and decreases at a constant rate.
+     *  Once it reaches 0, it resets back to full brightness and repeats.</i>
+     */
+    eSingleSawtoothFadeOut,
+    /*!
+     * <b>8</b><br>
+     * <i>Uses a sine function to fade in and out. This makes it spend more time near the
+     *  extremes of full brightness and very dim light, and less time in the mid range.
+     *  of the LEDs.</i>
+     */
+    eSingleSineFade,
+    /*!
+     * <b>9</b><br>
      * <i> Uses the first color of the array as the base color
      * and uses the other colors for a glimmer effect.</i>
      */
     eMultiGlimmer,
     /*!
-     * <b>6</b><br>
+     * <b>10</b><br>
      * <i>Fades slowly between each color in the array.</i>
      */
     eMultiFade,
     /*!
-     * <b>7</b><br>
+     * <b>11</b><br>
      * <i>Chooses a random color from the array and lights all
      * all LEDs to match that color.</i>
      */
     eMultiRandomSolid,
     /*!
-     * <b>8</b><br>
+     * <b>12</b><br>
      * <i>Chooses a random color from the array for each
      * individual LED.</i>
      */
     eMultiRandomIndividual,
     /*!
-     * <b>9</b><br>
+     * <b>13</b><br>
      * <i>Draws the colors of the array in alternating
      *  groups of equal size.</i>
      */
     eMultiBarsSolid,
     /*!
-     * <b>10</b><br>
+     * <b>14</b><br>
      * <i>Draws the colors of the array in alternating
      *  groups of equal size. On each update, it moves those
      *  groups one index to the right, creating a scrolling

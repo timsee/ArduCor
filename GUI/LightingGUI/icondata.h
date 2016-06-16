@@ -34,6 +34,7 @@ public:
      * \param height the height
      */
     IconData(int width, int height);
+
     /*!
      * \brief Required constructor when the icons use the color array.
      *
@@ -96,18 +97,44 @@ public:
     void setMultiBarsMoving(EColorGroup group);
 
     /*!
+     * \brief addWave similar to a linear fade, but offset a bit since otherwise
+     *        they would have the same static icon..
+     */
+    void addWave();
+
+    /*!
      * \brief addGlimmer adds glimmer lighting effect to the preexisting data
      */
     void addGlimmer();
+
     /*!
      * \brief addBlink turns half the columns of preexisting data black to give blink effect
      *        in static image
      */
     void addBlink();
+
     /*!
-     * \brief addFade takes preexisting data and fades it to black column by column
+     * \brief addLinearFade fades from no color to full color back to full color with constant
+     *        intervals between each pixel.
      */
-    void addFade();
+    void addLinearFade();
+
+    /*!
+     * \brief addSawtoothIn fades from no color to full color and then repeats the fade again.
+     */
+    void addSawtoothIn();
+
+    /*!
+     * \brief addSawtoothOut fades from full color to no color and then repeats the fade again.
+     */
+    void addSawtoothOut();
+
+    /*!
+     * \brief addSineFade similar to a linear fade in that it fades from no color to full color
+     *        then back to no color, but this one uses a sine wave to to determine the intervals
+     *        between the colors instead of a constant value.
+     */
+    void addSineFade();
 
     /*!
      * \brief getters for private values

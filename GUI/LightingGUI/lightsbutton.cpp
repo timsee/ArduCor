@@ -98,6 +98,7 @@ EColorGroup LightsButton::colorGroup() {
 }
 
 void LightsButton::resizeEvent(QResizeEvent *event) {
+    Q_UNUSED(event);
     int size = (int)(std::min(this->size().width(), this->size().height()));
     if (mIsMenuButton) {
         button->setMinimumSize(size,size);        

@@ -6,7 +6,7 @@
 
 #include "presetcolorspage.h"
 #include "icondata.h"
-#include "ui_PresetColorsPage.h"
+#include "ui_presetcolorspage.h"
 
 #include <QDebug>
 #include <QSignalMapper>

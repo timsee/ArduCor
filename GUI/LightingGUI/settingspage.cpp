@@ -111,13 +111,13 @@ void SettingsPage::highlightButton(ECommType currentCommType) {
     ui->httpButton->setChecked(false);
     ui->udpButton->setChecked(false);
 
-    if (mComm->currentCommType() == ECommType::eHTTP) {
+    if (currentCommType == ECommType::eHTTP) {
         ui->httpButton->setChecked(true);
-    } else if (mComm->currentCommType() == ECommType::eUDP) {
+    } else if (currentCommType == ECommType::eUDP) {
         ui->udpButton->setChecked(true);
     }
 #ifndef MOBILE_BUILD
-    else if (mComm->currentCommType() == ECommType::eSerial) {
+    else if (currentCommType == ECommType::eSerial) {
         ui->serialButton->setChecked(true);
     }
 #endif //MOBILE_BUILD
@@ -189,7 +189,7 @@ void SettingsPage::showEvent(QShowEvent *event) {
     highlightButton(mComm->currentCommType());
     commTypeSelected((int)mComm->currentCommType());
     // default the settings bars to the current colors
-    if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
+    if (mData->currentRoutine() <= ELightingRoutine::eSingleSineFade) {
         ui->speedSlider->setSliderColorBackground(mData->mainColor());
         ui->timeoutSlider->setSliderColorBackground(mData->mainColor());
     } else {
@@ -218,7 +218,6 @@ void SettingsPage::showEvent(QShowEvent *event) {
 
 void SettingsPage::updateConnectionList() {
     ui->connectionList->clear();
-    bool firstItem = true;
     for (QString connectionName : (*mComm->comm()->connectionList().get())) {
         bool itemFound = false;
         for (int i = 0; i < ui->connectionList->count(); i++) {
@@ -227,7 +226,7 @@ void SettingsPage::updateConnectionList() {
                 itemFound = true;
             }
         }
-        if (!itemFound) {
+        if (!itemFound && (QString::compare(QString(""), connectionName))) {
             ui->connectionList->addItem(connectionName);
         }
     }

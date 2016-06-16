@@ -26,7 +26,7 @@ const byte IS_COMMON_ANODE   = 1;      // SINGLE_LED only, 0 if common cathode, 
 const int LED_COUNT          = 64;
 
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
-const byte FADE_SPEED        = 50;     // change rate of solid fade routine, range 1 (slow) - 100 (fast)
+const byte FADE_SPEED        = 25;     // change rate of solid fade routine, range 1 (fast) - 100 (slow)
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
 
 const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
@@ -141,6 +141,7 @@ void loop()
 
   if (!(loop_counter % light_speed)) {
     currentLightingRoutine(current_routine);
+    routines.applyBrightness(); // Optional. uses brightness setting
     updateLEDs();
   }
 
@@ -196,14 +197,40 @@ void currentLightingRoutine(ELightingRoutine currentMode)
       routines.singleBlink(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
       break;
 
-    case eSingleFade:
+    case eSingleLinearFade:
       // allow for the color to change independently of the fade animation while setting a color
       if (last_message_time + light_speed > millis()) {
-        routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
+        routines.singleLinearFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
       } else {
-        routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
+        routines.singleLinearFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
       }
+      break;
 
+    case eSingleSawtoothFadeIn:
+      // allow for the color to change independently of the fade animation while setting a color
+      if (last_message_time + light_speed > millis()) {
+        routines.singleSawtoothFadeIn(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
+      } else {
+        routines.singleSawtoothFadeIn(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
+      }
+      break;
+
+    case eSingleSawtoothFadeOut:
+      // allow for the color to change independently of the fade animation while setting a color
+      if (last_message_time + light_speed > millis()) {
+        routines.singleSawtoothFadeOut(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
+      } else {
+        routines.singleSawtoothFadeOut(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
+      }
+      break;
+      
+    case eSingleSineFade:
+      // allow for the color to change independently of the fade animation while setting a color
+      if (last_message_time + light_speed > millis()) {
+        routines.singleSineFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
+      } else {
+        routines.singleSineFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
+      }
       break;
 
     case eSingleGlimmer:
@@ -211,6 +238,14 @@ void currentLightingRoutine(ELightingRoutine currentMode)
         routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT, false);
       } else {
         routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT, true);
+      }
+      break;
+      
+    case eSingleWave:
+      if (last_message_time + light_speed > millis()) {
+        routines.singleWave(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, BAR_SIZE, false);
+      } else {
+        routines.singleWave(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, BAR_SIZE, true);
       }
       break;
 

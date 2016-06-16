@@ -88,15 +88,16 @@ bool CommType::removeConnection(QString connection) {
         for (int i = 0; i < mListSize; ++i) {
             if (connection.compare((*mList.get())[i]) == 0) tempIndex = i;
         }
-        // copy the vector
-        std::vector<QString> tempCopy = *mList.get();
-        // move all values to the right of the index one left
-        for (int i = tempIndex; i < (mListSize - 1); ++i) {
-           (*mList.get())[i] = tempCopy[i + 1];
-        }
         // handle edge case
-        if (mSelectedIndex == (mListSize - 1)) {
-           (*mList.get())[mListSize - 1] = QString("");
+        if (tempIndex == (mListSize - 1)) {
+           (*mList.get())[tempIndex] = QString("");
+        } else {
+            // copy the vector
+            std::vector<QString> tempCopy = *mList.get();
+            // move all values to the right of the index one left
+            for (int i = tempIndex; i < mListSize; ++i) {
+               (*mList.get())[i] = tempCopy[i + 1];
+            }
         }
         // reduce the overall size.
         if ((mListSize != 0)) mListSize--;

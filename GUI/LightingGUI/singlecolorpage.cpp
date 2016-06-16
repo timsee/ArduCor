@@ -35,16 +35,24 @@ void SingleColorPage::setupButtons() {
 
     std::vector<std::string> labels = {"Solid",
                                        "Blink",
-                                       "Fade",
-                                       "Glimmer"};
+                                       "Wave",
+                                       "Glimmer",
+                                       "Linear Fade",
+                                       "Sawtooth In",
+                                       "Sawtooth Out",
+                                       "Sine Fade"};
 
     std::vector<LightsButton *> buttons = {ui->solidButton,
                                            ui->blinkButton,
+                                           ui->waveButton,
+                                           ui->glimmerButton,
                                            ui->fadeButton,
-                                           ui->glimmerButton};
+                                           ui->sawtoothInButton,
+                                           ui->sawtoothOutButton,
+                                           ui->sineFadeButton};
 
-    mRoutineButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(4, nullptr));
-    for (int i = 0; i < 4; ++i) {
+    mRoutineButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(buttons.size(), nullptr));
+    for (int i = 0; i < (int)mRoutineButtons->size(); ++i) {
         (*mRoutineButtons.get())[i] = buttons[i];
         (*mRoutineButtons.get())[i]->setupAsStandardButton((ELightingRoutine)(i + 1), mData->currentColorGroup(), mData, QString::fromStdString(labels[i]));
         connect((*mRoutineButtons.get())[i], SIGNAL(buttonClicked(int, int)), this, SLOT(modeChanged(int, int)));
@@ -60,10 +68,18 @@ void SingleColorPage::highlightRoutineButton(ELightingRoutine routine) {
         ui->solidButton->button->setChecked(true);
     } else if (routine == ELightingRoutine::eSingleBlink) {
         ui->blinkButton->button->setChecked(true);
-    } else if (routine == ELightingRoutine::eSingleFade) {
-        ui->fadeButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eSingleWave) {
+        ui->waveButton->button->setChecked(true);
     } else if (routine == ELightingRoutine::eSingleGlimmer) {
         ui->glimmerButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eSingleLinearFade) {
+        ui->fadeButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eSingleSawtoothFadeIn) {
+        ui->sawtoothInButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eSingleSawtoothFadeOut) {
+        ui->sawtoothOutButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eSingleSineFade) {
+        ui->sineFadeButton->button->setChecked(true);
     }
 }
 
@@ -84,16 +100,19 @@ void SingleColorPage::colorChanged(QColor color) {
     mComm->sendMainColorChange(mData->mainColor());
     if (!(mData->currentRoutine() == ELightingRoutine::eSingleBlink
             || mData->currentRoutine() == ELightingRoutine::eSingleSolid
-            || mData->currentRoutine() == ELightingRoutine::eSingleFade
-            || mData->currentRoutine() == ELightingRoutine::eSingleGlimmer)) {
+            || mData->currentRoutine() == ELightingRoutine::eSingleWave
+            || mData->currentRoutine() == ELightingRoutine::eSingleGlimmer
+            || mData->currentRoutine() == ELightingRoutine::eSingleLinearFade
+            || mData->currentRoutine() == ELightingRoutine::eSingleSawtoothFadeIn
+            || mData->currentRoutine() == ELightingRoutine::eSingleSawtoothFadeOut
+            || mData->currentRoutine() == ELightingRoutine::eSingleSineFade)) {
         mData->currentRoutine(ELightingRoutine::eSingleGlimmer);
         mComm->sendRoutineChange(ELightingRoutine::eSingleGlimmer);
     }
 
-    ui->solidButton->updateIcon();
-    ui->fadeButton->updateIcon();
-    ui->glimmerButton->updateIcon();
-    ui->blinkButton->updateIcon();
+    for (int i = 0; i < (int)mRoutineButtons->size(); ++i) {
+         (*mRoutineButtons.get())[i]->updateIcon();
+    }
 
     emit updateMainIcons();
 }

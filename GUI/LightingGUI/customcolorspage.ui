@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="12,1,1,2,1,4,4">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="12,1,2,2,1,3,3">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -129,12 +129,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>LightsSlider</class>
-   <extends>QWidget</extends>
-   <header>lightsslider.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>ColorPicker</class>
    <extends>QWidget</extends>
    <header location="global">colorpicker.h</header>
@@ -144,6 +138,12 @@
    <class>LightsButton</class>
    <extends>QWidget</extends>
    <header location="global">lightsbutton.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>LightsSlider</class>
+   <extends>QWidget</extends>
+   <header>lightsslider.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

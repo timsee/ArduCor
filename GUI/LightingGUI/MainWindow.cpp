@@ -109,7 +109,7 @@ void MainWindow::toggleOnOff() {
         mIsOn = false;
         mComm->sendRoutineChange(ELightingRoutine::eOff);
     } else {
-        if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
+        if (mData->currentRoutine() <= ELightingRoutine::eSingleSineFade) {
             mIconData.setSolidColor(mData->mainColor());
         } else if (mData->currentColorGroup() > EColorGroup::eCustom) {
             mIconData.setLightingRoutine(ELightingRoutine::eMultiFade, mData->currentColorGroup());
@@ -162,7 +162,7 @@ void MainWindow::updateMenuBar() {
         mIconData.setMultiFade(EColorGroup::eCustom, true);
         ui->customArrayButton->updateIcon();
         ui->brightnessSlider->setSliderColorBackground(mData->colorsAverage(EColorGroup::eCustom));
-    } else if (mData->currentRoutine() <= ELightingRoutine::eSingleGlimmer) {
+    } else if (mData->currentRoutine() <= ELightingRoutine::eSingleSineFade) {
         mIconData.setSolidColor(mData->mainColor());
         ui->singleColorButton->updateIcon();
         ui->brightnessSlider->setSliderColorBackground(mData->mainColor());
@@ -190,6 +190,7 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
+    Q_UNUSED(event);
     int min = std::min(ui->settingsButton->width(), ui->settingsButton->height()) * 0.85f;
     ui->settingsButton->setIconSize(QSize(min, min));
 

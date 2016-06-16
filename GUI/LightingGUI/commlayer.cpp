@@ -13,7 +13,6 @@
 CommLayer::CommLayer() {
     mUDP  = std::shared_ptr<CommUDP>(new CommUDP());
     mHTTP = std::shared_ptr<CommHTTP>(new CommHTTP());
-
 #ifndef MOBILE_BUILD
     mSerial = std::shared_ptr<CommSerial>(new CommSerial());
 #endif //MOBILE_BUILD
@@ -25,11 +24,9 @@ CommLayer::~CommLayer() {
 }
 
 #ifndef MOBILE_BUILD
-
 void CommLayer::changeSerialPort(QString serialPort) {
     mSerial->connectSerialPort(serialPort);
 }
-
 #endif //MOBILE_BUILD
 
 void CommLayer::currentCommType(ECommType commType) {

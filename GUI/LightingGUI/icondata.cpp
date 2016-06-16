@@ -6,11 +6,12 @@
 
 #include "icondata.h"
 
-#include <qDebug>
+#include <QDebug>
 
 #include <stdlib.h>
 #include <ctime>
 #include <algorithm>
+#include <math.h>
 
 IconData::IconData() {
     setup(64, 64);
@@ -130,13 +131,29 @@ void IconData::setLightingRoutine(ELightingRoutine routine, EColorGroup colorGro
             setSolidColor(mDataLayer->mainColor());
             addBlink();
             break;
-        case ELightingRoutine::eSingleFade:
+        case ELightingRoutine::eSingleWave:
             setSolidColor(mDataLayer->mainColor());
-            addFade();
+            addWave();
             break;
         case ELightingRoutine::eSingleGlimmer:
             setSolidColor(mDataLayer->mainColor());
             addGlimmer();
+            break;
+        case ELightingRoutine::eSingleLinearFade:
+            setSolidColor(mDataLayer->mainColor());
+            addLinearFade();
+            break;
+        case ELightingRoutine::eSingleSawtoothFadeIn:
+            setSolidColor(mDataLayer->mainColor());
+            addSawtoothIn();
+            break;
+        case ELightingRoutine::eSingleSawtoothFadeOut:
+            setSolidColor(mDataLayer->mainColor());
+            addSawtoothOut();
+            break;
+        case ELightingRoutine::eSingleSineFade:
+            setSolidColor(mDataLayer->mainColor());
+            addSineFade();
             break;
         case ELightingRoutine::eMultiGlimmer:
             setMultiGlimmer(colorGroup);
@@ -448,18 +465,100 @@ void IconData::addBlink() {
     bufferToOutput();
 }
 
-void IconData::addFade() {
-    int k = 1;
-    for (int i = 0; i < 12; i = i + 3) {
-        for (int j = 0; j < 4; j = j + 1) {
-            mBuffer[(j * 12) + i] = mBuffer[(j * 12) + i] / k;
-            mBuffer[(j * 12) + i + 1] = mBuffer[(j * 12) + i + 1] / k;
-            mBuffer[(j * 12) + i + 2] = mBuffer[(j * 12) + i + 2] / k;
+void IconData::addWave() {
+    float k = 0.0f;
+    int j = 3;
+    float max = (mBufferLength / 3.0f) - 1.0f;
+    bool skip = false;
+    for (uint i = 0; i < mBufferLength; i = i + 3) {
+        k = j / max;
+        if (k <= 0.5f) {
+            k = k / 0.5f;
+        } else {
+            k = 1.0f - (k - 0.5f) / 0.5f;
         }
-        k++;
+        mBuffer[i]     = (uint8_t)(mBuffer[i] * k);
+        mBuffer[i + 1] = (uint8_t)(mBuffer[i + 1] * k);
+        mBuffer[i + 2] = (uint8_t)(mBuffer[i + 2] * k);
+        if (!skip) {
+            j++;
+        }
+        skip = !skip;
     }
     bufferToOutput();
 }
+
+void IconData::addLinearFade() {
+    float k = 0.0f;
+    int j = 0;
+    float max = (mBufferLength / 3.0f) - 1.0f;
+    for (uint i = 0; i < mBufferLength; i = i + 3) {
+        k = j / max;
+        if (k < 0.5f) {
+            k = k / 0.5f;
+        } else {
+            k = 1.0f - (k - 0.5f) / 0.5f;
+        }
+        mBuffer[i]     = (uint8_t)(mBuffer[i] * k);
+        mBuffer[i + 1] = (uint8_t)(mBuffer[i + 1] * k);
+        mBuffer[i + 2] = (uint8_t)(mBuffer[i + 2] * k);
+        j++;
+    }
+    bufferToOutput();
+}
+
+void IconData::addSawtoothIn() {
+    float k = 0.0f;
+    int j = 0;
+    float max = (mBufferLength / 3.0f) - 1.0f;
+    for (uint i = 0; i < mBufferLength; i = i + 3) {
+        k = j / max;
+        if (k < 0.5f) {
+            k = k / 0.5f;
+        } else {
+            k = (k - 0.5f) / 0.5f;
+        }
+        mBuffer[i]     = (uint8_t)(mBuffer[i] * k);
+        mBuffer[i + 1] = (uint8_t)(mBuffer[i + 1] * k);
+        mBuffer[i + 2] = (uint8_t)(mBuffer[i + 2] * k);
+        j++;
+    }
+    bufferToOutput();
+}
+
+void IconData::addSawtoothOut() {
+    float k = 0.0f;
+    int j = 0;
+    float max = (mBufferLength / 3.0f) - 1.0f;
+    for (uint i = 0; i < mBufferLength; i = i + 3) {
+        k = j / max;
+        if (k < 0.5f) {
+            k = 1.0f - k / 0.5f;
+        } else {
+            k = 1.0f - (k - 0.5f) / 0.5f;
+        }
+        mBuffer[i]     = (uint8_t)(mBuffer[i] * k);
+        mBuffer[i + 1] = (uint8_t)(mBuffer[i + 1] * k);
+        mBuffer[i + 2] = (uint8_t)(mBuffer[i + 2] * k);
+        j++;
+    }
+    bufferToOutput();
+}
+
+void IconData::addSineFade() {
+    float k = 0.0f;
+    int j = 0;
+    float max = (mBufferLength / 3) - 1;
+    for (uint i = 0; i < mBufferLength; i = i + 3) {
+        k = cbrt((sin(((j / max) * 6.28f) - 1.67f) + 1) / 2.0f);
+        mBuffer[i]     = (uint8_t)(mBuffer[i] * k);
+        mBuffer[i + 1] = (uint8_t)(mBuffer[i + 1] * k);
+        mBuffer[i + 2] = (uint8_t)(mBuffer[i + 2] * k);
+        j++;
+    }
+    bufferToOutput();
+}
+
 
 uint IconData::dataLength() {
     return mDataLength;

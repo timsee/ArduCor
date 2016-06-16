@@ -72,4 +72,12 @@
 * Fixed GUI layout issues on certain devices.
 * Fixed bugs.
 
+### **v1.9.7** 
+#### Arduino Library and Linux Update
+* Added 4 single color routines.
+* Added post-processing options to arduino library.
+* Tested and added Linux support to GUI.
+* Fixed bugs.
+
+
 

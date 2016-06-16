@@ -1,6 +1,6 @@
 /*!
- * \version v1.9.6
- * \date May 30, 2016
+ * \version v1.9.7
+ * \date June 15, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -19,7 +19,7 @@
 const uint8_t  DEFAULT_BRIGHTNESS  = 50;
 // used for determining how fast the fade routines fade. LEDs will change
 // this value per fade frame, so a smaller value slows down fades.
-const uint8_t  DEFAULT_FADE_SPEED  = 10;
+const uint8_t  DEFAULT_FADE_SPEED  = 25;
 // used for determining how fast blink routines are. This is how many
 // frames it waits until switching the LED states from on or off. 
 // a lower number speeds up the blink.
@@ -27,6 +27,10 @@ const uint8_t  DEFAULT_BLINK_SPEED = 3;
 // default value that determines how many colors a custom color routine should use.
 // This value must be less than the size of the custom color array. 
 const uint8_t  DEFAULT_CUSTOM_COUNT = 2;
+// default value that determines how large "bars" are, which are groups of LEDs
+// of the same color in routines that display multiple colors or multiple
+// shares of the same color. 
+const uint8_t  DEFAULT_BAR_SIZE = 2;
 
 //================================================================================
 // Constructors
@@ -76,7 +80,7 @@ void RoutinesRGB::resetToDefaults()
     m_fade_speed   = DEFAULT_FADE_SPEED;
     m_blink_speed  = DEFAULT_BLINK_SPEED;
     m_custom_count = DEFAULT_CUSTOM_COUNT;
-    m_bar_size = 0;
+    m_bar_size     = DEFAULT_BAR_SIZE;
     
     // set temp values
     m_temp_index = 0;
@@ -85,12 +89,12 @@ void RoutinesRGB::resetToDefaults()
     m_temp_color = {0, 0, 0};
     m_scale_factor = 0;
     m_difference = 0;
+    m_temp_float = 0.0f;
     m_possible_array_color = 0;
     
     // set routine specific variables
     m_goal_color = {0, 0, 0};
     m_start_next_fade = true;
-
     
     // set custom colors to default colors
     for (x = 0; x < 10; x = x + 5) {
@@ -144,7 +148,14 @@ RoutinesRGB::brightness(uint8_t brightness)
 {
     if (brightness <= 100) {
         m_bright_level = brightness;
-        m_max_brightness = 255 * m_bright_level / 100;
+    }
+}
+
+void 
+RoutinesRGB::barSize(uint8_t barSize)
+{
+    if ((barSize != 0) && (barSize < m_LED_count)) {
+        m_bar_size = barSize;
     }
 }
 
@@ -225,14 +236,14 @@ RoutinesRGB::preProcess(ELightingRoutine newRoutine, EColorGroup newGroup)
 {    
     // prevent illegal values
     if (newGroup >= eColorGroup_MAX) {
-        newGroup = (EColorGroup)((int)eColorGroup_MAX - 1);
+        newGroup = (EColorGroup)((uint8_t)eColorGroup_MAX - 1);
     }
     if (newGroup < 0) {
         newGroup = (EColorGroup)0;
     }
     
     //---------
-    // State Has Changed
+    // Routine Has Changed
     //---------
     if ((m_current_routine != newRoutine)
         || m_preprocess_flag) {
@@ -241,18 +252,12 @@ RoutinesRGB::preProcess(ELightingRoutine newRoutine, EColorGroup newGroup)
         m_temp_counter = 0;
         m_temp_bool = true;
         m_temp_color = {0,0,0};
-        
-        // always reset blink
-        if (m_current_routine == eSingleBlink) {
-            m_temp_counter = 0;
-            m_temp_bool = true;
-        }
         m_preprocess_flag = true;
         m_current_routine = newRoutine;
     }
     
     //---------
-    // Preset Has Changed
+    // Group Has Changed
     //---------
     if ((m_current_group != newGroup) 
         || m_preprocess_flag) {
@@ -266,20 +271,26 @@ RoutinesRGB::preProcess(ELightingRoutine newRoutine, EColorGroup newGroup)
         m_temp_color = {0,0,0};      
         
         // reset fades, even when only the colorGroup changes
-        if (m_current_routine == eMultiFade) {
+        if (newRoutine == eMultiFade) {
             m_start_next_fade = true;
             m_temp_counter = 0;
         }
         
-        setupColorGroup(newGroup);
-        
+        setupColorGroup(newGroup); 
         // setup the buffer to do a moving array.
         if (newRoutine == eMultiBarsMoving
             || newRoutine == eMultiBarsSolid) {
             m_temp_index = 0;
             movingBufferSetup(m_temp_size, m_bar_size);
         }
-        
+        if (newRoutine == eSingleWave) {
+            m_temp_index = 0;
+            m_temp_float = m_LED_count / (2 * m_bar_size);
+            movingBufferSetup(m_temp_float, m_bar_size, 1);
+        }   
+        if (newRoutine == eSingleSawtoothFadeOut) {
+            m_temp_counter = m_fade_speed;
+        }     
         m_current_group = newGroup;
     }
 }
@@ -314,29 +325,6 @@ RoutinesRGB::setupColorGroup(EColorGroup colorGroup)
     } 
 }
 
-//================================================================================
-// Post Processing
-//================================================================================
-
-void
-RoutinesRGB::postProcess()
-{
-    // loop again to apply global effects
-    for(x = 0; x < m_LED_count; x++) {
-        // apply brightness
-        r_buffer[x] = applyBrightness(r_buffer[x]);
-        g_buffer[x] = applyBrightness(g_buffer[x]);
-        b_buffer[x] = applyBrightness(b_buffer[x]);
-    }
-}
-
-
-uint8_t
-RoutinesRGB::applyBrightness(uint16_t value)
-{ 
-    return (uint8_t)(value * m_max_brightness / 255);
-}
-
 
 //================================================================================
 // Single Color Routines
@@ -350,7 +338,6 @@ RoutinesRGB::singleSolid(uint8_t red, uint8_t green, uint8_t blue)
     memset(r_buffer, red, m_LED_count);
     memset(g_buffer, green, m_LED_count);
     memset(b_buffer, blue, m_LED_count);
-    postProcess();
 }
 
 
@@ -370,40 +357,34 @@ RoutinesRGB::singleBlink(uint8_t red, uint8_t green, uint8_t blue)
             memset(b_buffer, 0, m_LED_count);
         }
         m_temp_bool = !m_temp_bool;
-        postProcess();
     }
     m_temp_counter++;
 }
 
 
-
 void
-RoutinesRGB::singleFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeed, boolean shouldUpdate)
+RoutinesRGB::singleWave(uint8_t red, uint8_t green, uint8_t blue, uint8_t barSizeSetting, boolean shouldUpdate)
 {
-    preProcess(eSingleFade, m_current_group);    
-    uint16_t maxFadeSpeed =  255 * fadeSpeed / 100;
+    barSize(barSizeSetting);
+    preProcess(eSingleWave, m_current_group);  
     
-    if (shouldUpdate) {
-        // catch illegal argument and fix it
-        if (fadeSpeed == 0) fadeSpeed = 1;
-    
-        // apply the fade
-        if (m_temp_bool)  m_temp_counter++;
-        else              m_temp_counter--;
-    
-        // constrain the fade
-        if (m_temp_counter == fadeSpeed) m_temp_bool = false;
-        else if (m_temp_counter == 0)    m_temp_bool = true;
+    m_repeat_index = 0;
+    // loop through all the values between 0 and m_loop_index m_loop_count times.
+    for (x = 0; x < (m_loop_count * m_loop_index); ++x) {
+        // if we are computing values above m_LED_count, ignore.
+        if (x < m_LED_count) {
+            // m_temp_counter holds the index in this instance of a repeat through
+            // the looped values.
+            m_temp_counter = (m_repeat_index + m_temp_index) % m_loop_index;
+            r_buffer[x] = (uint8_t)(red * (m_temp_buffer[m_temp_counter] / m_temp_float));
+            g_buffer[x] = (uint8_t)(green * (m_temp_buffer[m_temp_counter] / m_temp_float));
+            b_buffer[x] = (uint8_t)(blue * (m_temp_buffer[m_temp_counter] / m_temp_float));
+            // if a loop is pushing a repeat_index over m_loop_index, go back to 0
+            m_repeat_index = (x + 1) % m_loop_index;
+        }
     }
-    
-    // draws the current state of the fade to the buffers
-    memset(r_buffer, (uint8_t)(red * m_temp_counter / maxFadeSpeed), m_LED_count);
-    memset(g_buffer, (uint8_t)(green * m_temp_counter / maxFadeSpeed), m_LED_count);
-    memset(b_buffer, (uint8_t)(blue * m_temp_counter / maxFadeSpeed), m_LED_count);
-    
-    postProcess();
+    m_temp_index = (m_temp_index + 1) % m_loop_index;
 }
-
 
 
 void
@@ -426,7 +407,105 @@ RoutinesRGB::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, uint8_t per
             } 
         }
     }
-    postProcess();
+}
+
+
+void
+RoutinesRGB::singleLinearFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeedSetting, boolean shouldUpdate)
+{
+    fadeSpeed(fadeSpeedSetting);
+    preProcess(eSingleLinearFade, m_current_group);    
+    
+    if (shouldUpdate) {
+        // apply the fade
+        if (m_temp_bool)  m_temp_counter++;
+        else              m_temp_counter--;
+    
+        // constrain the fade
+        if (m_temp_counter == m_fade_speed) m_temp_bool = false;
+        else if (m_temp_counter == 0)       m_temp_bool = true;
+    }
+    
+    // draws the current state of the fade to the buffers
+    memset(r_buffer, (uint8_t)(red  * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+    memset(g_buffer, (uint8_t)(green * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+    memset(b_buffer, (uint8_t)(blue  * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+}
+
+
+void
+RoutinesRGB::singleSawtoothFadeIn(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeedSetting, boolean shouldUpdate)
+{
+    fadeSpeed(fadeSpeedSetting);
+    preProcess(eSingleSawtoothFadeIn, m_current_group);       
+    if (shouldUpdate) {
+        // apply the fade
+        if (m_temp_bool) {
+            m_temp_counter++;
+        } else {
+            m_temp_counter = 0;
+            m_temp_bool = true;
+        }
+    
+        // constrain the fade
+        if (m_temp_counter == m_fade_speed) m_temp_bool = false;
+    }
+    
+    // draws the current state of the fade to the buffers
+    memset(r_buffer, (uint8_t)(red * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+    memset(g_buffer, (uint8_t)(green * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+    memset(b_buffer, (uint8_t)(blue * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+}
+
+void
+RoutinesRGB::singleSawtoothFadeOut(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeedSetting, boolean shouldUpdate)
+{
+    fadeSpeed(fadeSpeedSetting);
+    preProcess(eSingleSawtoothFadeOut, m_current_group);       
+    if (shouldUpdate) {
+        // apply the fade
+        if (m_temp_bool) {
+            m_temp_counter--;
+        } else {
+            m_temp_counter = m_fade_speed;
+            m_temp_bool = true;
+        }
+    
+        // constrain the fade
+        if (m_temp_counter == 0) m_temp_bool = false;
+    }
+    // draws the current state of the fade to the buffers
+    memset(r_buffer, (uint8_t)(red * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+    memset(g_buffer, (uint8_t)(green * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+    memset(b_buffer, (uint8_t)(blue * (m_temp_counter / (float)m_fade_speed)), m_LED_count);
+}
+
+
+void
+RoutinesRGB::singleSineFade(uint8_t red, uint8_t green, uint8_t blue, uint8_t fadeSpeedSetting, boolean shouldUpdate)
+{
+    fadeSpeed(fadeSpeedSetting);
+    preProcess(eSingleLinearFade, m_current_group);  
+    // we map the range 0 through 1 based off of m_fade_speed to -pi/2 to 3pi/2, then convert
+    // that value back between 0 and 1.  
+    m_temp_float = (sin(((m_temp_counter / (float)m_fade_speed) * 6.28f) - 1.67f) + 1) / 2.0f; 
+    if (shouldUpdate) {
+        // apply the fade
+        if (m_temp_bool) {
+            m_temp_counter++;
+        } else {
+            m_temp_counter = 0;
+            m_temp_bool = true;
+        }
+            
+        // constrain the fade
+        if (m_temp_counter == m_fade_speed) m_temp_bool = false;
+    }
+    
+    // draws the current state of the fade to the buffers
+    memset(r_buffer, (uint8_t)(red * m_temp_float), m_LED_count);
+    memset(g_buffer, (uint8_t)(green * m_temp_float), m_LED_count);
+    memset(b_buffer, (uint8_t)(blue * m_temp_float), m_LED_count);
 }
 
 
@@ -458,7 +537,6 @@ RoutinesRGB::multiGlimmer(EColorGroup colorGroup, uint8_t percent)
             b_buffer[x] = m_temp_color.blue / m_scale_factor;
         }
     }
-    postProcess();
 }
 
 
@@ -490,7 +568,6 @@ RoutinesRGB::multiFade(EColorGroup colorGroup)
     memset(r_buffer, m_temp_color.red, m_LED_count);
     memset(g_buffer, m_temp_color.green, m_LED_count);
     memset(b_buffer, m_temp_color.blue, m_LED_count);
-    postProcess();
 }
 
 
@@ -518,7 +595,6 @@ RoutinesRGB::multiRandomSolid(EColorGroup colorGroup)
                 memset(b_buffer, m_temp_color.blue, m_LED_count);
                 break;
             }
-         postProcess();
     }   
     m_temp_counter++;
 }
@@ -549,15 +625,14 @@ RoutinesRGB::multiRandomIndividual(EColorGroup colorGroup)
             }
             break;
     }
-    postProcess();
 }
 
 
 
 void
-RoutinesRGB::multiBarsSolid(EColorGroup colorGroup, uint8_t barSize)
+RoutinesRGB::multiBarsSolid(EColorGroup colorGroup, uint8_t barSizeSetting)
 {   
-    m_bar_size =  barSize;
+    barSize(barSizeSetting);
     preProcess(eMultiBarsSolid, colorGroup);  
      
     m_temp_counter = 0;
@@ -567,19 +642,18 @@ RoutinesRGB::multiBarsSolid(EColorGroup colorGroup, uint8_t barSize)
         g_buffer[x] = m_temp_array[m_temp_index].green;
         b_buffer[x] = m_temp_array[m_temp_index].blue;
         m_temp_counter++;
-        if (m_temp_counter == barSize) {
+        if (m_temp_counter == m_bar_size) {
             m_temp_counter = 0;
             m_temp_index = (m_temp_index + 1) % m_temp_size;
         }
     }
-    postProcess();
 }
 
 
 void
-RoutinesRGB::multiBarsMoving(EColorGroup colorGroup, uint8_t barSize)
+RoutinesRGB::multiBarsMoving(EColorGroup colorGroup, uint8_t barSizeSetting)
 {   
-    m_bar_size =  barSize;
+    barSize(barSizeSetting);
     preProcess(eMultiBarsMoving, colorGroup);
     
     m_repeat_index = 0;
@@ -598,9 +672,35 @@ RoutinesRGB::multiBarsMoving(EColorGroup colorGroup, uint8_t barSize)
         }
     }
     m_temp_index = (m_temp_index + 1) % m_loop_index;
-    postProcess();
 }
 
+//================================================================================
+// 
+//================================================================================
+
+void
+RoutinesRGB::applyBrightness()
+{
+    // loop again to apply global effects
+    for(x = 0; x < m_LED_count; x++) {
+        // Since this is expensive and often run on every LED update, we avoid
+        // floating point calculations for a bit of a speed increase. 
+        r_buffer[x] = (uint8_t)((r_buffer[x] * (uint16_t)m_bright_level) / 100); 
+        g_buffer[x] = (uint8_t)((g_buffer[x] * (uint16_t)m_bright_level) / 100);  
+        b_buffer[x] = (uint8_t)((b_buffer[x] * (uint16_t)m_bright_level) / 100);  
+    }
+}
+
+    
+bool 
+RoutinesRGB::drawColor(uint16_t i, uint8_t red, uint8_t green, uint8_t blue)
+{
+    if (i < m_LED_count) {
+        r_buffer[i] = red;
+        g_buffer[i] = green;
+        b_buffer[i] = blue;
+    }
+}
 
 //================================================================================
 // Helper Functions
@@ -632,28 +732,34 @@ RoutinesRGB::fadeBetweenValues(uint16_t fadeChannel, uint16_t destinationChannel
 }
 
 void
-RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t barSize)
+RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t groupSize, uint8_t startingValue)
 {
-    if ((barSize * colorCount) > m_LED_count) {
+    if ((groupSize * colorCount) > m_LED_count) {
         // edge case handled for memory reasons, a full loop must
         // take less than the m_LED_count 
-        barSize = 1;
+        groupSize = 1;
     }
     // minimum number of values needed for a looping pattern.
-    m_loop_index = barSize * colorCount;
+    m_loop_index = groupSize * colorCount;
     // minimum number of times we need to loop these values to 
     // completely fill the LEDs.
     m_loop_count = ((m_LED_count / m_loop_index) + 1); 
-    
+    // change the starting value for routines like singleWave
+    if (startingValue < colorCount) {
+        m_temp_index = startingValue;
+    } else {
+        startingValue = 0;
+    }
+      
     //the buffer from 0 to m_loop_index with the proper bars
     for (x = 0; x < m_loop_index; ++x) {
         m_temp_buffer[x] = m_temp_index;
         m_temp_counter++;
-        if (m_temp_counter == barSize) {
+        if (m_temp_counter == groupSize) {
             m_temp_counter = 0;
             m_temp_index++;
             if (m_temp_index == colorCount) {
-                m_temp_index = 0;
+                m_temp_index = startingValue;
             }
         }
     }
