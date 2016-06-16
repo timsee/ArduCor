@@ -1,6 +1,6 @@
 # Qt Lighting GUI for RGB LED Routines
 
-The GUI interacts with the sample arduino sketches. It supports Windows, Mac OS X, Android, and iOS.
+The GUI interacts with the sample arduino sketches. It supports Windows, Linux, Mac OS X, Android, and iOS.
 It requires on Qt5.2 or later and C++11.
 
 ##<a name="documentation"></a>Documentation

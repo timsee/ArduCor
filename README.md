@@ -1,10 +1,10 @@
 
 # RGB LED Routines for Arduino
 
-This project is based around an arduino library that generates a set of lighting routines for various arduino-based lighting arrays.
+This project is based around an arduino library that generates a set of lighting routines for various arduino-based lighting arrays. It works for all arduinos except the ATtiny series.
 
 Sample sketches are provided for Rainbowduino, a NeoPixel products, or a standard RGB LED. The samples
-provide an ASCII based serial interface to change the lighting routines, the brightness of the lights, and more. A Qt-based GUI is also provided which can control the arduino sketches. The GUI has been tested on Windows, Mac OS X, Android, and iOS. It requires Qt 5.2 or later and C++11.
+provide an ASCII based serial interface to change the lighting routines, the brightness of the lights, and more. A Qt-based GUI is also provided which can control the arduino sketches. The GUI has been tested on Windows, Linux, Mac OS X, Android, and iOS. It requires Qt 5.2 or later and C++11.
 
 ## <a name="toc"></a>Table of Contents
 
@@ -41,8 +41,12 @@ These routines use a single color:
 
 * Single Solid
 * Single Blink
-* Single Fade
+* Single Wave
 * Single Glimmer
+* Single Linear Fade
+* Single Sawtooth Fade In
+* Single Sawtooth Fade Out
+* Single Singe Fade
 
 ### <a name="multi-routines"></a>Multi Colors Routines
 
@@ -55,6 +59,12 @@ These routines use groups of colors saved in an array to execute the routine. Th
 * Multi Bars Solid
 * Multi Bars Moving
 
+### <a name="post-processing"></a>Post Processing
+
+Tese are optional and can be applied after a routine. The `applyBrightness` option is recommended, since it simplifies dimming the LEDs by making their overall brightness a parameter between 0 and 100. 
+
+* Apply Brightness
+* Draw Color on LED
 
 ## <a name="contributing"></a>Contributing
 

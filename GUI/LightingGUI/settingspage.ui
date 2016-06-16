@@ -150,7 +150,7 @@
      <item>
       <widget class="QLabel" name="availablePortsLabel">
        <property name="text">
-        <string>Available Ports</string>
+        <string>Serial Ports</string>
        </property>
       </widget>
      </item>

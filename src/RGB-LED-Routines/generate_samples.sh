@@ -215,6 +215,7 @@ do
     line_num=$(($line_num+1))
 done
 
+#TODO: remove libraries that make no sense, such as a rainbowduino with Yun capabilities.
 
 # reset the second line to be #define IS_NEOPIXELS 1 since thats the default testing environment
 sed "2s/.*/#define IS_NEOPIXELS 1 /" $PROJ_PATH > temp.txt ; mv temp.txt $PROJ_PATH

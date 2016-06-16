@@ -57,3 +57,13 @@
 * Fixed connection issues.
 * Fixed layout issues on certain devices.
 
+### **v0.9.0** 
+#### Arduino Library and Linux Update
+* Tested and added Linux support.
+* Fixed layout issues.
+* Fixed edge cases in Settings Page.
+* Added support for 4 new single color routines. 
+* Fixed warnings.
+
+
+

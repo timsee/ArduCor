@@ -53,7 +53,7 @@ Header,param1,param2,param3,param4;
 | Parameter         | Values        | 
 | ----------------- | ------------- |
 | Header            |     0         | 
-| New Routine       | (ELightingRoutine)0 - 10  |  
+| New Routine       | (ELightingRoutine)0 - 14  |  
 | Color Group (Optional) | (EColorGroup)0 - 17        |  
 
 **Example:** `0,1;` *(Header 0, New Routine 1)*
@@ -136,9 +136,9 @@ Header,param1,param2,param3,param4;
 
 ### <a name="generating-samples"></a>Generating Samples
 
-Samples are generated off of the `RGB-LED-Routines` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates 3 versions of the sketch. It does this since the arduino IDE doesn't always play nicely with preprocesor directives and it will outright ignore them for includes, making the sample size larger than it needs to be. Each of the versions generated contains only the relevant code for one of the hardware setups. To make changes to all the samples, changes need to be made the `RGB-LED-Routines` sketch and then the `generate_samples.sh` script must be ran again. To test any independent sketch from the `RGB-LED-Routines` sketch, you can set the preprocessor directives on the first few lines of the sketch. Only one define should be set to `1` at any given time. 
+Samples are generated off of the `RGB-LED-Routines` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates 3 versions of the sketch.
 
-There is also the option for a custom sketch, which is useful if you have a complex light setup but you still want to use the master project for development.
+To make changes to all the samples, edit the sketch in `src/RGB-LED-Routines` and then run the `generate_samples.sh` script.
 
 
 

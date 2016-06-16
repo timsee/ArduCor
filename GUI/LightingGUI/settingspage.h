@@ -48,11 +48,13 @@ public slots:
      *        the LEDs speed changes its value.
      */
     void speedChanged(int);
+
     /*!
      * \brief timeoutChanged signaled whenever the slider that controls
      *        the LEDs idle time out changes its value.
      */
     void timeoutChanged(int);
+
     /*!
      * \brief listClicked signaled whenever the serial list is clicked. It
      *        attempts to connect to the serial device that is clicked, if

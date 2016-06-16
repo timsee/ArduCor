@@ -26,7 +26,8 @@ class SingleColorPage;
  * The page contains a ColorPicker widget used to choose the color and a series of
  * buttons that change the mode.
  *
- * The single color modes current supported are solid, blink, fade, and glimmer.
+ * The single color modes currently supported are solid, blink, wave, glimmer, linear fade,
+ * sawtooth fade in, sawtooth fade out, and sine fade.
  *
  */
 class SingleColorPage : public QWidget, public LightingPage

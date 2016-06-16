@@ -258,10 +258,10 @@ void ColorPicker::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void ColorPicker::resizeEvent(QResizeEvent *event) {
+    Q_UNUSED(event);
     if (mCurrentLayoutColorPicker == ELayoutColorPicker::eFullLayout) {
         QPixmap pixmap = QPixmap(":/images/color_wheel.png");
-        int wheelSize = (int)(std::min((int)((this->size().height() - rSlider->size().height() - gSlider->size().height() - bSlider->size().height()) * 0.9f),
-                                       this->size().width()) * 0.9f);
+        int wheelSize = (this->size().height() - rSlider->size().height() - gSlider->size().height() - bSlider->size().height()) * 0.75f;
         rSlider->setMinimumHeight(wheelSize * 0.1f);
         gSlider->setMinimumHeight(wheelSize * 0.1f);
         bSlider->setMinimumHeight(wheelSize * 0.1f);
@@ -274,7 +274,7 @@ void ColorPicker::resizeEvent(QResizeEvent *event) {
         // handles some phone edge cases where the wheel and sliders overlap ever so slightly
         // TODO: debug the root cause of this...
         if (size * 2.5f > this->size().width()) {
-            size = size * 0.9f;
+            size = size * 0.85f;
         }
         colorWheel->setFixedSize(size, size);
         QPixmap pixmap = QPixmap(":/images/color_wheel.png");

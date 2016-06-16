@@ -75,6 +75,9 @@ private:
      */
     std::shared_ptr<QSerialPort> serial;
 
+    /*!
+     * \brief mIsConnected true if connected, false otherwise
+     */
     bool mIsConnected;
 
 };

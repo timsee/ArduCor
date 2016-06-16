@@ -4,8 +4,8 @@
  *
  */
 
-#include "CustomColorsPage.h"
-#include "ui_CustomColorsPage.h"
+#include "customcolorspage.h"
+#include "ui_customcolorspage.h"
 #include "icondata.h"
 
 #include <QSignalMapper>
@@ -86,9 +86,9 @@ void CustomColorsPage::setupButtons() {
                                            ui->barsSolidButton,
                                            ui->barsMovingButton};
 
-    mRoutineButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(6, nullptr));
+    mRoutineButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(buttons.size(), nullptr));
     int routineIndex = (int)ELightingRoutine::eMultiGlimmer;
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < (int)buttons.size(); ++i) {
         (*mRoutineButtons.get())[i] = buttons[i];
         (*mRoutineButtons.get())[i]->setupAsStandardButton((ELightingRoutine)(routineIndex + i), EColorGroup::eCustom, mData, QString::fromStdString(labels[i]));
         connect((*mRoutineButtons.get())[i], SIGNAL(buttonClicked(int, int)), this, SLOT(routineButtonClicked(int, int)));
@@ -117,8 +117,8 @@ void CustomColorsPage::highlightRoutineButton(ELightingRoutine routine) {
     }
 
     if (mData->currentColorGroup() == EColorGroup::eCustom) {
-        for (int i = (int)ELightingRoutine::eSingleGlimmer + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
-            (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleGlimmer - 1]->updateIcon();
+        for (int i = (int)ELightingRoutine::eSingleSineFade + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
+            (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleSineFade - 1]->updateIcon();
         }
     }
 }
@@ -207,6 +207,7 @@ void CustomColorsPage::showEvent(QShowEvent *event) {
 
 
 void CustomColorsPage::resizeEvent(QResizeEvent *event) {
+    Q_UNUSED(event);
     for (int i = 0; i < mCustomArraySize; ++i) {
         int size = std::min(ui->arrayColorsLayout->geometry().size().width() / 10,
                             ui->arrayColorsLayout->geometry().size().height());
@@ -231,8 +232,8 @@ void CustomColorsPage::updateIcons() {
         (*mArrayColorsButtons.get())[i]->setEnabled(false);
     }
 
-    for (int i = (int)ELightingRoutine::eSingleGlimmer + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
-        (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleGlimmer - 1]->updateIcon();
+    for (int i = (int)ELightingRoutine::eSingleSineFade + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
+        (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleSineFade - 1]->updateIcon();
     }
 }
 

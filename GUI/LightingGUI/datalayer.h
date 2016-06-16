@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <QColor>
 
-#include "LightingProtocols.h"
+#include "lightingprotocols.h"
 /*!
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.

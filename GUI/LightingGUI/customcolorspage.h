@@ -87,7 +87,6 @@ public slots:
      *        as the color you can change with the color picker.
      */
     void selectArrayColor(int);
-
     /*!
      * \brief routineButtonClicked whenever a button is clicked, this signal
      *        is called. The first argument is the routine itself, the second
