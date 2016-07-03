@@ -5,7 +5,7 @@
 #include <QList>
 #include <QSettings>
 #include <QDebug>
-
+#include <QWidget>
 #include <memory>
 
 
@@ -19,7 +19,8 @@ enum class ECommType {
     eSerial,
 #endif //MOBILE_BUILD
     eHTTP,
-    eUDP
+    eUDP,
+    eHue
 };
 
 /*!
@@ -31,7 +32,8 @@ enum class ECommType {
  * own conenctionList(), which lists up to 5 of the previous connections. This
  * list persists in the application's memory after the application closes.
  */
-class CommType {
+class CommType : public QWidget {
+    Q_OBJECT
 public:
     /*!
      * \brief ~CommType Deconstructor

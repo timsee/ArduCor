@@ -231,12 +231,19 @@ DataLayer::DataLayer() {
     }
     i++;
 
-
     resetToDefaults();
 }
 
 DataLayer::~DataLayer() {
 
+}
+
+void DataLayer::multiLightMode(bool setToMultiLightMode) {
+    mIsMultiLightMode = setToMultiLightMode;
+}
+
+bool DataLayer::multiLightMode() {
+   return mIsMultiLightMode;
 }
 
 bool DataLayer::brightness(int brightness) {

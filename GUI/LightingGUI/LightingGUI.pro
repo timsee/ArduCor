@@ -24,6 +24,33 @@ TEMPLATE = app
 CONFIG += c++11 #adds C++11 support
 
 #----------
+# Dependencies check
+#----------
+
+# openSSL is not included in Qt due to legal restrictions
+# in some countries. This links windows against an openSSL
+# library downloaded from this project:
+# http://slproweb.com/products/Win32OpenSSL.html
+#
+# NOTE: This dependency is currently only used for discovering
+#       Phillips Hues, and is not even a requirement for that.
+
+#message("DEBUG: QT_ARCH = $$QT_ARCH")
+win32{
+    # uses default path for openSSL in 32 and 64 bit
+    contains(QT_ARCH, i386) {
+        message("Using windows 32 bit libraries")
+        LIBS += -LC:/OpenSSL-Win32/lib -lubsec
+        INCLUDEPATH += C:/OpenSSL-Win32/include
+    } else {
+        message("Using windows 64 bit libraries")
+        LIBS += -LC:/OpenSSL-Win64/lib -lubsec
+        INCLUDEPATH += C:/OpenSSL-Win64/include
+    }
+}
+
+
+#----------
 # Qt Linking
 #----------
 
@@ -75,7 +102,9 @@ SOURCES += main.cpp\
     commserial.cpp \
     commhttp.cpp \
     commudp.cpp \
-    commtype.cpp
+    commtype.cpp \
+    commhue.cpp \
+    huebridgediscovery.cpp
 
 HEADERS  += mainwindow.h \
     singlecolorpage.h \
@@ -93,7 +122,9 @@ HEADERS  += mainwindow.h \
     commtype.h \
     commserial.h \
     commhttp.h \
-    commudp.h
+    commudp.h \
+    commhue.h \
+    huebridgediscovery.h
 
 FORMS    += mainwindow.ui \
     singlecolorpage.ui \

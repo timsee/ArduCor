@@ -124,6 +124,14 @@ public:
      */
     QLabel *bLabel;
 
+    /*!
+     * \brief useHueWheel uses a wheel with more desaturated colors since a hue bulb has a
+     *        different color gamut than standard RGB LEDs.
+     * \param shouldUseHueWheel true if it should use a hue wheel, false if it should use the
+     *        standard wheel.
+     */
+    void useHueWheel(bool shouldUseHueWheel);
+
 signals:
     /*!
      * \brief colorUpdate should be connected to the slot of any other elements
@@ -232,6 +240,11 @@ private:
      *        the picker will show the color wheel, otherwise it won't show them.
      */
     bool mShowWheel;
+
+    /*!
+     * \brief mUseHueWheel true if using standard wheel, false otherwise.
+     */
+    bool mUseHueWheel;
 
     /*!
      * \brief sliderLayout layout used to arrange the RGB sliders.

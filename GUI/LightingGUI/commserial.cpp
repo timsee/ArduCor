@@ -25,44 +25,46 @@ CommSerial::~CommSerial() {
 
 
 void CommSerial::discoverSerialPorts() {
-    for (const QSerialPortInfo &info : QSerialPortInfo::availablePorts()) {
-        bool serialPortFound = false;
-        for (QSerialPortInfo savedInfo : serialList) {
-            if (!QString::compare(info.portName(), savedInfo.portName())) {
-                serialPortFound = true;
+    if (QSerialPortInfo::availablePorts().size() > 0) {
+        for (const QSerialPortInfo &info : QSerialPortInfo::availablePorts()) {
+            bool serialPortFound = false;
+            for (QSerialPortInfo savedInfo : serialList) {
+                if (!QString::compare(info.portName(), savedInfo.portName())) {
+                    serialPortFound = true;
+                }
             }
-        }
 
-        bool isSpecialCase = false;
-        if (!serialPortFound) {
-            if (!QString::compare(info.portName(), QString("Bluetooth-Incoming-Port"))) {
-                isSpecialCase = true;
+            bool isSpecialCase = false;
+            if (!serialPortFound) {
+                if (!QString::compare(info.portName(), QString("Bluetooth-Incoming-Port"))) {
+                    isSpecialCase = true;
+                }
+                if (!QString::compare(info.portName(), QString("cu.Bluetooth-Incoming-Port"))) {
+                    isSpecialCase = true;
+                }
+                if(!QString::compare(info.portName(), QString("COM1"))) {
+                    isSpecialCase = true;
+                }
+                if (!isSpecialCase) {
+                    serialList.append(info);
+                }
             }
-            if (!QString::compare(info.portName(), QString("cu.Bluetooth-Incoming-Port"))) {
-                isSpecialCase = true;
-            }
-            if(!QString::compare(info.portName(), QString("COM1"))) {
-                isSpecialCase = true;
-            }
+
+            qDebug() << "Name : " << info.portName();
+            qDebug() << "Description : " << info.description();
+            qDebug() << "Manufacturer: " << info.manufacturer();
             if (!isSpecialCase) {
-                serialList.append(info);
+                addConnection(info.portName());
             }
         }
-
-        qDebug() << "Name : " << info.portName();
-        qDebug() << "Description : " << info.description();
-        qDebug() << "Manufacturer: " << info.manufacturer();
-        if (!isSpecialCase) {
-            addConnection(info.portName());
-        }
-    }
-    // if none is connected, attempt automatic connection
-    if (!mIsConnected && (numberOfConnections() > 0)) {
-        int index = 0;
-        while (!mIsConnected && index < numberOfConnections()) {
-            selectConnection(index);
-            mIsConnected = connectSerialPort(currentConnection());
-            index++;
+        // if none is connected, attempt automatic connection
+        if (!mIsConnected && (numberOfConnections() > 0)) {
+            int index = 0;
+            while (!mIsConnected && index < numberOfConnections()) {
+                selectConnection(index);
+                mIsConnected = connectSerialPort(currentConnection());
+                index++;
+            }
         }
     }
 }
@@ -117,5 +119,6 @@ bool CommSerial::connectSerialPort(QString serialPortName) {
         return false;
     }
 }
+
 
 #endif //MOBILE_BUILD

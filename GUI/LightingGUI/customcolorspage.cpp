@@ -39,13 +39,12 @@ CustomColorsPage::CustomColorsPage(QWidget *parent) :
     QSignalMapper *arrayButtonsMapper = new QSignalMapper(this);
     for (int i = 0; i < mCustomArraySize; ++i) {
         (*mArrayColorsButtons.get())[i] = new QPushButton;
-        (*mArrayColorsButtons.get())[i]->setMinimumHeight(30);
         (*mArrayColorsButtons.get())[i]->setStyleSheet("border:none;");
         int size = std::min((*mArrayColorsButtons.get())[i]->size().width() - 10,
                             (*mArrayColorsButtons.get())[i]->size().height() - 10);
         (*mArrayColorsButtons.get())[i]->setIconSize(QSize(size, size));
         (*mArrayColorsButtons.get())[i]->setIcon(mIconData.renderAsQPixmap());
-        (*mArrayColorsButtons.get())[i]->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        (*mArrayColorsButtons.get())[i]->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         ui->arrayColorsLayout->addWidget((*mArrayColorsButtons.get())[i], 0 , i);
         connect((*mArrayColorsButtons.get())[i], SIGNAL(clicked(bool)), arrayButtonsMapper, SLOT(map()));
         arrayButtonsMapper->setMapping((*mArrayColorsButtons.get())[i], i);
@@ -117,8 +116,8 @@ void CustomColorsPage::highlightRoutineButton(ELightingRoutine routine) {
     }
 
     if (mData->currentColorGroup() == EColorGroup::eCustom) {
-        for (int i = (int)ELightingRoutine::eSingleSineFade + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
-            (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleSineFade - 1]->updateIcon();
+        for (int i = (int)ELightingRoutine::eSingleSawtoothFadeOut + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
+            (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleSawtoothFadeOut - 1]->updateIcon();
         }
     }
 }
@@ -202,6 +201,12 @@ void CustomColorsPage::showEvent(QShowEvent *event) {
     ui->arraySlider->slider->setValue(20);
   }
 
+  if (mComm->currentCommType() == ECommType::eHue) {
+      ui->colorPicker->useHueWheel(true);
+  } else {
+      ui->colorPicker->useHueWheel(false);
+  }
+
   selectArrayColor(mCurrentColorPickerIndex);
 }
 
@@ -232,8 +237,8 @@ void CustomColorsPage::updateIcons() {
         (*mArrayColorsButtons.get())[i]->setEnabled(false);
     }
 
-    for (int i = (int)ELightingRoutine::eSingleSineFade + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
-        (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleSineFade - 1]->updateIcon();
+    for (int i = (int)ELightingRoutine::eSingleSawtoothFadeOut + 1; i < (int)ELightingRoutine::eLightingRoutine_MAX; i++) {
+        (*mRoutineButtons.get())[i - (int)ELightingRoutine::eSingleSawtoothFadeOut - 1]->updateIcon();
     }
 }
 

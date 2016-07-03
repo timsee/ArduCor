@@ -21,7 +21,7 @@ IconData::IconData(int width, int height) {
     setup(width, height);
 }
 
-IconData::IconData(int width, int height, std::shared_ptr<DataLayer>data) {
+IconData::IconData(int width, int height, DataLayer *data) {
     mDataLayer = data;
     setup(width, height);
 }

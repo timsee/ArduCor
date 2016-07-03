@@ -94,13 +94,13 @@ private:
      * \brief communication pointer to communication object
      *        for sending comannds to the lights
      */
-    std::shared_ptr<CommLayer> mComm;
+    CommLayer *mComm;
 
     /*!
      * \brief data layer that maintains and tracks the states of the lights
      *        and the saved data of the GUI
      */
-    std::shared_ptr<DataLayer> mData;
+    DataLayer *mData;
 
     /*!
      * \brief mPageButtons pointers to all the main buttons, used

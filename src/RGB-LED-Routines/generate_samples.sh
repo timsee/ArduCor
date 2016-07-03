@@ -7,7 +7,7 @@
 # need to run the proper project.
 #
 #
-# Script Version: 1.3
+# Script Version: 1.4
 # Github repository: http://www.github.com/timsee/RGB-LED-Routines
 # License: MIT-License, LICENSE provided in root of git repo
 #
@@ -117,7 +117,10 @@ function generate_hardware_specific_sample()
         then
 
             WRITE_PATH=${WRITE_PATH_DIR}/${WRITE_PROJ}.ino
-            rm -r $WRITE_PATH_DIR                   # remove the old version of the sketch
+            if [ -d $WRITE_PATH_DIR ]
+            then
+                rm -r $WRITE_PATH_DIR               # remove the old version of the sketch
+            fi
             mkdir $WRITE_PATH_DIR                   # remake the directory
             SHOULD_WRITE=1
             cat $PROJ_PATH.temp | while read line   # parse the master project line by line
@@ -132,7 +135,11 @@ function generate_hardware_specific_sample()
                     || [[ "${COMM_FLAGS[@]}" =~ "$line" ]]  \
                     || [ "$line" == "${END_FLAG}" ];
                 then
-                    SHOULD_WRITE=0
+                    # handle edge case in certain environments.
+                    if [ "${line}" != "" ]
+                    then
+                        SHOULD_WRITE=0
+                    fi
                 fi
 
                 #---------------------
@@ -215,7 +222,9 @@ do
     line_num=$(($line_num+1))
 done
 
-#TODO: remove libraries that make no sense, such as a rainbowduino with Yun capabilities.
+# remove samples that combine incompatible hardware, such as a rainbowduino with Yun capabilities.
+rm -r ${SAMPLES_PATH}/yun/http/Rainbowduino-HTTP-Routines-Sample
+rm -r ${SAMPLES_PATH}/yun/udp/Rainbowduino-UDP-Routines-Sample
 
 # reset the second line to be #define IS_NEOPIXELS 1 since thats the default testing environment
 sed "2s/.*/#define IS_NEOPIXELS 1 /" $PROJ_PATH > temp.txt ; mv temp.txt $PROJ_PATH

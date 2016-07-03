@@ -5,6 +5,7 @@
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+
 /*!
  * \copyright
  * Copyright (C) 2015 - 2016. All Rights MIT Licensed.
@@ -17,6 +18,7 @@
 
 class CommHTTP : public CommType
 {
+    Q_OBJECT
 public:
     /*!
      * \brief CommHTTP Constructor
@@ -34,13 +36,6 @@ public:
      * \param packet the string to be sent over HTTP.
      */
     void sendPacket(QString packet);
-
-    /*!
-     * \brief closeConnection Doesn't do anything for HTTP
-     *        "connections" as they don't actually have a
-     *        consistent connection.
-     */
-    void closeConnection();
 
 private:
     /*!

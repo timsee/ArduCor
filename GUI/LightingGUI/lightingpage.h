@@ -27,8 +27,8 @@ public:
      * \param dataLayer the object that handles storing data about the application
      *                  and the LED array's state.
      */
-    void setup(std::shared_ptr<CommLayer> commLayer,
-               std::shared_ptr<DataLayer> dataLayer) {
+    void setup(CommLayer *commLayer,
+               DataLayer *dataLayer) {
         mComm = commLayer;
         mData = dataLayer;
     }
@@ -38,13 +38,13 @@ protected:
      * \brief communication pointer to communication object
      *        for sending comannds to the lights
      */
-    std::shared_ptr<CommLayer> mComm;
+    CommLayer *mComm;
 
     /*!
      * \brief data layer that maintains and tracks the states of the lights
      *        and the saved data of the GUI
      */
-    std::shared_ptr<DataLayer> mData;
+    DataLayer *mData;
 
 };
 

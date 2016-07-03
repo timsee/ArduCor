@@ -10,6 +10,9 @@
 
 ColorPicker::ColorPicker(QWidget *parent) :
     QWidget(parent) {
+
+    mUseHueWheel = false;
+
     // --------------
     // Setup Thrrole Timer
     // --------------
@@ -260,7 +263,12 @@ void ColorPicker::mouseReleaseEvent(QMouseEvent *event) {
 void ColorPicker::resizeEvent(QResizeEvent *event) {
     Q_UNUSED(event);
     if (mCurrentLayoutColorPicker == ELayoutColorPicker::eFullLayout) {
-        QPixmap pixmap = QPixmap(":/images/color_wheel.png");
+        QPixmap pixmap;
+        if (mUseHueWheel) {
+            pixmap = QPixmap(":/images/hue_wheel.png");
+        } else {
+            pixmap = QPixmap(":/images/color_wheel.png");
+        }
         int wheelSize = (this->size().height() - rSlider->size().height() - gSlider->size().height() - bSlider->size().height()) * 0.75f;
         rSlider->setMinimumHeight(wheelSize * 0.1f);
         gSlider->setMinimumHeight(wheelSize * 0.1f);
@@ -277,7 +285,12 @@ void ColorPicker::resizeEvent(QResizeEvent *event) {
             size = size * 0.85f;
         }
         colorWheel->setFixedSize(size, size);
-        QPixmap pixmap = QPixmap(":/images/color_wheel.png");
+        QPixmap pixmap;
+        if (mUseHueWheel) {
+            pixmap = QPixmap(":/images/hue_wheel.png");
+        } else {
+            pixmap = QPixmap(":/images/color_wheel.png");
+        }
         colorWheel->setPixmap(pixmap.scaled(size - size * 0.1f,
                                             size - size * 0.1f,
                                             Qt::KeepAspectRatio,
@@ -323,6 +336,13 @@ void ColorPicker::handleMouseEvent(QMouseEvent *event) {
     }
 }
 
+void ColorPicker::useHueWheel(bool shouldUseHueWheel) {
+    if (shouldUseHueWheel != mUseHueWheel) {
+        mUseHueWheel = shouldUseHueWheel;
+        // force a redraw with the new variable
+        resizeEvent(NULL);
+    }
+}
 
 // ----------------------------
 // Private

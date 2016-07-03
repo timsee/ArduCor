@@ -1,6 +1,6 @@
 # Qt Lighting GUI for RGB LED Routines
 
-The GUI interacts with the sample arduino sketches. It supports Windows, Linux, Mac OS X, Android, and iOS.
+The GUI interacts with the sample arduino sketches or a Phillips Hue. It supports Windows, Linux, Mac OS X, Android, and iOS.
 It requires on Qt5.2 or later and C++11.
 
 ##<a name="documentation"></a>Documentation
@@ -14,7 +14,7 @@ The GUI makes use of Qt5's support for Android and iOS. To use it, set up your Q
 to work with either android or iOS, attach the device, and build to that target. You may need to update
 your user specific settings in Qt in order to recognize the new targets.
 
-The mobile application can be compiled to use either the [HTTP or UDP arduino yun samples](../samples/yun). 
+The mobile application can be compiled to use either the [HTTP or UDP arduino yun samples](../samples/yun) or it can communicate with a Phillips Hue. 
 It cannot be used with the serial samples, since mobile phones aren't really designed to interface
 with serial ports. As for screen orientations, It will support portrait and landscape for tablets with an aspect 
 ratio of 4:3, such as an iPad. For phones and thinner tablets, only portrait will be supported.

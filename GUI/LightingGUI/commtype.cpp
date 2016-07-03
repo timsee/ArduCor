@@ -139,6 +139,8 @@ QString CommType::settingsIndexKey(int index) {
         typeID = QString("HTTP");
     } else if (mType == ECommType::eUDP) {
         typeID = QString("UDP");
+    } else if (mType == ECommType::eHue) {
+        typeID = QString("HUE");
     }
 #ifndef MOBILE_BUILD
     else if (mType == ECommType::eSerial) {
@@ -155,6 +157,8 @@ QString CommType::settingsListSizeKey() {
         typeID = QString("HTTP");
     } else if (mType == ECommType::eUDP) {
         typeID = QString("UDP");
+    } else if (mType == ECommType::eHue) {
+        typeID = QString("HUE");
     }
 #ifndef MOBILE_BUILD
     else if (mType == ECommType::eSerial) {

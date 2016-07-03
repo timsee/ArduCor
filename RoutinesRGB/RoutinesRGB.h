@@ -6,8 +6,8 @@
 #include "LightingProtocols.h"
 
 /*!
- * \version v1.9.7
- * \date June 15, 2016
+ * \version v1.9.8
+ * \date July 3, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -102,9 +102,13 @@ public:
      */
     
     /*!
-     * Sets the color used for single color routines.
+     * Sets the color used for single color routines. This is automatically 
+     * called by each routine. Returns false if the new main color matches
+     * the previous main color. 
+     *
+     * \return true if a new color is set, false if the input matches the current color.
      */
-    void setMainColor(byte r, byte g, byte b);
+    bool setMainColor(byte r, byte g, byte b);
     
     /*!
      * Set the color in the custom color array at the provided index. colorIndex must be
@@ -113,9 +117,9 @@ public:
     void setColor(uint16_t colorIndex, byte r, byte g, byte b);
     
     /*!
-     * Sets the amount of colors used in custom multi color routines. This is useful when you
-     * want to use a subset of the custom colors. The value given must be less than the size
-     * of the custom array or else it will be set to use the entire array. 
+     * Sets the amount of colors used in custom multi color routines. The value given must 
+     * be less than the size of the custom array or else it will be set to use the entire
+     * array. 
      */
     void setCustomColorCount(uint8_t count);
     
@@ -153,8 +157,7 @@ public:
      * \barSize a number greater than 0 and less than the number of LEDs being used.
      */
     void barSize(uint8_t barSize);
-    
-    
+
     /*!
      * Retrieve the main color, which is used for single color routines.
      */
@@ -188,7 +191,7 @@ public:
      *  These routines each take a R, G, and B value as parameters to generate
      *  a color. This color is the only color used by the routine.
      *
-     *  Blink, fade, and glimmer, should be called repeatedly on a loop for their 
+     *  All routines except singleSolid should be called repeatedly on a loop for their 
      *  full effect. The speed of the loop determines how fast the LEDs update.
      *  @{
      */
@@ -210,85 +213,17 @@ public:
      * \param blue strength of blue LED, between 0 and 255
      */
     void singleBlink(uint8_t red, uint8_t green, uint8_t blue);
-    
+                
     /*!
-     * Fades the LEDs on and off based on the provided color.
-     * Uses the parameter fadeSpeedSetting to determine how fast to fade. A larger
-     * number leads to a slower fade.
-     *
-     * \param red strength of red LED, between 0 and 255
-     * \param green strength of green LED, between 0 and 255
-     * \param blue strength of blue LED, between 0 and 255
-     * \param fadeSpeedSetting how many ticks it takes to fade. Higher numbers are slower.
-     * \param shouldUpdate Gives the user the ability to set the LEDs color at a quicker rate
-     *        than the routine itself updates. This allows the user to rapidly set the LEDs
-     */
-    void singleLinearFade(uint8_t red, uint8_t green, uint8_t blue, 
-                          uint8_t fadeSpeedSetting = 25, boolean shouldUpdate = true);
-    
-    /*!
-     * Fades the LEDs in from complete darkness based off the provided color. When it reaches
-     * maximum brightness, it resets the brightness back to 0 and repeats the fade in. 
-     * Uses the parameter fadeSpeedSetting to determine how fast to fade. A larger
-     * number leads to a slower fade.
-     *
-     * \param red strength of red LED, between 0 and 255
-     * \param green strength of green LED, between 0 and 255
-     * \param blue strength of blue LED, between 0 and 255
-     * \param fadeSpeedSetting how many ticks it takes to fade. Higher numbers are slower.
-     * \param shouldUpdate Gives the user the ability to set the LEDs color at a quicker rate
-     *        than the routine itself updates. This allows the user to rapidly set the LEDs
-     */
-    void singleSawtoothFadeIn(uint8_t red, uint8_t green, uint8_t blue, 
-                              uint8_t fadeSpeedSetting = 25, boolean shouldUpdate = true);
-
-    /*!
-     * Fades the LEDs out from full brightness based off the provided color. When it reaches
-     * complete darkness, it resets the brightness back to full brightness and repeats the 
-     * fade out. Uses the parameter fadeSpeedSetting to determine how fast to fade. A larger
-     * number leads to a slower fade.
-     *
-     * \param red strength of red LED, between 0 and 255
-     * \param green strength of green LED, between 0 and 255
-     * \param blue strength of blue LED, between 0 and 255
-     * \param fadeSpeedSetting how many ticks it takes to fade. Higher numbers are slower.
-     * \param shouldUpdate Gives the user the ability to set the LEDs color at a quicker rate
-     *        than the routine itself updates. This allows the user to rapidly set the LEDs
-     */
-    void singleSawtoothFadeOut(uint8_t red, uint8_t green, uint8_t blue, 
-                               uint8_t fadeSpeedSetting = 25, boolean shouldUpdate = true);
-                              
-    
-    /*!
-     * Fades the LEDs in and out using a sine wave based off of the provided color. This
-     * makes the fade take more time on extremes and to go through the mid-range values
-     * quicker. Uses the parameter fadeSpeed to determine how fast to fade. A larger
-     * number leads to a slower fade. 
-     *
-     * \param red strength of red LED, between 0 and 255
-     * \param green strength of green LED, between 0 and 255
-     * \param blue strength of blue LED, between 0 and 255
-     * \param fadeSpeedSetting how many ticks it takes to fade. Higher numbers are slower.
-     * \param shouldUpdate Gives the user the ability to set the LEDs color at a quicker rate
-     *        than the routine itself updates. This allows the user to rapidly set the LEDs
-     */
-    void singleSineFade(uint8_t red, uint8_t green, uint8_t blue, 
-                        uint8_t fadeSpeedSetting = 25, boolean shouldUpdate = true);
-        
-    /*!
-     * Uses the provided color and draws various groups of the color in increasing levels
+     * Uses the provided color and generates groups of the color in increasing levels
      * of brightness. On each update, the LEDs move one index to the right. This creates a 
      * wave/scrolling effect. 
      *
      * \param red strength of red LED, between 0 and 255
      * \param green strength of green LED, between 0 and 255
      * \param blue strength of blue LED, between 0 and 255
-     * \param barSize how large each group of colors should be. 
-     * \param shouldUpdate Gives the user the ability to set the LEDs color at a quicker rate
-     *        than the routine itself updates. This allows the user to rapidly set the LEDs
      */
-    void singleWave(uint8_t red, uint8_t green, uint8_t blue,
-                    uint8_t barSizeSetting = 2, boolean shouldUpdate = true);
+    void singleWave(uint8_t red, uint8_t green, uint8_t blue);
   
     /*!
      * Set every LED to the provided color. A subset of the LEDs
@@ -300,9 +235,37 @@ public:
      * \param blue strength of blue LED, between 0 and 255
      * \param percent determines how many LEDs will be slightly dimmer than the rest, between 0 and 100
      */
-    void singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, 
-                       uint8_t percent = 20, boolean shouldUpdate = true);
+    void singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, uint8_t percent = 20);
     
+    
+    /*!
+     * Fades the LEDs in and out based on the provided color.
+     * Can fade in two ways: linear and sine. If isSine is set to false, the interval
+     * between each update is constant. If isSine is true, a sine wave is used to generate
+     * the intervals, resulting in lights that stay on near their full brightness for longer.
+     *
+     * \param red strength of red LED, between 0 and 255
+     * \param green strength of green LED, between 0 and 255
+     * \param blue strength of blue LED, between 0 and 255
+     * \param isSine if true, a sine wave is used, if false, constant intervals are used. 
+     */
+    void singleFade(uint8_t red, uint8_t green, uint8_t blue, bool isSine);
+    
+    /*!
+     * If `fadeIn` is true, the LEDs start with a brightness value of 0 and each update rasies 
+     * the brightness by a constant value.  When it reaches maximum brightness, it resets the
+     * brightness back to 0 and repeats the fade in.  If `fadeIn` is set to false, it does the 
+     * opposite; it starts at full brightness and then fades to darkness. 
+     *
+     * \param red strength of red LED, between 0 and 255
+     * \param green strength of green LED, between 0 and 255
+     * \param blue strength of blue LED, between 0 and 255
+     * \param fadeIn if true, it fades from darkness to maximum brightness, if false, 
+     *        it fades from maximum brightness to darkness.
+     */
+    void singleSawtoothFade(uint8_t red, uint8_t green, uint8_t blue, bool fadeIn);
+
+
     /*! @} */
     //================================================================================
     // Multi Color Routines
@@ -344,7 +307,7 @@ public:
      * sets each individual LED as a random color from the chosen color group.
      *
      * \param colorGroup the color array to use for the routine. eCustom is the custom array, 
-     *        all other values are colorGroup arrays
+     *        all other values are colorGroup arrays.
      */
     void multiRandomIndividual(EColorGroup colorGroup);
     
@@ -388,19 +351,22 @@ public:
     /*!
      * This function takes the brightness() value given to the routines object and applies
      * it to every LED. Relatively speaking, this is a pretty expensive operation so it is 
-     * left optional. This method should be called after all other
-     * post-processing methods if you want brightness applied to all of them. 
+     * left optional. 
      */
     void applyBrightness();
     
     /*!
-     * Attempts to draw the color provided on the pixel provided. 
+     * Attempts to draw the color provided on the index provided. 
      *
+     * \param i the index of the LED that you want to change. Must be less than the total
+     *        amount of LEDs or else it will return false. 
+     * \param red the new red value of the LED, between 0 and 255.
+     * \param green the new green value of the LED, between 0 and 255.
+     * \param blue the new blue value of the LED, between 0 and 255.
      * \return true if index exists and the color was drawn, false otherwise. 
      */
     bool drawColor(uint16_t i, uint8_t red, uint8_t green, uint8_t blue);
-    
-    
+     
     /*! @} */
 private:
 
@@ -429,6 +395,7 @@ private:
     uint16_t m_bright_level;
     uint8_t  m_fade_speed;
     uint8_t  m_blink_speed;
+    boolean  m_brightness_flag;
     boolean  m_preprocess_flag;
    
     // temp values
@@ -438,6 +405,8 @@ private:
     boolean  m_temp_bool;
     Color    m_temp_color;
     uint8_t  m_temp_size;
+    uint8_t  m_temp_goal;
+    int      m_temp_step;
     float    m_temp_float;
     
     // variables used by specific routines
@@ -456,17 +425,18 @@ private:
     /*!
      * Called before every function. Used to update the library state tracking
      * and to reset any necessary variables when a state changes.
+     * 
+     * \param routine the routine that is about to be displayed
+     * \param the color group that will be used. For single color routines,
+     *        this value is ignored.
      */
-    void preProcess(ELightingRoutine newRoutine, EColorGroup newGroup);
-    
-    /*!
-     * Called after every function that uses brightness and other post-processing.
-     */
-    void postProcess();
+    void preProcess(ELightingRoutine routine, EColorGroup group);
     
     /*!
      * Called by preprocessing if the the colorGroup has changed. This sets up the
      * m_temp_array and m_temp_size with the relevant data from the color colorGroup.
+     *
+     * \colorGroup the new color group that is getting used by the routines.
      */
     void setupColorGroup(EColorGroup colorGroup);
     
@@ -484,11 +454,22 @@ private:
     /*!
      * Helper for fading between two predetermined channels
      * of an overall color for array fade routines.
+     *
+     * \param fadeChannel the input channel.
+     * \param destinationChannel the goal value of the input. 
      */
     uint16_t fadeBetweenValues(uint16_t fadeChannel, uint16_t destinationChannel);
     
     /*!
-     * Chooses a random different color from the array of colors.
+     * Chooses a random different color from the array of colors. Stores resulting color in
+     * m_temp_color and the random index in m_temp_index.
+     *
+     * \param array pointer to the color array.
+     * \param the largest possible value that can be randomly chosen, must be less than
+     *        the size of the color array. 
+     * \param true if it can have the same value as the last time this was called, false otherwise. 
+     *        For example, if this is set to true and the last time a value was chosen it chose
+     *        2, then the next value will be anything else in the range except 2. 
      */
     void chooseRandomFromArray(Color* array, uint8_t max_index, boolean canRepeat); 
 };
