@@ -5,12 +5,16 @@
 #include "lightingprotocols.h"
 #include <QColor>
 #include <memory>
+#include <QWidget>
+#include <QTimer>
+#include "datalayer.h"
 
 #ifndef MOBILE_BUILD
 #include "commserial.h"
 #endif //MOBILE_BUILD
 #include "commhttp.h"
 #include "commudp.h"
+#include "commhue.h"
 
 /*!
  * \copyright
@@ -23,22 +27,14 @@
  *  array. Currently it supports serial, UDP, and HTTP.
  *
  */
-class CommLayer
+class CommLayer : public QWidget
 {
+    Q_OBJECT
 public:
     /*!
      * \brief Constructor
      */
-    CommLayer();
-    /*!
-     * \brief Deconstructor
-     */
-    ~CommLayer();
-
-#ifndef MOBILE_BUILD
-
-    void changeSerialPort(QString serialPort);
-#endif //MOBILE_BUILD
+    CommLayer(QWidget *parent = 0);
 
     /*!
      * \brief sendMainColorChange change the main color of the lighting settings
@@ -129,6 +125,93 @@ public:
      */
     ECommType currentCommType();
 
+    /*!
+     * \brief mData pointer to the data layer
+     */
+    DataLayer *mData;
+
+    /*!
+     * \brief startDiscovery start the discovery methods of the current ECommType
+     */
+    void startDiscovery();
+
+    /*!
+     * \brief isInDiscoveryMode returns true if in discovery mode, false otherwise.
+     * \return true if in discovery mode, false otherwise.
+     */
+    bool isInDiscoveryMode() { return mCurrentlyDiscovering; }
+
+    /*!
+     * \brief stopDiscovery stop the discovery methods of the current ECommType
+     */
+    void stopDiscovery();
+
+    /*!
+     * \brief isConnected returns true if a connection has been estbalished
+     *        with the given parameters for the current communication type.
+     *        If the communication type is connectionless, this returns
+     *        true.
+     * \return true if a conenction has been established for the current
+     *         communication type or if the communication type is connectionaless,
+     *         false otherwise.
+     */
+    bool isConnected();
+
+    // --------------------------
+    // Hardware specific functions
+    // --------------------------
+    //TODO: most of these should be turned into generalized systems that
+    //      work for whatever comm types they apply to...
+
+#ifndef MOBILE_BUILD
+    /*!
+     * \brief changeSerialPort attempts to change to the serial port with
+     *        the same name as the argument given.
+     * \param serialPort the name of the serial port to connect to.
+     */
+    void changeSerialPort(QString serialPort);
+#endif //MOBILE_BUILD
+
+    /*!
+     * \brief selectHueLight selects a hue light from the set of connected lights
+     * \param i the index of the light you want to select.
+     */
+    void selectHueLight(int i);
+
+    /*!
+     * \brief connectedHues returns a vector of structs that contain all relevant
+     *        states of all Hue lights connected to the Bridge. These values are
+     *        updated every few seconds by a timer.
+     * \return a vector of SHueLight structs which contain info on all the connected lights.
+     */
+    std::vector<SHueLight> connectedHues() { return mHue->connectedHues(); }
+
+signals:
+    /*!
+    * \brief hueDiscoveryStateChange the state of the Hue discovery methods,
+    *        forwarded from a private HueBridgeDiscovery object.
+    */
+   void hueDiscoveryStateChange(int);
+
+   /*!
+    * \brief hueLightStateChange sent out whenever there is a change in the state
+    *        of the LEDs.
+    */
+   void hueLightStateChange();
+
+private slots:
+   /*!
+    * \brief hueStateUpdate forwards the hue discovery state changes
+    *        from a private HueBridgeDiscovery object.
+    */
+   void hueDiscoveryUpdate(int newDiscoveryState) { emit hueDiscoveryStateChange(newDiscoveryState); }
+
+   /*!
+    * \brief hueLightStateUpdate forwards the hue light state changes
+    *        from a prviate HueBridgeDiscovery object.
+    */
+   void hueLightStateUpdate() { emit hueLightStateChange(); }
+
 private:
 
 #ifndef MOBILE_BUILD
@@ -147,6 +230,11 @@ private:
     std::shared_ptr<CommUDP>  mUDP;
 
     /*!
+     * \brief mHue Phillip's Hue connection object
+     */
+    std::shared_ptr<CommHue> mHue;
+
+    /*!
      * \brief mCommType The currently active
      *        connection type.
      */
@@ -157,6 +245,47 @@ private:
      *        being used.
      */
     CommType *mComm;
+
+    /*!
+     * \brief mSettings object used to access persistent app memory
+     */
+    QSettings *mSettings;
+
+    /*!
+     * \brief mCurrentlyDiscovering set to true by startDiscovery() and set to false
+     *        by stopDiscovery().
+     */
+    bool mCurrentlyDiscovering;
+
+    /*!
+     * \brief hueBrightness converts the brightness from the applications protocols
+     *        to a brightness message that the Hue can use.
+     * \param brightness a brightness value between 0 and 100.
+     */
+    void hueBrightness(int brightness);
+
+    /*!
+     * \brief hueRoutineChange converts a routine change from the applications protocols
+     *        to a color change packet that the Hue can use.
+     * \param routine the new routine for the Hue
+     * \param colorGroupUsed the color group used for the routine.
+     */
+    void hueRoutineChange(ELightingRoutine routine, int colorGroupUsed = -1);
+
+    /*!
+     * \brief KCommDefaultType Settings key for default type of communication.
+     *        This is saved whenever the user changes it and is restored at the
+     *        start of each application session.
+     */
+    const static QString KCommDefaultType;
+
+    /*!
+     * \brief KCommDefaultName Settings key for default name of communication.
+     *        This is saved whenever the user changes it and is restored at the
+     *        start of each application session.
+     */
+    const static QString kCommDefaultName;
+
 };
 
 #endif // COMMLAYER_H

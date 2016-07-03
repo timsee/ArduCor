@@ -42,6 +42,12 @@ public:
      */
     ~SettingsPage();
 
+    /*!
+     * \brief setupUI called after mComm is constructed so that it can be used
+     *        to set up the UI of the Settings Page.
+     */
+    void setupUI();
+
 public slots:
     /*!
      * \brief speedChanged signaled whenever the slider that controls
@@ -83,6 +89,19 @@ public slots:
      */
     void minusButtonClicked();
 
+    /*!
+     * \brief hueDiscoveryUpdate provides an int representation of the EHueDiscoveryState
+     *        of Hue's discovery object. Used by the connectionList to display the current
+     *        state.
+     */
+    void hueDiscoveryUpdate(int);
+
+    /*!
+     * \brief updateConnectionList updates the GUI elements that display the
+     *        CommLayer's connection list.
+     */
+    void updateConnectionList();
+
 protected:
     /*!
      * \brief showEvent called before the this page is shown. Used to sync up
@@ -98,12 +117,6 @@ private:
     Ui::SettingsPage *ui;
 
     /*!
-     * \brief updateConnectionList updates the GUI elements that display the
-     *        CommLayer's connection list.
-     */
-    void updateConnectionList();
-
-    /*!
      * \brief mCurrentListString name of the current comm list connection
      */
     QString mCurrentListString;
@@ -114,6 +127,23 @@ private:
      */
     int mSliderSpeedValue;
 
+    /*!
+     * \brief mHasSelectedIndex used to avoid race conditions
+     * \todo remove race conditions...
+     */
+    bool mHasSelectedIndex;
+
+    /*!
+     * \brief mFirstLoad prevents race condition
+     * \todo solve race condition...
+     */
+    bool mFirstLoad;
+
+    /*!
+     * \brief mHueDiscoveryState stored state of the Hue Discovery methods.
+     *        This is udpated internally by the hueDiscoveryUpdate(int) slot.
+     */
+    EHueDiscoveryState mHueDiscoveryState;
 };
 
 #endif // SETTINGSPAGE_H

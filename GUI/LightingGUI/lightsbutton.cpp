@@ -20,7 +20,7 @@ LightsButton::LightsButton(QWidget *parent) : QWidget(parent) {
 }
 
 
-void LightsButton::setupAsMenuButton(int pageNumber, std::shared_ptr<DataLayer> dataLayer) {
+void LightsButton::setupAsMenuButton(int pageNumber, DataLayer *dataLayer) {
     mIconData = IconData(256, 256, dataLayer);
     if (pageNumber == 0) {
         mIconData.setSolidColor(QColor(0,255,0));
@@ -42,7 +42,7 @@ void LightsButton::setupAsMenuButton(int pageNumber, std::shared_ptr<DataLayer> 
     setLayout(mLayout);
 }
 
-void LightsButton::setupAsStandardButton(ELightingRoutine routine, EColorGroup colorGroup, std::shared_ptr<DataLayer> dataLayer, QString label) {
+void LightsButton::setupAsStandardButton(ELightingRoutine routine, EColorGroup colorGroup, DataLayer *dataLayer, QString label) {
     mIconData = IconData(256, 256, dataLayer);
     mSetupHasBeenCalled = true;
     bool renderIcon = false;

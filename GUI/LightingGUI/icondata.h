@@ -42,7 +42,7 @@ public:
      * \param height the height
      * \param data pointer to the data layer to access array data.
      */
-    IconData(int width, int height, std::shared_ptr<DataLayer> data);
+    IconData(int width, int height, DataLayer *data);
 
     /*!
      * \brief setLightingRoutine use a lighting routine and color group to set up the IconData.
@@ -174,7 +174,7 @@ private:
     /*!
      * \brief mDataLayer a pointer to the data layer.
      */
-    std::shared_ptr<DataLayer> mDataLayer;
+    DataLayer *mDataLayer;
 
     /*!
      * the full data used when rendering an image.
@@ -231,8 +231,7 @@ private:
      * \return A new QColor based on adding the two colors together and dividing
      *         by two.
      */
-    QColor getMiddleColor(QColor first,
-                          QColor second);
+    QColor getMiddleColor(QColor first, QColor second);
 
     /*!
      * \brief mRandomIndividual used by random

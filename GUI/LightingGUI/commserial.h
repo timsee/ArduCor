@@ -23,6 +23,7 @@
 
 class CommSerial : public CommType
 {
+    Q_OBJECT
 public:
     /*!
      * \brief CommSerial Constructor
@@ -67,6 +68,12 @@ public:
      *        staying bound until the computer resets.
      */
     void closeConnection();
+
+    /*!
+     * \brief isConnected returns true if connected, false otherwise.
+     * \return true if connected, false otherwise.
+     */
+    bool isConnected() { return mIsConnected; }
 
 private:
 

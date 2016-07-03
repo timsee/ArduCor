@@ -41,7 +41,7 @@ public:
      */
     void setupAsStandardButton(ELightingRoutine routine,
                                EColorGroup colorGroup,
-                               std::shared_ptr<DataLayer> dataLayer,
+                               DataLayer *dataLayer,
                                QString label = QString(""));
 
     /*!
@@ -51,7 +51,7 @@ public:
      *        its clicked.
      * \param dataLayer pointer to the data layer, which is used for creating the icon.
      */
-    void setupAsMenuButton(int pageNumber, std::shared_ptr<DataLayer> dataLayer);
+    void setupAsMenuButton(int pageNumber, DataLayer *dataLayer);
 
     /*!
      * \brief updateIcon update the icon of the of the lightsbutton.
@@ -119,7 +119,7 @@ private:
     /*!
      * \brief mDataLayer pointer to the data layer of the application
      */
-    std::shared_ptr<DataLayer> mDataLayer;
+    DataLayer *mDataLayer;
 
     /*!
      * the string representation of the text of the QLabel of the button

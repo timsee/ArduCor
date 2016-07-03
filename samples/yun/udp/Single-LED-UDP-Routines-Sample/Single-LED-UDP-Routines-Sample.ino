@@ -7,8 +7,8 @@
  * Provides a UDP interface to a set of lighting routines.
  * by the RoutinesRGB library.
  *
- * Version 1.9.6
- * Date: May 30, 2016
+ * Version 1.9.8
+ * Date: July 3, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -19,14 +19,12 @@
 // Settings
 //================================================================================
 
-const byte R_PIN             = 5;      // SINGLE_LED only
-const byte G_PIN             = 4;      // SINGLE_LED only
-const byte B_PIN             = 3;      // SINGLE_LED only
-const byte IS_COMMON_ANODE   = 1;      // SINGLE_LED only, 0 if common cathode, 1 if common anode
-const int LED_COUNT          = 64;
+const byte R_PIN             = 5;
+const byte G_PIN             = 4;
+const byte B_PIN             = 3;
+const byte IS_COMMON_ANODE   = 1;      // 0 if common cathode, 1 if common anode
 
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
-const byte FADE_SPEED        = 25;     // change rate of solid fade routine, range 1 (fast) - 100 (slow)
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
 
 const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
@@ -197,56 +195,28 @@ void currentLightingRoutine(ELightingRoutine currentMode)
       routines.singleBlink(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
       break;
 
+    case eSingleWave:
+      routines.singleWave(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
+      break;
+         
+    case eSingleGlimmer:
+      routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT);
+      break;
+      
     case eSingleLinearFade:
-      // allow for the color to change independently of the fade animation while setting a color
-      if (last_message_time + light_speed > millis()) {
-        routines.singleLinearFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
-      } else {
-        routines.singleLinearFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
-      }
+      routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, false);
+      break;
+
+    case eSingleSineFade:
+      routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, true);
       break;
 
     case eSingleSawtoothFadeIn:
-      // allow for the color to change independently of the fade animation while setting a color
-      if (last_message_time + light_speed > millis()) {
-        routines.singleSawtoothFadeIn(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
-      } else {
-        routines.singleSawtoothFadeIn(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
-      }
+      routines.singleSawtoothFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, true);
       break;
 
     case eSingleSawtoothFadeOut:
-      // allow for the color to change independently of the fade animation while setting a color
-      if (last_message_time + light_speed > millis()) {
-        routines.singleSawtoothFadeOut(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
-      } else {
-        routines.singleSawtoothFadeOut(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
-      }
-      break;
-      
-    case eSingleSineFade:
-      // allow for the color to change independently of the fade animation while setting a color
-      if (last_message_time + light_speed > millis()) {
-        routines.singleSineFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, false);
-      } else {
-        routines.singleSineFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, FADE_SPEED, true);
-      }
-      break;
-
-    case eSingleGlimmer:
-      if (last_message_time + light_speed > millis()) {
-        routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT, false);
-      } else {
-        routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT, true);
-      }
-      break;
-      
-    case eSingleWave:
-      if (last_message_time + light_speed > millis()) {
-        routines.singleWave(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, BAR_SIZE, false);
-      } else {
-        routines.singleWave(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, BAR_SIZE, true);
-      }
+      routines.singleSawtoothFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, false);
       break;
 
     case eMultiGlimmer:
@@ -319,8 +289,8 @@ void parsePacket(int header)
     case eMainColorChange:
       if (parsed_packet.count == 4) {
         if (parsed_packet.values[1] != routines.mainColor().red 
-        || parsed_packet.values[2] != routines.mainColor().green 
-        || parsed_packet.values[3] != routines.mainColor().blue) {
+          || parsed_packet.values[2] != routines.mainColor().green 
+          || parsed_packet.values[3] != routines.mainColor().blue) {
           // Reset to 0 to draw to screen right away
           loop_counter = 0;
           success = true;
@@ -334,9 +304,14 @@ void parsePacket(int header)
       if (parsed_packet.count == 5) {
         int color_index = parsed_packet.values[1];
         if (color_index >= 0 && color_index < eLightingRoutine_MAX) {
-          // Reset to 0 to draw to screen right away
-          loop_counter = 0;
-          success = true;
+          success = true;         
+          
+          // only tell the routines to reset themselves if a custom routine is used. 
+          if ((current_routine > eSingleSawtoothFadeOut)
+              && (current_group == eCustom)) {
+            // Reset LEDS
+            loop_counter = 0;
+          }
           routines.setColor(color_index, 
                             parsed_packet.values[2], 
                             parsed_packet.values[3], 
@@ -378,11 +353,9 @@ void parsePacket(int header)
       break;
    case eResetSettingsToDefaults:
       if (parsed_packet.count == 3) {
-        // reset is based off of a sequence of 3 bytes
-        // and the message must be exactly this size.
-        // this prevents buffer issues from causing
-        // false positives on just one byte message 
-        // sizes. 
+        // reset requires a message with exactly 2 parameters:
+        // 42 and 71. This drops the probability of buffer 
+        // issues causing causing false positives.
         if ((parsed_packet.values[1] == 42) 
             && (parsed_packet.values[2] == 71)) {
             success = true;

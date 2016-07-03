@@ -65,5 +65,11 @@
 * Added support for 4 new single color routines. 
 * Fixed warnings.
 
+### **v0.9.2** 
+#### Phillips Hue Update
+* Added support for the Phillips Hue. 
+* Added discovery methods for the Hue Bridge.
+* Refactored code to support more types of connections. 
+* Fixed bugs.
 
 

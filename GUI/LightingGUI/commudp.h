@@ -14,6 +14,7 @@
 
 class CommUDP : public CommType
 {
+    Q_OBJECT
 public:
     /*!
      * \brief CommUDP Constructor

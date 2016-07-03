@@ -38,18 +38,18 @@ void SingleColorPage::setupButtons() {
                                        "Wave",
                                        "Glimmer",
                                        "Linear Fade",
+                                       "Sine Fade",
                                        "Sawtooth In",
-                                       "Sawtooth Out",
-                                       "Sine Fade"};
+                                       "Sawtooth Out"};
 
     std::vector<LightsButton *> buttons = {ui->solidButton,
                                            ui->blinkButton,
                                            ui->waveButton,
                                            ui->glimmerButton,
                                            ui->fadeButton,
+                                           ui->sineFadeButton,
                                            ui->sawtoothInButton,
-                                           ui->sawtoothOutButton,
-                                           ui->sineFadeButton};
+                                           ui->sawtoothOutButton};
 
     mRoutineButtons = std::shared_ptr<std::vector<LightsButton*> >(new std::vector<LightsButton*>(buttons.size(), nullptr));
     for (int i = 0; i < (int)mRoutineButtons->size(); ++i) {
@@ -74,12 +74,12 @@ void SingleColorPage::highlightRoutineButton(ELightingRoutine routine) {
         ui->glimmerButton->button->setChecked(true);
     } else if (routine == ELightingRoutine::eSingleLinearFade) {
         ui->fadeButton->button->setChecked(true);
+    } else if (routine == ELightingRoutine::eSingleSineFade) {
+        ui->sineFadeButton->button->setChecked(true);
     } else if (routine == ELightingRoutine::eSingleSawtoothFadeIn) {
         ui->sawtoothInButton->button->setChecked(true);
     } else if (routine == ELightingRoutine::eSingleSawtoothFadeOut) {
         ui->sawtoothOutButton->button->setChecked(true);
-    } else if (routine == ELightingRoutine::eSingleSineFade) {
-        ui->sineFadeButton->button->setChecked(true);
     }
 }
 
@@ -103,9 +103,9 @@ void SingleColorPage::colorChanged(QColor color) {
             || mData->currentRoutine() == ELightingRoutine::eSingleWave
             || mData->currentRoutine() == ELightingRoutine::eSingleGlimmer
             || mData->currentRoutine() == ELightingRoutine::eSingleLinearFade
+            || mData->currentRoutine() == ELightingRoutine::eSingleSineFade
             || mData->currentRoutine() == ELightingRoutine::eSingleSawtoothFadeIn
-            || mData->currentRoutine() == ELightingRoutine::eSingleSawtoothFadeOut
-            || mData->currentRoutine() == ELightingRoutine::eSingleSineFade)) {
+            || mData->currentRoutine() == ELightingRoutine::eSingleSawtoothFadeOut)) {
         mData->currentRoutine(ELightingRoutine::eSingleGlimmer);
         mComm->sendRoutineChange(ELightingRoutine::eSingleGlimmer);
     }
@@ -124,5 +124,10 @@ void SingleColorPage::colorChanged(QColor color) {
 
 void SingleColorPage::showEvent(QShowEvent *) {
   highlightRoutineButton(mData->currentRoutine());
+  if (mComm->currentCommType() == ECommType::eHue) {
+      ui->colorPicker->useHueWheel(true);
+  } else {
+      ui->colorPicker->useHueWheel(false);
+  }
 }
 

@@ -79,5 +79,10 @@
 * Tested and added Linux support to GUI.
 * Fixed bugs.
 
-
+### **v1.9.8** 
+#### Phillips Hue Update
+* Added support for the Phillips Hue to the GUI. 
+* Refactored GUI code to support more types of connections.
+* Cleaned up API of the Arduino library.
+* Fixed bugs.
 

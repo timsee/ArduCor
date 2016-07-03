@@ -154,6 +154,21 @@ public:
      */
     void resetToDefaults();
 
+    /*!
+     * \brief multiLightMode toggles between a GUI set up to do a single light at a time
+     *        to a GUI set up to connect to a single piece of hardware at a time, and a
+     *        GUI set up to connect to multiple groups of varying sizes.
+     * \param setToMultiLightMode true sets the GUI to multi light mode, false sets it to
+     *        single light mode.
+     */
+    void multiLightMode(bool setToMultiLightMode);
+
+    /*!
+     * \brief multiLightMode returns true if in multi light mode, false othewrise.
+     * \return true if in multi light mode, false othewrise.
+     */
+    bool multiLightMode();
+
 private:
 
     /*!
@@ -203,6 +218,11 @@ private:
      * \brief mSpeed the current speed value of the arduino.
      */
     int mSpeed;
+
+    /*!
+     * \brief mIsMultiLightMode true if in multi light mode, false othewrise.
+     */
+    bool mIsMultiLightMode;
 };
 
 #endif // DATALAYER_H

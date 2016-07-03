@@ -4,5 +4,6 @@
         <file>images/color_wheel.png</file>
         <file>images/icon.ico</file>
         <file>images/icon.icns</file>
+        <file>images/hue_wheel.png</file>
     </qresource>
 </RCC>

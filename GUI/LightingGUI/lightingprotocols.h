@@ -53,23 +53,23 @@ enum class ELightingRoutine
     eSingleLinearFade,
     /*!
      * <b>6</b><br>
-     * <i>fades in starting at 0 brightness and  increases a constant rate.
-     * Once it reaches  full brightness, it resets back to zero and repeats.</i>
-     */
-    eSingleSawtoothFadeIn,
-    /*!
-     * <b>7</b><br>
-     * <i>fades out starting at 0 brightness and decreases at a constant rate.
-     *  Once it reaches 0, it resets back to full brightness and repeats.</i>
-     */
-    eSingleSawtoothFadeOut,
-    /*!
-     * <b>8</b><br>
      * <i>Uses a sine function to fade in and out. This makes it spend more time near the
      *  extremes of full brightness and very dim light, and less time in the mid range.
      *  of the LEDs.</i>
      */
     eSingleSineFade,
+    /*!
+     * <b>7</b><br>
+     * <i>fades in starting at 0 brightness and  increases a constant rate.
+     * Once it reaches  full brightness, it resets back to zero and repeats.</i>
+     */
+    eSingleSawtoothFadeIn,
+    /*!
+     * <b>8</b><br>
+     * <i>fades out starting at 0 brightness and decreases at a constant rate.
+     *  Once it reaches 0, it resets back to full brightness and repeats.</i>
+     */
+    eSingleSawtoothFadeOut,
     /*!
      * <b>9</b><br>
      * <i> Uses the first color of the array as the base color
@@ -270,4 +270,5 @@ enum class EPacketHeader
   eResetSettingsToDefaults,
   ePacketHeader_MAX //total number of Packet Headers
 };
+
 #endif // LIGHTINGPROTOCOLS_H

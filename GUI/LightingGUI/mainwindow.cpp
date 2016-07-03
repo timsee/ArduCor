@@ -18,14 +18,17 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
+    mComm = new CommLayer(this);
+    mData = new DataLayer();
+
     ui->setupUi(this);
     this->setWindowTitle("Corluma");
 
     // --------------
     // Setup Backend
     // --------------
-    mData = std::shared_ptr<DataLayer>(new DataLayer());
-    mComm =std::shared_ptr<CommLayer>(new CommLayer());
+   // mComm =std::shared_ptr<CommLayer>(new CommLayer(this));
+    mComm->mData = mData;
     ui->singleColorPage->setup(mComm, mData);
     ui->customColorsPage->setup(mComm, mData);
     ui->presetColorsPage->setup(mComm, mData);
@@ -33,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->singleColorPage->setupButtons();
     ui->customColorsPage->setupButtons();
     ui->presetColorsPage->setupButtons();
+    ui->settingsPage->setupUI();
 
     // --------------
     // Setup Pages
@@ -109,7 +113,7 @@ void MainWindow::toggleOnOff() {
         mIsOn = false;
         mComm->sendRoutineChange(ELightingRoutine::eOff);
     } else {
-        if (mData->currentRoutine() <= ELightingRoutine::eSingleSineFade) {
+        if (mData->currentRoutine() <= ELightingRoutine::eSingleSawtoothFadeOut) {
             mIconData.setSolidColor(mData->mainColor());
         } else if (mData->currentColorGroup() > EColorGroup::eCustom) {
             mIconData.setLightingRoutine(ELightingRoutine::eMultiFade, mData->currentColorGroup());
@@ -162,7 +166,7 @@ void MainWindow::updateMenuBar() {
         mIconData.setMultiFade(EColorGroup::eCustom, true);
         ui->customArrayButton->updateIcon();
         ui->brightnessSlider->setSliderColorBackground(mData->colorsAverage(EColorGroup::eCustom));
-    } else if (mData->currentRoutine() <= ELightingRoutine::eSingleSineFade) {
+    } else if (mData->currentRoutine() <= ELightingRoutine::eSingleSawtoothFadeOut) {
         mIconData.setSolidColor(mData->mainColor());
         ui->singleColorButton->updateIcon();
         ui->brightnessSlider->setSliderColorBackground(mData->mainColor());
