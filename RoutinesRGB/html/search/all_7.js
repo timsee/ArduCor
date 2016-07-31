@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lightingprotocols_2eh',['LightingProtocols.h',['../a00003.html',1,'']]]
+  ['ison',['isOn',['../a00006.html#ga2d0f347d562209514b342609c22da997',1,'RoutinesRGB']]]
 ];

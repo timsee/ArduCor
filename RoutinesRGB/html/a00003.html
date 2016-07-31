@@ -24,7 +24,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">RoutinesRGB
-   &#160;<span id="projectnumber">v1.9.8</span>
+   &#160;<span id="projectnumber">v2.0.0</span>
    </div>
   </td>
  </tr>
@@ -39,6 +39,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -152,18 +153,21 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="a00003.html#a28121d682969dd1cd2ea53db86213952a3172436e0ff40c1288321f8217944976">eSpeedChange</a>, 
 <a class="el" href="a00003.html#a28121d682969dd1cd2ea53db86213952ac09ad6c082f2a5dbee5295dbe9487713">eCustomColorCountChange</a>, 
 <a class="el" href="a00003.html#a28121d682969dd1cd2ea53db86213952a66eac43db7f4eefe5cd444f36e5b0a72">eIdleTimeoutChange</a>, 
-<a class="el" href="a00003.html#a28121d682969dd1cd2ea53db86213952ad6d1c0b338f9fc38b8f6ccd991047504">eResetSettingsToDefaults</a>
+<a class="el" href="a00003.html#a28121d682969dd1cd2ea53db86213952adc59777d395732b01b064252aa743994">eStateUpdateRequest</a>, 
+<br />
+&#160;&#160;<a class="el" href="a00003.html#a28121d682969dd1cd2ea53db86213952ad6d1c0b338f9fc38b8f6ccd991047504">eResetSettingsToDefaults</a>
 <br />
  }</td></tr>
 <tr class="separator:a28121d682969dd1cd2ea53db86213952"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><dl class="section version"><dt>Version</dt><dd>v1.9.8 </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>July 3, 2016 </dd></dl>
+<div class="textblock"><dl class="section version"><dt>Version</dt><dd>v2.0.0 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>July 31, 2016 </dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Tim Seemann </dd></dl>
 <dl class="section copyright"><dt>Copyright</dt><dd><a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">MIT License </a></dd></dl>
-<p>This file defines the protocols used for the Arduino libraries and the GUI.</p>
-<p>A slightly modified version of this file exists in the Qt GUI project. None of the modifications change the naming, documentation, or order of the protocols. Instead, the changes allow the GUI version to use the strongly typed enums that were made available in C++11. </p>
+<p>This file defines the protocols used for the sample sketches.</p>
+<p>This file also gets copied to other projects as part of integrating with this project. For example, the <a href="https://github.com/timsee/Corluma">Corluma</a> project has a C++ version of this file. If packets between the two projects seem mixed up, check that the version of the Corluma App you are using matches the version of the your <a class="el" href="a00001.html" title="An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware...">RoutinesRGB</a> library.</p>
+<p>Protocol Version: 1.0 </p>
 </div><h2 class="groupheader">Enumeration Type Documentation</h2>
 <a class="anchor" id="aacfa5db0b5684d40790252d6a2df61d6"></a>
 <div class="memitem">
@@ -366,8 +370,12 @@ Enumerations</h2></td></tr>
 <p><b>6</b><br />
  <em>Set to 0 to turn off, set to any other number minutes until idle timeout happens.</em> </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="a28121d682969dd1cd2ea53db86213952ad6d1c0b338f9fc38b8f6ccd991047504"></a>eResetSettingsToDefaults&#160;</td><td class="fielddoc">
+<tr><td class="fieldname"><a class="anchor" id="a28121d682969dd1cd2ea53db86213952adc59777d395732b01b064252aa743994"></a>eStateUpdateRequest&#160;</td><td class="fielddoc">
 <p><b>7</b><br />
+ <em>Sends back a packet that contains basic LED state information.</em> </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a28121d682969dd1cd2ea53db86213952ad6d1c0b338f9fc38b8f6ccd991047504"></a>eResetSettingsToDefaults&#160;</td><td class="fielddoc">
+<p><b>8</b><br />
  <em>Resets all values inside of <a class="el" href="a00001.html" title="An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware...">RoutinesRGB</a> back to their default values. Useful for soft reseting the LED hardware. </em> </p>
 </td></tr>
 </table>

@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['these_20methods_20can_20be_20called_20after_20a_20routine_20is_20chosen',['These methods can be called after a routine is chosen',['../a00009.html',1,'']]]
+  ['red',['red',['../a00006.html#gad48fd862e9444d709bd6de96b6f22bd1',1,'RoutinesRGB']]],
+  ['resettodefaults',['resetToDefaults',['../a00001.html#ae88e557e7c4b63784fb25cdd3ccd6391',1,'RoutinesRGB']]],
+  ['routinesrgb',['RoutinesRGB',['../a00001.html',1,'RoutinesRGB'],['../a00001.html#a47bf1a0019b91a0d5d15e8f13f444aa5',1,'RoutinesRGB::RoutinesRGB()']]]
 ];
