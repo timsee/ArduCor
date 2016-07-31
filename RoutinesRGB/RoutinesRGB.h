@@ -1,4 +1,3 @@
-
 #ifndef RoutinesRGB_h
 #define RoutinesRGB_h
 
@@ -6,8 +5,8 @@
 #include "LightingProtocols.h"
 
 /*!
- * \version v1.9.8
- * \date July 3, 2016
+ * \version v2.0.0
+ * \date July 31, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -46,7 +45,7 @@
  * vary from hardware to hardware, but for a NeoPixels sample, it would look something like this:
  *
  * ~~~~~~~~~~~~~~~~~~~~~
- * routines.applyBrightness(); // Optional. sets how bright the LEDs shine, based off of the brightness setting.
+ * routines.applyBrightness();  // Optional. Dims the LEDs based on the routines.brightness() setting
  * for (int x = 0; x < LED_COUNT; x++) {
  *    pixels.setPixelColor(x, pixels.Color(routines.red(x),
  *                                         routines.green(x),
@@ -92,6 +91,12 @@ public:
      */
     void resetToDefaults();
     
+    /*!
+     *  Turns off all the LEDs. To turn the lights back on, call any other
+     *  light routine. 
+     */
+    void turnOff();
+
     //================================================================================
     // Getters and Setters
     //================================================================================
@@ -100,7 +105,7 @@ public:
      *  the settings and the colors.
      *  @{
      */
-    
+
     /*!
      * Sets the color used for single color routines. This is automatically 
      * called by each routine. Returns false if the new main color matches
@@ -108,13 +113,13 @@ public:
      *
      * \return true if a new color is set, false if the input matches the current color.
      */
-    bool setMainColor(byte r, byte g, byte b);
+    bool setMainColor(uint8_t r, uint8_t g, uint8_t b);
     
     /*!
      * Set the color in the custom color array at the provided index. colorIndex must be
      * less than the size of the custom color array or else it won't have any effect.
      */
-    void setColor(uint16_t colorIndex, byte r, byte g, byte b);
+    void setColor(uint16_t colorIndex, uint8_t r, uint8_t g, uint8_t b);
     
     /*!
      * Sets the amount of colors used in custom multi color routines. The value given must 
@@ -122,20 +127,31 @@ public:
      * array. 
      */
     void setCustomColorCount(uint8_t count);
-    
+
+    /*!
+     * Returns true if the LEDs are on, false if they are off.
+     */
+    boolean isOn() { return m_is_on; }
+
     /*!
      * Retrieve the amount of colors that are used from the custom array. 
      */
     uint8_t customColorCount();
         
     /*!
-     * Set the brightness between 0 and 100. 0 is off, 100 is full power.
+     * Set the brightness between 0 and 100. 0 is off, 100 is full brightness.
      */
     void brightness(uint8_t brightness);
     
     /*!
-     * Sets the speed of routines that fade between colors between 1 and 100.
-     * A fade speed of 1 is the slowest possible fade.
+     * Retrieve the brightness level, which is a value between 0 and 100 where
+     * 100 is full brightness. 
+     */
+    int brightness() { return m_bright_level; }
+
+    /*!
+     * Sets the speed of routines that fade between colors between 1 and 200.
+     * A fade speed of 200 is the slowest possible fade.
      */
     void fadeSpeed(uint8_t fadeSpeed);
     
@@ -226,9 +242,8 @@ public:
     void singleWave(uint8_t red, uint8_t green, uint8_t blue);
   
     /*!
-     * Set every LED to the provided color. A subset of the LEDs
-     * based on the percent parameter will be less bright than the
-     * rest of the LEDs.
+     * Set every LED to the provided color. A subset of the LEDs based on the 
+     * percent parameter will be less bright than the rest of the LEDs.
      *
      * \param red strength of red LED, between 0 and 255
      * \param green strength of green LED, between 0 and 255
@@ -240,8 +255,8 @@ public:
     
     /*!
      * Fades the LEDs in and out based on the provided color.
-     * Can fade in two ways: linear and sine. If isSine is set to false, the interval
-     * between each update is constant. If isSine is true, a sine wave is used to generate
+     * Can fade in two ways: linear and sine. If `isSine` is set to false, the interval
+     * between each update is constant. If `isSine` is true, a sine wave is used to generate
      * the intervals, resulting in lights that stay on near their full brightness for longer.
      *
      * \param red strength of red LED, between 0 and 255
@@ -264,6 +279,7 @@ public:
      *        it fades from maximum brightness to darkness.
      */
     void singleSawtoothFade(uint8_t red, uint8_t green, uint8_t blue, bool fadeIn);
+
 
 
     /*! @} */
@@ -343,9 +359,10 @@ public:
     //================================================================================
     // Post Processing 
     //================================================================================
-    /*! @defgroup postProcessing These methods can be called after a routine is chosen
-     *  but before the routines get displayed to the LEDs. They add special effects
-     *  to the routines. 
+    /*! @defgroup postProcessing Post Processing
+     *
+     *  These methods can be called after a routine is chosen but before the routines 
+     *  get displayed to the LEDs. They add special effects to the routines. 
      */
 
     /*!
@@ -378,6 +395,7 @@ private:
     // be used in a routine.
     uint8_t  m_custom_count;
 
+    // these variables are checked in every preproces step
     ELightingRoutine m_current_routine;
     EColorGroup  m_current_group;
     
@@ -397,6 +415,7 @@ private:
     uint8_t  m_blink_speed;
     boolean  m_brightness_flag;
     boolean  m_preprocess_flag;
+    boolean  m_is_on;
    
     // temp values
     uint8_t *m_temp_buffer;
@@ -411,12 +430,15 @@ private:
     
     // variables used by specific routines
     Color    m_goal_color;
-    boolean  m_start_next_fade;
+    int      m_red_diff;
+    int      m_green_diff;
+    int      m_blue_diff;
+    uint8_t  m_fade_counter;
     uint16_t m_loop_index;
     uint8_t  m_loop_count;
     uint8_t  m_scale_factor;
-    uint8_t  m_difference;
     uint8_t  m_repeat_index;
+
     uint8_t  m_possible_array_color;
     
     // index for loops and other iterators
@@ -451,14 +473,6 @@ private:
      */
     void movingBufferSetup(uint16_t colorCount, byte groupSize, uint8_t startingValue = 0);
     
-    /*!
-     * Helper for fading between two predetermined channels
-     * of an overall color for array fade routines.
-     *
-     * \param fadeChannel the input channel.
-     * \param destinationChannel the goal value of the input. 
-     */
-    uint16_t fadeBetweenValues(uint16_t fadeChannel, uint16_t destinationChannel);
     
     /*!
      * Chooses a random different color from the array of colors. Stores resulting color in
@@ -471,7 +485,17 @@ private:
      *        For example, if this is set to true and the last time a value was chosen it chose
      *        2, then the next value will be anything else in the range except 2. 
      */
-    void chooseRandomFromArray(Color* array, uint8_t max_index, boolean canRepeat); 
+    void chooseRandomFromArray(Color *array, uint8_t max_index, boolean canRepeat); 
+
+    /*!
+     * Uses memset to change every value in the r_buffer to r, the g_buffer to g, and the b_buffer
+     * to b. All previous colors in the buffers will be overwritten by this function call.
+     *
+     * \param r the new value for all red LEDs.
+     * \param g the new value for all green LEDs.
+     * \param b the new value for all blue LEDs.
+     */
+    void fillColorBuffers(uint8_t r, uint8_t g, uint8_t b);
 };
 
-#endif
+#endif //RoutinesRGB_h

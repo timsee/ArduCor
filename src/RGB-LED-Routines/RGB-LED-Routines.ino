@@ -1,7 +1,7 @@
 #define IS_RAINBOWDUINO 0 
 #define IS_NEOPIXELS 1 
 #define IS_SINGLE_LED 0 
-#define IS_CUSTOM 0 
+#define IS_MULTI 0 
 #define IS_SERIAL 1 
 #define IS_HTTP 0 
 #define IS_UDP 0 
@@ -10,12 +10,11 @@
  * Sample Sketch
  *
  * DESCRIPTION_PLACEHOLDER
- *
+ * 
  * COM_PLACEHOLDER
- * by the RoutinesRGB library.
  *
- * Version 1.9.8
- * Date: July 3, 2016
+ * Version 2.0.0
+ * Date: July 31, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -33,10 +32,9 @@
 #if IS_UDP
 #include <Bridge.h>
 #endif
-#if IS_CUSTOM
+#if IS_MULTI
 #include <SoftwareSerial.h>
 #include <Adafruit_NeoPixel.h>
-#include <SoftwareSerial.h>
 #endif
 
 //================================================================================
@@ -45,124 +43,168 @@
 
 #if IS_NEOPIXELS
 const byte CONTROL_PIN       = 6;      // pin used by NeoPixels library
-const int LED_COUNT          = 64;
+const int  LED_COUNT         = 64;
 #endif
 #if IS_RAINBOWDUINO
-const int LED_COUNT          = 64;
+const int  LED_COUNT         = 64;
 #endif
 #if IS_SINGLE_LED
-const byte R_PIN             = 5;
-const byte G_PIN             = 4;
-const byte B_PIN             = 3;
+const byte R_PIN             = 6;
+const byte G_PIN             = 5;
+const byte B_PIN             = 4;
+const int  LED_COUNT         = 1;
 const byte IS_COMMON_ANODE   = 1;      // 0 if common cathode, 1 if common anode
 #endif
-#if IS_CUSTOM
+#if IS_MULTI
 const byte CONTROL_PIN       = 5;
-const byte CUBE_IN           = 4;
-const byte CUBE_OUT          = 3;
-const int LED_COUNT          = 120;
+const int  LED_COUNT         = 120;
 #endif
 
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
 
 #if IS_SERIAL
-const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
+const byte DELAY_VALUE       = 3;      // amount of sleep time between loops
 #endif
 #if IS_UDP
-const byte DELAY_VALUE       = 3;      // amount of sleep time between loops 
+const byte DELAY_VALUE       = 3;      // amount of sleep time between loops
 #endif
 #if IS_HTTP
-const byte DELAY_VALUE       = 50;     // amount of sleep time between loops 
+const byte DELAY_VALUE       = 50;     // amount of sleep time between loops
 #endif
 
-const int DEFAULT_SPEED      = 300;    // default delay for LEDs update, suggested range: 10 (super fast) - 1000 (slow). 
-const int DEFAULT_TIMEOUT    = 120;    // number of minutes without packets until the arduino times out.
+const int  DEFAULT_SPEED     = 300;    // default delay for LEDs update, suggested range: 10 (fast) - 1000 (slow).
+const int  DEFAULT_TIMEOUT   = 120;    // number of minutes without packets until the arduino times out.
+
+const int  DEFAULT_HW_INDEX  = 1;      // index for this particular microcontroller
+#if IS_NEOPIXELS
+const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
+#endif
+#if IS_RAINBOWDUINO
+const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
+#endif
+#if IS_SINGLE_LED
+const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
+#endif
+#if IS_MULTI
+const int  MAX_HW_INDEX      = 3;      // multi sample gives access to 3 different LED devices
+#endif
 
 //=======================
 // Stored Values and States
 //=======================
 
-// checked on each frame to see how the LEDs should update
 ELightingRoutine current_routine = eSingleGlimmer;
-EColorGroup  current_group = eCustom;
+#if IS_MULTI
+ELightingRoutine current_routine_2 = eSingleGlimmer;
+#endif
+EColorGroup current_group = eCustom;
+#if IS_MULTI
+EColorGroup current_group_2    = eCustom;
+EColorGroup current_group_cube = eCustom;
+#endif
 
-// contrary to popular belief, light_speed != MC^2. Instead, it is the delay
-// between updates of the LEDs. Calculate it by DEFAULT_SPEED * 10msec
-int light_speed = (int)((1000.0f / DELAY_VALUE) / (DEFAULT_SPEED / 100.0f));
+// used in sketches with multiple hardware connected to one arduino.
+uint8_t received_hardware_index;
+uint8_t hardware_index = DEFAULT_HW_INDEX;
+
+// value determines how quickly the LEDs udpate. Lower values lead to faster updates
+int update_speed = (int)((1000.0 / DELAY_VALUE) / (DEFAULT_SPEED / 100.0));
+#if IS_MULTI
+int update_speed_2 = (int)((1000.0 / DELAY_VALUE) / (DEFAULT_SPEED / 100.0));
+#endif
 
 // timeout variables
 unsigned long idle_timeout = (unsigned long)DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
+#if IS_MULTI
+unsigned long idle_timeout_2 = (unsigned long)DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
+#endif
 unsigned long last_message_time = 0;
 
 // counts each loop and uses it to determine
 // when to update the LEDs.
 unsigned long loop_counter = 0;
+String currentPacket;
 
 #if IS_UDP
-// used for communication over the Bridge Library
-String lastString = "";
+// used for communication over the Bridge Library 
+String lastString; 
 char buffer[25];
+#endif
+#if IS_HTTP
+BridgeClient client;
 #endif
 
 //=======================
 // String Parsing
 //=======================
 
-// the current packet being parsed by the loop() function
-String currentPacket;
 // flag ued by parsing system. if TRUE, continue parsing, if FALSE,
 // packet is either illegal, a repeat, or empty and parsing can be skipped.
 bool packetReceived = false;
 
-// delimiter used to break up values sent as strings over serial.
-char delimiter = ',';
+char char_array[30];
+int packet_int_array[10];
+int int_array_size = 0;
 
-// struct that stores parsed values
-struct ParsedIntPacket
-{
-  int* values;  // array of values
-  byte count;   // count of values
-  byte isValid;
-};
+char num_buf[4];
 
-// temporary values used by the string parsing system
-ParsedIntPacket parsed_packet;
-uint8_t delimited_packet_size = 0;
-uint8_t delimited_counter = 0;
-uint8_t delimited_index = 0;
-String delimited_string;
-
-// function prototype to compile with struct
-ParsedIntPacket delimitedStringToIntArray(String message);
-
+#if IS_RAINBOWDUINO
 //=======================
 // RoutinesRGB Setup
 //=======================
-
 // Library used to generate the RGB LED routines.
 RoutinesRGB routines = RoutinesRGB(LED_COUNT);
+#endif
+#if IS_NEOPIXELS
+//=======================
+// RoutinesRGB Setup
+//=======================
+// Library used to generate the RGB LED routines.
+RoutinesRGB routines = RoutinesRGB(LED_COUNT);
+#endif
+#if IS_SINGLE_LED
+//=======================
+// RoutinesRGB Setup
+//=======================
+// Library used to generate the RGB LED routines.
+RoutinesRGB routines = RoutinesRGB(LED_COUNT);
+#endif
 
 #if IS_NEOPIXELS
 //=======================
 // Hardware Setup
 //=======================
 
-//NOTE: you may need to change the NEO_GRB or NEO_KHZ2800 for this sample to work with your lights. 
+//NOTE: you may need to change the NEO_GRB or NEO_KHZ2800 for this sample to work with your lights.
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
 #endif
-#if IS_CUSTOM
+#if IS_MULTI
 //=======================
 // Hardware Setup
 //=======================
-
+/*
+ * This demo sketch shows routines that use these indices for their light groups:
+ *    1 (routines)   :  first half of a 2 meter neopixel strip
+ *    2 (routines_2) :  second half of 2 meter neopixel strip
+ *    3 (cube_serial):  another microcontroller attached via serial running its own sample sketch.
+ *
+ * For the microcontroller attached in 3, the sample sketch can be any of the four serial-based
+ * samples, but it's DEFAULT_HW_INDEX needs to be changed to 3.
+ */
 // NeoPixels controller object
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(120, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
 
-SoftwareSerial cubeSerial(CUBE_IN, CUBE_OUT); // RX, TX
+uint8_t routines_2_index  = DEFAULT_HW_INDEX + 1;
+uint8_t cube_serial_index = DEFAULT_HW_INDEX + 2;
+
+RoutinesRGB routines = RoutinesRGB(LED_COUNT / 2);
+RoutinesRGB routines_2 = RoutinesRGB(LED_COUNT / 2);
+
+SoftwareSerial cube_serial(10, 11); // RX, TX
+
 #endif
 #if IS_HTTP
-
 BridgeServer server;
 #endif
 
@@ -183,10 +225,11 @@ void setup()
   pinMode(G_PIN, OUTPUT);
   pinMode(B_PIN, OUTPUT);
 #endif
-#if IS_CUSTOM
+#if IS_MULTI
   pixels.begin();
-  cubeSerial.begin(19200); 
-  while (!cubeSerial);
+  cube_serial.begin(19200);
+  // wait for connection to light cube
+  while (!cube_serial);
 #endif
 
 #if IS_HTTP
@@ -194,76 +237,128 @@ void setup()
   server.listenOnLocalhost();
   server.begin();
 #endif
-#if IS_UDP
-  Bridge.begin();
-#endif
   // choose the default color for the single
   // color routines. This can be changed at any time.
-  // and its set it to green in sample routines. 
-  // If its not set, it defaults to a faint orange. 
+  // and its set it to green in sample routines.
+  // If its not set, it defaults to a faint orange.
   routines.setMainColor(0, 255, 0);
-
+#if IS_MULTI
+  routines_2.setMainColor(0, 255, 0);
+#endif
+#if IS_UDP
+  Bridge.begin();
+  Bridge.put("hardware_count", itoa(MAX_HW_INDEX, num_buf, sizeof(num_buf)));
+  Bridge.put("state_update", buildStateUpdatePacket());
+#endif
+#if IS_SERIAL
   // put your setup code here, to run once:
   Serial.begin(19200);
+#endif
 }
 
 void loop()
 {
- packetReceived = false;
+  packetReceived = false;
 #if IS_SERIAL
   if (Serial.available()) {
     currentPacket = Serial.readStringUntil(';');
-    // remove any extraneous whitepsace or newline characters
-    packetReceived = true;
+    if (currentPacket.substring(0, 16).equals("DISCOVERY_PACKET")) {
+      Serial.print("DISCOVERY_PACKET,");
+      Serial.print(MAX_HW_INDEX);
+      Serial.print(",");
+      Serial.println(buildStateUpdatePacket());
+    } else {
+      packetReceived = true;
+    }
   }
 #endif
 #if IS_HTTP
-  BridgeClient client = server.accept();
+  client = server.accept();
   if (client) {
     currentPacket = client.readStringUntil('/');
-    client.stop();
-    packetReceived = true;
+    if (currentPacket.substring(0, 16).equals("DISCOVERY_PACKET")) {
+      client.print("DISCOVERY_PACKET,");
+      client.print(MAX_HW_INDEX);
+      client.print(",");
+      client.println(buildStateUpdatePacket());
+    } else {
+      client.println(currentPacket); // echo packet back
+      packetReceived = true;
+    }
   }
 #endif
 #if IS_UDP
-  Bridge.get("udp", buffer, 25); 
-  String tempString(buffer);
-  if (tempString != lastString) {
-    currentPacket = tempString; 
-    lastString = currentPacket;
-    packetReceived = true;
-  }
+  Bridge.get("udp", buffer, 25);
+  currentPacket = String(buffer);
+  if (currentPacket != lastString) { 
+    lastString = currentPacket; 
+    packetReceived = true; 
+  } 
 #endif
   if (packetReceived) {
+    // remove any extraneous whitepsace or newline characters
     currentPacket.trim();
-#if IS_CUSTOM
-    String repeatString = currentPacket + ";";
-    cubeSerial.println(repeatString);
-#endif
-    parsed_packet = delimitedStringToIntArray(currentPacket);
+    bool isValid = delimitedStringToIntArray(currentPacket);
     // parse a paceket only if its header is is in the correct range
-    if (parsed_packet.isValid
-        && (parsed_packet.count > 0)
-        && (parsed_packet.values[0] < ePacketHeader_MAX)) {
-      parsePacket(parsed_packet.values[0]);
+    if (isValid
+        && (int_array_size > 0)
+        && (packet_int_array[0] < ePacketHeader_MAX)) {
+     if(parsePacket(packet_int_array[0])) {
+#if IS_SERIAL
+      Serial.println(currentPacket + ";");
+#endif
+      last_message_time = millis();
+    }
+#if IS_MULTI
+      cube_serial.println(currentPacket + ";");
+#endif
     }
   }
 
-  if (!(loop_counter % light_speed)) {
-    currentLightingRoutine(current_routine);
-    routines.applyBrightness(); // Optional. uses brightness setting
+  if (!(loop_counter % update_speed)) {
+    changeLightingRoutine(current_routine);
+    routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
+#if IS_RAINBOWDUINO
     updateLEDs();
+#endif
+#if IS_NEOPIXELS
+    updateLEDs();
+#endif
+#if IS_SINGLE_LED
+    updateLEDs();
+#endif
+  }
+#if IS_MULTI
+  if (!(loop_counter % update_speed_2)) {
+    changeLightingRoutine_2(current_routine_2);
+    routines_2.applyBrightness(); // Optional. Dims the LEDs based on the routines_2.brightness() setting
   }
 
+  // update happens here for edge case handling
+  if (!(loop_counter % update_speed_2) || !(loop_counter % update_speed)) {
+    updateLEDs();
+  }
+#endif
+
   // Timeout the LEDs.
-  if ((idle_timeout != 0) && 
-      (last_message_time + idle_timeout < millis())) {
+  if ((idle_timeout != 0)
+      && (last_message_time + idle_timeout < millis())) {
     routines.singleSolid(0, 0, 0);
     current_routine = eOff;
   }
+#if IS_MULTI
+  if ((idle_timeout_2 != 0)
+      && (last_message_time + idle_timeout_2 < millis())) {
+    routines_2.singleSolid(0, 0, 0);
+    current_routine_2 = eOff;
+  }
+#endif
 
   loop_counter++;
   delay(DELAY_VALUE);
+#if IS_HTTP
+  client.stop();
+#endif
 }
 
 
@@ -308,17 +403,24 @@ void updateLEDs()
   }
 }
 #endif
-#if IS_CUSTOM
+#if IS_MULTI
 void updateLEDs()
 {
-  for(int x = 0; x < LED_COUNT; x++) 
-    {
-     pixels.setPixelColor(x, pixels.Color(routines.red(x),
-                                          routines.green(x),
-                                          routines.blue(x)));
-    }
-    // Neopixels use the show function to update the pixels
-    pixels.show();
+  for (int x = 0; x < LED_COUNT / 2; x++) {
+    pixels.setPixelColor(x, pixels.Color(routines.red(x),
+                                         routines.green(x),
+                                         routines.blue(x)));
+  }
+
+  int y = 0;
+  for (int x = LED_COUNT / 2; x < LED_COUNT; x++) {
+    pixels.setPixelColor(x, pixels.Color(routines_2.red(y),
+                                         routines_2.green(y),
+                                         routines_2.blue(y)));
+    y++;
+  }
+  // Neopixels use the show function to update the pixels
+  pixels.show();
 }
 #endif
 
@@ -328,16 +430,17 @@ void updateLEDs()
 //================================================================================
 
 /*!
- * Function that runs every loop iteration and determines how to light up the LEDs.
- *
+ * @brief changeLightingRoutine Function that runs every loop iteration  
+ *        and determines how to light up the LEDs.
+ *  
  * @param currentMode the current mode of the program
  */
-void currentLightingRoutine(ELightingRoutine currentMode)
+void changeLightingRoutine(ELightingRoutine currentMode)
 {
   switch (currentMode)
   {
     case eOff:
-      routines.singleSolid(0, 0, 0);
+      routines.turnOff();
       break;
 
     case eSingleSolid:
@@ -351,11 +454,11 @@ void currentLightingRoutine(ELightingRoutine currentMode)
     case eSingleWave:
       routines.singleWave(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
       break;
-         
+
     case eSingleGlimmer:
       routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT);
       break;
-      
+
     case eSingleLinearFade:
       routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, false);
       break;
@@ -379,7 +482,7 @@ void currentLightingRoutine(ELightingRoutine currentMode)
     case eMultiFade:
       routines.multiFade(current_group);
       break;
-      
+
     case eMultiRandomSolid:
       routines.multiRandomSolid(current_group);
       break;
@@ -395,21 +498,94 @@ void currentLightingRoutine(ELightingRoutine currentMode)
     case eMultiBarsMoving:
       routines.multiBarsMoving(current_group, BAR_SIZE);
       break;
-      
+
     default:
       break;
   }
 }
+#if IS_MULTI
+
+void changeLightingRoutine_2(ELightingRoutine currentMode)
+{
+  switch (currentMode)
+  {
+    case eOff:
+      routines_2.turnOff();
+      break;
+
+    case eSingleSolid:
+      routines_2.singleSolid(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue);
+      break;
+
+    case eSingleBlink:
+      routines_2.singleBlink(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue);
+      break;
+
+    case eSingleWave:
+      routines_2.singleWave(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue);
+      break;
+
+    case eSingleGlimmer:
+      routines_2.singleGlimmer(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, GLIMMER_PERCENT);
+      break;
+
+    case eSingleLinearFade:
+      routines_2.singleFade(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, false);
+      break;
+
+    case eSingleSineFade:
+      routines_2.singleFade(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, true);
+      break;
+
+    case eSingleSawtoothFadeIn:
+      routines_2.singleSawtoothFade(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, true);
+      break;
+
+    case eSingleSawtoothFadeOut:
+      routines_2.singleSawtoothFade(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, false);
+      break;
+
+    case eMultiGlimmer:
+      routines_2.multiGlimmer(current_group_2, GLIMMER_PERCENT);
+      break;
+
+    case eMultiFade:
+      routines_2.multiFade(current_group_2);
+      break;
+
+    case eMultiRandomSolid:
+      routines_2.multiRandomSolid(current_group_2);
+      break;
+
+    case eMultiRandomIndividual:
+      routines_2.multiRandomIndividual(current_group_2);
+      break;
+
+    case eMultiBarsSolid:
+      routines_2.multiBarsSolid(current_group_2, BAR_SIZE);
+      break;
+
+    case eMultiBarsMoving:
+      routines_2.multiBarsMoving(current_group_2, BAR_SIZE);
+      break;
+
+    default:
+      break;
+  }
+}
+#endif
 
 //================================================================================
 //  Packet Parsing
 //================================================================================
 
 /*!
- * This parser looks at the header of a control packet and from that determines
- * which parameters to use and what settings to change.
+ * @brief parsePacket This parser looks at the header of a control packet and from that determines
+ *        which parameters to use and what settings to change.
+ *   
+ * @param header the int representation of the packet's first value.
  */
-void parsePacket(int header)
+bool parsePacket(int header)
 {
   // In each case, theres a final check that the packet was properly
   // formatted by making sure its getting the right number of values.
@@ -417,111 +593,261 @@ void parsePacket(int header)
   switch (header)
   {
     case eModeChange:
-      if (parsed_packet.count == 2 && parsed_packet.values[1] < eLightingRoutine_MAX) {
-        if (parsed_packet.values[1] != current_routine) {
-            // Reset to 0 to draw to screen right away
-            loop_counter = 0;
-            success = true;
-        }
-        // change mode to new mode
-        current_routine = (ELightingRoutine)parsed_packet.values[1];
-      }
-      // pick up cases where the modes can take extra optional arguments
-      if (parsed_packet.count == 3) {
-        if (parsed_packet.values[1] >= (int)eMultiGlimmer) {
-            if (parsed_packet.values[1] != current_routine) {
-              // Reset to 0 to draw to screen right away
-              loop_counter = 0;
-              success = true;
-            }
-            current_routine = (ELightingRoutine)parsed_packet.values[1];
-            current_group = (EColorGroup)parsed_packet.values[2];
-        } 
-      }
-      break;
-    case eMainColorChange:
-      if (parsed_packet.count == 4) {
-        if (parsed_packet.values[1] != routines.mainColor().red 
-          || parsed_packet.values[2] != routines.mainColor().green 
-          || parsed_packet.values[3] != routines.mainColor().blue) {
+      if (int_array_size == 3 && packet_int_array[2] < eLightingRoutine_MAX) {
+        if (packet_int_array[2] != current_routine) {
           // Reset to 0 to draw to screen right away
           loop_counter = 0;
           success = true;
         }
-        routines.setMainColor(parsed_packet.values[1], 
-                              parsed_packet.values[2], 
-                              parsed_packet.values[3]);
+        received_hardware_index = packet_int_array[1];
+        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+          // change mode to new mode
+          current_routine = (ELightingRoutine)packet_int_array[2];
+        }
+#if IS_MULTI
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          current_routine_2 = (ELightingRoutine)packet_int_array[2];
+        }
+#endif
+      }
+      // pick up cases where the modes can take extra optional arguments
+      if (int_array_size == 4) {
+        if (packet_int_array[2] >= (int)eMultiGlimmer) {
+          if (packet_int_array[2] != current_routine) {
+            // Reset to 0 to draw to screen right away
+            loop_counter = 0;
+            success = true;
+          }
+          received_hardware_index = packet_int_array[1];
+          if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+            current_routine = (ELightingRoutine)packet_int_array[2];
+            current_group = (EColorGroup)packet_int_array[3];
+          }
+#if IS_MULTI
+          if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+            current_routine_2 = (ELightingRoutine)packet_int_array[2];
+            current_group_2   = (EColorGroup)packet_int_array[3];
+          }
+#endif
+        }
+      }
+      break;
+    case eMainColorChange:
+      if (int_array_size == 5) {
+        if (packet_int_array[2] != routines.mainColor().red
+            || packet_int_array[3] != routines.mainColor().green
+            || packet_int_array[4] != routines.mainColor().blue) {
+          // Reset to 0 to draw to screen right away
+          loop_counter = 0;
+          success = true;
+        }
+        received_hardware_index = packet_int_array[1];
+        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+          routines.setMainColor(packet_int_array[2],
+                                packet_int_array[3],
+                                packet_int_array[4]);
+        }
+#if IS_MULTI
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          routines_2.setMainColor(packet_int_array[2],
+                                  packet_int_array[3],
+                                  packet_int_array[4]);
+        }
+#endif
       }
       break;
     case eCustomArrayColorChange:
-      if (parsed_packet.count == 5) {
-        int color_index = parsed_packet.values[1];
+      if (int_array_size == 6) {
+        int color_index = packet_int_array[2];
         if (color_index >= 0 && color_index < eLightingRoutine_MAX) {
-          success = true;         
-          
-          // only tell the routines to reset themselves if a custom routine is used. 
+          success = true;
+
+          // only tell the routines to reset themselves if a custom routine is used.
           if ((current_routine > eSingleSawtoothFadeOut)
               && (current_group == eCustom)) {
             // Reset LEDS
             loop_counter = 0;
           }
-          routines.setColor(color_index, 
-                            parsed_packet.values[2], 
-                            parsed_packet.values[3], 
-                            parsed_packet.values[4]);
+          received_hardware_index = packet_int_array[1];
+          if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+            routines.setColor(color_index,
+                              packet_int_array[3],
+                              packet_int_array[4],
+                              packet_int_array[5]);
+          }
+#if IS_MULTI
+          if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+            routines_2.setColor(color_index,
+                                packet_int_array[2],
+                                packet_int_array[3],
+                                packet_int_array[4]);
+          }
+#endif
         }
       }
       break;
     case eBrightnessChange:
       {
-        if (parsed_packet.count == 2) {
+        if (int_array_size == 3) {
           success = true;
-          int param = constrain(parsed_packet.values[1], 0, 100);
+          int param = constrain(packet_int_array[2], 0, 100);
+          received_hardware_index = packet_int_array[1];
           // update brightness level
-          routines.brightness(param);
+          if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+            routines.brightness(param);
+          }
+#if IS_MULTI
+          if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+            routines_2.brightness(param);
+          }
+#endif
         }
         break;
       }
     case eSpeedChange:
-      if (parsed_packet.count == 2) {
+      if (int_array_size == 3) {
         success = true;
-        // convert from 100 * FPS to real data 
-        light_speed = (int)((1000.0f / DELAY_VALUE) / (parsed_packet.values[1] / 100.0f));
+        received_hardware_index = packet_int_array[1];
+        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+          update_speed = (int)((1000.0 / DELAY_VALUE) / (packet_int_array[2] / 100.0));
+        }
+#if IS_MULTI
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          update_speed_2 = (int)((1000.0 / DELAY_VALUE) / (packet_int_array[2] / 100.0));
+        }
+#endif
       }
       break;
     case eIdleTimeoutChange:
-      if (parsed_packet.count == 2) {
+      if (int_array_size == 3) {
         success = true;
-        unsigned long new_timeout = (unsigned long)parsed_packet.values[1];
-        idle_timeout = new_timeout * 60 * 1000;
+        received_hardware_index = packet_int_array[1];
+        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+          unsigned long new_timeout = (unsigned long)packet_int_array[2];
+          idle_timeout = new_timeout * 60 * 1000;
+        }
+#if IS_MULTI
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          unsigned long new_timeout = (unsigned long)packet_int_array[2];
+          idle_timeout_2 = new_timeout * 60 * 1000;
+        }
+#endif
       }
       break;
-   case eCustomColorCountChange:
-      if (parsed_packet.count == 2) {
-        if (parsed_packet.values[1] > 0) {
+    case eCustomColorCountChange:
+      if (int_array_size == 3) {
+        if (packet_int_array[2] > 1) {
           success = true;
-          routines.setCustomColorCount(parsed_packet.values[1]);
+          received_hardware_index = packet_int_array[1];
+          if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+            routines.setCustomColorCount(packet_int_array[2]);
+          }
+#if IS_MULTI
+          if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+            routines_2.setCustomColorCount(packet_int_array[2]);
+          }
+#endif
         }
       }
       break;
-   case eResetSettingsToDefaults:
-      if (parsed_packet.count == 3) {
+    case eStateUpdateRequest:
+      if (int_array_size == 1) {
+        // Send back update
+#if IS_SERIAL
+        Serial.println(buildStateUpdatePacket() + ";");
+#endif
+#if IS_HTTP
+        client.println(buildStateUpdatePacket());
+#endif
+#if IS_UDP
+        Bridge.put("state_update", buildStateUpdatePacket());
+#endif
+        // count this is as a valid message, despite
+        // it not setting success to true. 
+        last_message_time = millis();
+      }
+      break;
+    case eResetSettingsToDefaults:
+      if (int_array_size == 3) {
         // reset requires a message with exactly 2 parameters:
-        // 42 and 71. This drops the probability of buffer 
+        // 42 and 71. This drops the probability of buffer
         // issues causing causing false positives.
-        if ((parsed_packet.values[1] == 42) 
-            && (parsed_packet.values[2] == 71)) {
-            success = true;
-            routines.resetToDefaults();
+        if ((packet_int_array[1] == 42)
+            && (packet_int_array[2] == 71)) {
+          success = true;
+          routines.resetToDefaults();
         }
       }
       break;
     default:
-      return;
+      break; 
   }
-  if (success) {
-    last_message_time = millis();
+  return success;
+}
+
+//================================================================================
+// State Update
+//================================================================================
+
+String buildStateUpdatePacket()
+{
+  String updatePacket = ""; 
+  updatePacket += (uint8_t)eStateUpdateRequest; 
+  updatePacket += ",";  
+  updatePacket += (uint8_t)hardware_index; 
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines.isOn(); 
+  updatePacket += ",";  
+  updatePacket += (uint8_t)1; // isReachable
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines.mainColor().red;  
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines.mainColor().green;  
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines.mainColor().blue;  
+  updatePacket += ",";  
+  updatePacket += (uint8_t)current_routine;  
+  updatePacket += ",";  
+  updatePacket += (uint8_t)current_group; 
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines.brightness();   
+  
+#if IS_MULTI
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines_2_index; 
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines_2.isOn(); 
+  updatePacket += ",";  
+  updatePacket += (uint8_t)1; // isReachable
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines_2.mainColor().red;  
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines_2.mainColor().green;  
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines_2.mainColor().blue;  
+  updatePacket += ",";  
+  updatePacket += (uint8_t)current_routine_2;  
+  updatePacket += ",";  
+  updatePacket += (uint8_t)current_group_2; 
+  updatePacket += ",";  
+  updatePacket += (uint8_t)routines_2.brightness();
+
+  cube_serial.println(currentPacket + ";"); 
+  if (cube_serial.available()) { 
+      String response = cube_serial.readStringUntil(';');
+      // remove any whitespace
+      response.trim(); 
+      // remove the first character, since it will be a header
+      // for the state update packet. 
+      response.remove(0,1); 
+      updatePacket += response; 
+      // clear out the buffer 
+      while(cube_serial.available() > 0) { 
+        char t = cube_serial.read(); 
+      } 
   }
+#endif
+  return updatePacket;
 }
 
 //================================================================================
@@ -529,83 +855,53 @@ void parsePacket(int header)
 //================================================================================
 
 /*!
- * Takes a string that is delimited by command and converts it to an int array.
+ * @brief delimitedStringToIntArray takes an Arduino string that contains a series of 
+ *        numbers delimited by commas, converts it to a char array, then converts
+ *        that char array into a series of integers. C functions are used here to decrease
+ *        PROGMEM size and to decrease the amount of dynamic memory allocation that 
+ *        is requird for String manipulation. 
+ *        
+ * @param message the input string. 
  *
- * @param message the incoming delimited string
- *
- * @return an int array that contains the values in the delimited string
+ * @return true if the string was parseable, false otherwise. 
  */
-ParsedIntPacket delimitedStringToIntArray(String message)
+bool delimitedStringToIntArray(String message)
 {
-  if (checkIfValidString(message)) {
-    delimited_packet_size = countDelimitedValues(message);
-    if (delimited_packet_size > 0) {
-      delimited_index = 0;
-      delimited_counter = 0;
-      int valueArray[delimited_packet_size];
-      for (int i = 0; i < message.length(); i++) {
-        if (message.charAt(i) == delimiter) {
-          delimited_string = message.substring(delimited_index, i);
-          valueArray[delimited_counter] = delimited_string.toInt();
-          delimited_counter++;
-          delimited_index = i + 1;
-        }
+  bool isValid = true;
+  int_array_size = 0;
+  // ignore messages that are too long
+  if (message.length() + 1 < sizeof(char_array)) {
+    // append a final comma to simplify parsing
+    message += ",";
+    // convert to char array
+    message.toCharArray(char_array, message.length());
+  
+    // check if it contains valid characters.
+    for (int i = 0; i < message.length(); i++) {
+      if (!(isdigit(message[i])
+            || message[i] == ','
+            || message[i] == '-')) {
+        isValid = false;
       }
-      // grab the last value of the string
-      valueArray[delimited_counter] = message.substring(delimited_index, message.length()).toInt();
-      ParsedIntPacket packet = {valueArray, delimited_packet_size, 1};
-      return packet;
     }
-  }
-  // somethign went wrong, treat it as junk
-  int junkArray[0];
-  ParsedIntPacket packet = {junkArray, 0, 0};
-  return packet;
-}
-
-/*!
- * Does a naive check on if the string is parseable. For now, it just
- * makes sure that every character is either a digit, a negative sign,
- * or a delimiter.
- *
- * @param message the current delimited string
- *
- * @return true if it passes validity test, false otherwise
- */
-boolean checkIfValidString(String message)
-{
-  for (int i = 0; i < message.length(); i++) {
-    if (!(isDigit(message.charAt(i))
-          || message.charAt(i) == delimiter
-          || message.charAt(i) == '-')) {
-      Serial.println("Invalid String");
-      return false;
+    
+    // if the string is parseable, parse it. 
+    if (isValid) {
+      // Get the frist substring delimited by a ","  
+      char* valuePtr = strtok(char_array, ",");
+      while (valuePtr != 0)
+      {
+        // convert chars to int and story in int array.
+        packet_int_array[int_array_size] = atoi(valuePtr);
+        int_array_size++;
+        // Find the next substring delimited by a ","
+        valuePtr = strtok(0, ",");
+      }
+      return isValid;
+    } else {
+      return isValid;
     }
-  }
-  return true;
-}
-
-/*!
- * Helper function that scans the incoming string and determines how
- * many values are in it.
- *
- * @param message the current delimited string
- *
- * @return number of values in delimited string
- */
-int countDelimitedValues(String message)
-{
-  delimited_counter = 0;
-  for (int i = 0; i < message.length(); i++) {
-    if (message.charAt(i) == delimiter) delimited_counter++;
-  }
-
-  if (delimited_counter == 0) {
-    return 1;
   } else {
-    return delimited_counter + 1; // first delimiter has two values
+    return false;
   }
 }
-
-
-
