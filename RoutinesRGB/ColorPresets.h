@@ -1,7 +1,7 @@
 /*!
  * \file ColorPresets.h
- * \version v1.9.8
- * \date July 3, 2016
+ * \version v2.0.0
+ * \date July 31, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -75,7 +75,7 @@ const PROGMEM uint8_t fireColors[]         = { 255, 70,  0,
                                                255, 20,  0,
                                                255, 80,  0,
                                                255, 5,   0,
-                                               0,   0,   0,
+                                               64,  6,   0,
                                                127, 127, 0,
                                                255, 60,  0,
                                                255, 45,  0,
@@ -90,7 +90,7 @@ const PROGMEM uint8_t evilColors[]         = { 255, 0,   0,
                                                20,  0,   0,
                                                20,  0,   0,
                                                30,  0,   40,
-                                               0,   0,   0,
+                                               10,  0,   0,
                                                80,  0,   0 };    
 
 //==========
@@ -197,21 +197,21 @@ const uint8_t* const colorPresets[] PROGMEM = { waterColors,
                                                 sevenColors };
          
                                             
-const PROGMEM uint8_t presetSizes []  =         { 9, 
-                                                  6,
-                                                  6,
-                                                  5,
-                                                  5,
-                                                  9,
-                                                  7,
-                                                  5,
-                                                  7,
-                                                  6,
-                                                  4,
-                                                  4,
-                                                  3,
-                                                  3,
-                                                  6,
-                                                  7 };
+const PROGMEM uint8_t presetSizes []        = { 9, 
+                                                6,
+                                                6,
+                                                5,
+                                                5,
+                                                9,
+                                                7,
+                                                5,
+                                                7,
+                                                6,
+                                                4,
+                                                4,
+                                                3,
+                                                3,
+                                                6,
+                                                7 };
          
                                                                                    

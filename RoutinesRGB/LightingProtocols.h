@@ -1,17 +1,20 @@
 /*!
  * \file LightingProtocols.h
- * \version v1.9.8
- * \date July 3, 2016
+ * \version v2.0.0
+ * \date July 31, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
  *            </a>
  * 
- * This file defines the protocols used for the Arduino libraries and the GUI.
- * 
- * A slightly modified version of this file exists in the Qt GUI project. None of the
- * modifications change the naming, documentation, or order of the protocols. Instead, the
- * changes allow the GUI version to use the strongly typed enums that were made available in C++11.
+ * This file defines the protocols used for the sample sketches.
+ *
+ * This file also gets copied to other projects as part of integrating with this project. For example, 
+ * the [Corluma](https://github.com/timsee/Corluma) project has a C++ version of this file. If packets
+ * between the two projects seem mixed up, check that the version of the Corluma App you are using
+ * matches the version of the your RoutinesRGB library. 
+ *
+ * Protocol Version: 1.0
  *
  */
  
@@ -267,6 +270,11 @@ enum EPacketHeader
   eIdleTimeoutChange,
   /*!
    * <b>7</b><br>
+   * <i>Sends back a packet that contains basic LED state information.</i>
+   */
+  eStateUpdateRequest,
+  /*!
+   * <b>8</b><br>
    * <i>Resets all values inside of RoutinesRGB back to their
    * default values. Useful for soft reseting the LED hardware. </i>
    */

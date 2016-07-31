@@ -16,13 +16,28 @@
 #------------------------------------------------------------------------------
 
 #----------------------------------------
+# Helper Functions
+#----------------------------------------
+
+# taken from http://stackoverflow.com/a/33248547 to trim leading
+# and trailing whitespace
+trim() {
+  local s2 s="$*"
+  # note: the brackets in each of the following two lines contain one space
+  # and one tab
+  until s2="${s#[   ]}"; [ "$s2" = "$s" ]; do s="$s2"; done
+  until s2="${s%[   ]}"; [ "$s2" = "$s" ]; do s="$s2"; done
+  echo "$s"
+}
+
+#----------------------------------------
 # Project Name Setup
 #----------------------------------------
 PROJECT_NAME=(
     "Rainbowduino"
     "Neopixels"
     "Single-LED"
-    "Custom"
+    "Multi"
 )
 # this array gets filled automatically based off of the
 # PROJECT_NAME array
@@ -40,7 +55,7 @@ PROJECT_DESCRIPTION=(
     " * Supports SeeedStudio Rainbowduino projects."
     " * Supports Adafruit NeoPixels products."
     " * Supports a single RGB LED but can be easily hacked to support more."
-    " * Custom Sketch."
+    " * Example sketch with multiple routinesRGB instances used"
 )
 
 
@@ -125,6 +140,9 @@ function generate_hardware_specific_sample()
             SHOULD_WRITE=1
             cat $PROJ_PATH.temp | while read line   # parse the master project line by line
             do
+                #trims leading and trailing whitespace, used for some edge cases.
+                trimmed=$(trim "$line")
+
                 #---------------------
                 # Set write flag, if needed
                 #---------------------
@@ -133,7 +151,7 @@ function generate_hardware_specific_sample()
                 # our special case variables.
                 if  [[ "${PROJECT_FLAG[@]}" =~ "$line" ]]   \
                     || [[ "${COMM_FLAGS[@]}" =~ "$line" ]]  \
-                    || [ "$line" == "${END_FLAG}" ];
+                    || [ "$trimmed" == "${END_FLAG}" ];
                 then
                     # handle edge case in certain environments.
                     if [ "${line}" != "" ]
@@ -156,16 +174,15 @@ function generate_hardware_specific_sample()
                 # DEFAULT: check if line belongs in the current sample
                 elif [ "${SHOULD_WRITE}" -eq 1 ]
                 then
-                    echo "$line" >> $WRITE_PATH
+                    echo "$line" >> "$WRITE_PATH"
                 fi
-
                 #---------------------
                 # Reset write flag, if needed
                 #---------------------
                 # write future lines if out of a preprocessor or in the proper preprocessor
-                if  [ "$line" == "$FLAG" ]        \
-                    || [ "$line" == "$END_FLAG" ] \
-                    || [ "$line" == "$COMM_FLAG" ];
+                if  [ "$trimmed" == "$FLAG" ]        \
+                    || [ "$trimmed" == "$END_FLAG" ] \
+                    || [ "$trimmed" == "$COMM_FLAG" ];
                 then
                     SHOULD_WRITE=1
                 fi

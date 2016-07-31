@@ -1,6 +1,6 @@
 # Arduino Yun Sample Sketches
 
-Sample Sketches for the Arduino Yun. These implement the same packet protocol as the standard samples and have all the same functionalities, but instead of serial they can use either HTTP or UDP. 
+Sample Sketches for the Arduino Yun. These samples provide a messagign protocol to control LEDs over HTTP or UDP. 
 
 ## <a name="toc"></a>Table of Contents
 
@@ -8,7 +8,6 @@ Sample Sketches for the Arduino Yun. These implement the same packet protocol as
 * [UDP](#udp)
 
 #### <a name="http"></a>HTTP
-
 
 HTTP uses an arduino yun to provide an interface similar to an IP Camera to an LED array. Commands can be sent through a web browser in the format of `http://IP_ADRESS/arduino/MESSAGE` where `IP_ADDRESS` is the current IP address of the arduino and `MESSAGE` is an ASCII message packet formatted in the same way as the [other samples](../). For example, to turn off the lights on an Arduino Yun on *192.168.0.101* you would enter this link into your web browser:
 
@@ -21,10 +20,10 @@ This method is very convenient since it can be controlled via web browser, but i
 
 #### <a name="udp"></a>UDP
 
-UDP provides a much faster data stream than HTTP, but the increased speed comes at the cost of more configuration. Arduino does not provide a standard UDP library, so the onboard Linux processor is set up to load a UDP server at boot. This is a simple server: all packets received over UDP are immediately put on the Arduino's Bridge without buffering. The sketch running on the microcontroller polls the bridge on a loop to receive the new packets, where its sent through the same parsing as the serial and HTTP samples. 
+UDP provides a faster data stream than HTTP, but the increased speed comes at the cost of more configuration. Arduino does not provide a standard UDP library, so the onboard Linux processor is set up to load a UDP server at boot. The server handles discovery packets and puts values onto the arduino's bridge. The sketch running on the microcontroller polls the bridge on a loop to receive the new packets, where its sent through the same parsing as the serial and HTTP samples. 
 
 
-To get this sample running, you'll need the IP address of your arduino and the password to ssh into it. 
+To get this sample running, you'll need the IP address of your arduino and the password to ssh into it.
 For our sample commands, we will be using the IP address of `192.168.0.102` but this will likely be different in your environment. 
 
 * ssh into your arduino yun. To do so, enter your terminal and run this command:
@@ -54,10 +53,3 @@ scp yun-udp-server.py root@192.168.0.102:/root/scripts
 * Almost there! Upload your desired UDP sample sketch to the arduino yun's microcontroller. Do this through the arduino application or however else you normally upload new sketches.
 
 * Restart your arduino yun. If everything is set up correctly, the server should start up at boot and after 30-60 seconds, you'll be able to control the arduino over UDP.
-
-
-
-
-
-
-

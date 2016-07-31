@@ -3,8 +3,9 @@
 
 This project is based around an arduino library that generates a set of lighting routines for various arduino-based lighting arrays. It works for all arduinos except the ATtiny series.
 
-Sample sketches are provided for Rainbowduino, a NeoPixel products, or a standard RGB LED. The samples
-provide an ASCII based serial interface to change the lighting routines, the brightness of the lights, and more. A Qt-based GUI is also provided which can control the arduino sketches. The GUI has been tested on Windows, Linux, Mac OS X, Android, and iOS. It requires Qt 5.2 or later and C++11.
+Sample sketches are provided for NeoPixel products, Rainbowduinos, and a single RGB LED. All samples implement an ASCII based interface to change the lighting routines, and to change settings such as the brightness of the LEDs.
+
+A related project, [Corluma](https://github.com/timsee/Corluma), provides a cross-platform GUI to control the lights with this interface.
 
 ## <a name="toc"></a>Table of Contents
 
@@ -15,9 +16,6 @@ provide an ASCII based serial interface to change the lighting routines, the bri
 * Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00001.html) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
 * [Sample Sketch Usage](samples)
     * [Yun Samples](samples/yun)
-* [Qt Based GUI](GUI)
-    * [Frontend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/front_overview.html)
-    * [Backend Overview](https://timsee.github.io/RGB-LED-Routines/LightingGUI/html/backend_overview.html)
 * [Contributing](#contributing)
 * [License](#license)
 * [Version Notes](CHANGELOG.md)
@@ -27,7 +25,7 @@ provide an ASCII based serial interface to change the lighting routines, the bri
 1. Download the git repository
 2. Copy the RoutinesRGB directory into your [Arduino Libraries directory](https://www.arduino.cc/en/Hacking/Libraries).
 3. Choose the proper sample for your hardware setup from the [samples folder](samples).
-4. Build and upload to your board.  
+4. Build and upload to your board.
 
 
 If there are compilation issues, make sure you have the library for your hardware setup installed. For a Rainbowduino, you can find the library [here](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0). For a NeoPixel, you can find the library [here](https://github.com/adafruit/Adafruit_NeoPixel). 

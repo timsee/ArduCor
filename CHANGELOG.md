@@ -82,7 +82,18 @@
 ### **v1.9.8** 
 #### Phillips Hue Update
 * Added support for the Phillips Hue to the GUI. 
-* Refactored GUI code to support more types of connections.
-* Cleaned up API of the Arduino library.
+* Refactored GUI code to support more types of connections. 
+* Cleaned up API of the Arduino library. 
 * Fixed bugs.
+
+### **v2.0.0** 
+#### Two Way Communication Update
+* Move GUI project to Corluma Repository.
+* Added state update packets.
+* Added optional discovery methods.
+* Added better support for connecting multiple devices to the same arduino. 
+* Removed custom sample, added multi device sample.
+* Fixed bugs.
+
+
 
