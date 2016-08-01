@@ -61,13 +61,13 @@ The second argument in a message is always a device index. This value determines
 | Parameter         | Values        | 
 | ----------------- | ------------- |
 | Header            |     0         | 
-| New Routine       | (ELightingRoutine)0 - 14  |  
-| Color Group (Optional) | (EColorGroup)0 - 17        |  
+| New Routine       | (ELightingRoutine)0 - 14  | 
+| Color Group (Optional) | (EColorGroup)0 - 17        | 
 
 **Example:** `0,0,1;` *(Header 0, Device Index 0, New Routine 1)*
  `0,0,4,6;` *(Header 0, Device Index 0, New Routine 4, New Color Group 6)* 
 
-*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). *
+*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the* [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html).
 
 #### Set Color for Single Color Routines
 
@@ -138,7 +138,7 @@ The second argument in a message is always a device index. This value determines
 | Header        |     8         | 
 | Check 1       |     42        |
 | Check 2       |     71        |
-**Example:** `8,42,71;` *(Header 7, Check 1, Check 2)*
+**Example:** `8,42,71;` *(Header 8, Check 1, Check 2)*
 
 *Note: This message contains two extra parameters to make it harder for it to be triggered accidentally by a corrupted packet.*
 
@@ -162,7 +162,7 @@ $stateUpdate,$isOn,$isReachable,$red, $green,$blue,$routine,$colorGroup,$brightn
 | -------------        | ------------- |  ------------- |
 | stateUpdate    |     7            |                    |
 | isOn              |     0 or 1     |     0 if the current routine is eOff, 1 otherwise             |
-| isReachable    |     1            |  Only 1 if it is expected to be connected but it is not connected to the controller. Used by [Corluma](https://github.com/timsee/Corluma)                    |
+| isReachable    |  0 or 1            |  Only 1 if it is expected to be connected but it is not connected to the controller. Used by [Corluma](https://github.com/timsee/Corluma)                    |
 | red, green, blue    |    0  - 255            |     Color used by single color routines                |
 | routine    |    0 - 14            |      Current lighting routine          |
 | colorGroup      |    0 - 17            |      Current color group         |
