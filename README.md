@@ -13,7 +13,7 @@ A related project, [Corluma](https://github.com/timsee/Corluma), provides a cros
 * [Library Usage](#library-usage)
     * [Single Color Routines](#single-routines)
     * [Multi Color Routines](#multi-routines)
-* Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00001.html) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
+* Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00001.html)) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
 * [Sample Sketch Usage](samples)
     * [Yun Samples](samples/yun)
 * [Contributing](#contributing)
