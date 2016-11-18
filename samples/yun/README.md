@@ -12,7 +12,7 @@ Sample Sketches for the Arduino Yun. These samples provide a messagign protocol 
 HTTP uses an arduino yun to provide an interface similar to an IP Camera to an LED array. Commands can be sent through a web browser in the format of `http://IP_ADRESS/arduino/MESSAGE` where `IP_ADDRESS` is the current IP address of the arduino and `MESSAGE` is an ASCII message packet formatted in the same way as the [other samples](../). For example, to turn off the lights on an Arduino Yun on *192.168.0.101* you would enter this link into your web browser:
 
 ```
-http://192.168.0.101/arduino/0,0
+http://192.168.0.101/arduino/0,0,0
 ```
 
 This method is very convenient since it can be controlled via web browser, but its major drawback is the speed that the Arduino Yun can handle HTTP requests. On the tested network, it took up to a second for the Yun to update the LEDs after sending a command.
