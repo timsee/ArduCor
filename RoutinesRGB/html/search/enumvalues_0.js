@@ -7,6 +7,7 @@ var searchData=
   ['ecorrorsive',['eCorrorsive',['../a00003.html#aacfa5db0b5684d40790252d6a2df61d6ad48287c354d55dcffc4d0d9248d64c30',1,'LightingProtocols.h']]],
   ['ecustom',['eCustom',['../a00003.html#aacfa5db0b5684d40790252d6a2df61d6aad04b64f6048e7730829dfa8048bc33c',1,'LightingProtocols.h']]],
   ['ecustomarraycolorchange',['eCustomArrayColorChange',['../a00003.html#a28121d682969dd1cd2ea53db86213952a3183879677444bbb9e22bdb12fac6156',1,'LightingProtocols.h']]],
+  ['ecustomarrayupdaterequest',['eCustomArrayUpdateRequest',['../a00003.html#a28121d682969dd1cd2ea53db86213952a9f0b29bea2a298673c79e69741edf3c1',1,'LightingProtocols.h']]],
   ['ecustomcolorcountchange',['eCustomColorCountChange',['../a00003.html#a28121d682969dd1cd2ea53db86213952ac09ad6c082f2a5dbee5295dbe9487713',1,'LightingProtocols.h']]],
   ['eevil',['eEvil',['../a00003.html#aacfa5db0b5684d40790252d6a2df61d6ad56805f147226efae23900e4ceeb76fa',1,'LightingProtocols.h']]],
   ['efire',['eFire',['../a00003.html#aacfa5db0b5684d40790252d6a2df61d6a15eaa5eae48cb78eb1453332d7cdfdae',1,'LightingProtocols.h']]],
