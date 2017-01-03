@@ -3,8 +3,8 @@
 #------------------------------------------------------------
 # Arduino Yun UDP Echo Server
 #------------------------------------------------------------
-# Version 1.1
-# July 31, 2016
+# Version 1.2
+# December 26, 2016
 # MIT License (in root of git repo)
 # by Tim Seemann
 #
@@ -39,7 +39,6 @@ from bridgeclient import BridgeClient
 
 # port for the UDP connection to bind to
 UDP_PORT = 10008
-last_packet = ""
 
 # Echoing back commands slows down the speed that lights update but it gives
 # more reliability since you know when a packet is received. Set this to 
@@ -85,14 +84,17 @@ while True:
         data += state_update
         # sends discovery packet
         sock.sendto(data, (addr[0], UDP_PORT))
-    elif data == "7":
+    elif data == "7&":
         bridge.put('udp', data)
         state_update = bridge.get('state_update')
         sock.sendto(state_update, (addr[0], UDP_PORT)) 
+    elif data == "8&":
+        bridge.put('udp', data)
+        custom_array_update = bridge.get('custom_array_update')
+        sock.sendto(custom_array_update, (addr[0], UDP_PORT)) 
     else: 
         # puts data on arduino bridge
     	bridge.put('udp', data)
-        if should_echo and (data != last_packet):
+        if should_echo:
             sock.sendto(data, (addr[0], UDP_PORT))
-            last_packet = data
 

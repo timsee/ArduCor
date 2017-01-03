@@ -6,8 +6,8 @@
  * 
  * Provides a HTTP interface to a set of lighting routines.
  *
- * Version 2.0.0
- * Date: July 31, 2016
+ * Version 2.1.0
+ * Date: December 26, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -43,12 +43,16 @@ const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for
 ELightingRoutine current_routine = eSingleGlimmer;
 EColorGroup current_group = eCustom;
 
+bool isOn = true;
+
 // used in sketches with multiple hardware connected to one arduino.
 uint8_t received_hardware_index;
 uint8_t hardware_index = DEFAULT_HW_INDEX;
 
 // value determines how quickly the LEDs udpate. Lower values lead to faster updates
 int update_speed = (int)((1000.0 / DELAY_VALUE) / (DEFAULT_SPEED / 100.0));
+// value received from packets
+int raw_speed = update_speed;
 
 // timeout variables
 unsigned long idle_timeout = (unsigned long)DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
@@ -66,14 +70,26 @@ BridgeClient client;
 //=======================
 
 // flag ued by parsing system. if TRUE, continue parsing, if FALSE,
-// packet is either illegal, a repeat, or empty and parsing can be skipped.
+// packet is either illegal or empty and parsing can be skipped.
 bool packetReceived = false;
 
-char char_array[30];
-int packet_int_array[10];
-int int_array_size = 0;
+const int max_number_of_messages = 5;
+const int max_message_size = 20;
 
+// buffers for receiving messages
+String multi_packet_strings[max_number_of_messages];
+char multi_packet_char_array[max_message_size * max_number_of_messages];
+
+// buffers for converting ASCII to an int array 
+char char_array[20];
+int packet_int_array[10];
 char num_buf[4];
+
+// used to manipulate the buffers for receiving messages and
+// converting them to int arrays.
+int multi_packet_size = 0;
+int current_multi_packet = 0;
+int int_array_size = 0;
 
 //=======================
 // RoutinesRGB Setup
@@ -122,28 +138,36 @@ void loop()
   if (packetReceived) {
     // remove any extraneous whitepsace or newline characters
     currentPacket.trim();
-    bool isValid = delimitedStringToIntArray(currentPacket);
-    // parse a paceket only if its header is is in the correct range
-    if (isValid
-        && (int_array_size > 0)
-        && (packet_int_array[0] < ePacketHeader_MAX)) {
-     if(parsePacket(packet_int_array[0])) {
-      last_message_time = millis();
-    }
+    bool multiMessageIsValid = parseMultiMessageString(currentPacket);
+    if (multiMessageIsValid) {
+      for (current_multi_packet = 0; current_multi_packet < multi_packet_size; ++current_multi_packet) {
+        bool isValid = delimitedStringToIntArray(multi_packet_strings[current_multi_packet]);
+        // parse a paceket only if its header is is in the correct range
+        if (isValid
+            && (int_array_size > 0)
+            && (packet_int_array[0] < ePacketHeader_MAX)) {
+          if (parsePacket(packet_int_array[0])) {
+            last_message_time = millis();
+          }
+        }
+      }
     }
   }
 
   if (!(loop_counter % update_speed)) {
-    changeLightingRoutine(current_routine);
-    routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
+    if (isOn) {
+      changeLightingRoutine(current_routine);
+      routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
+    } else {
+      routines.turnOff();
+    }
     updateLEDs();
   }
 
   // Timeout the LEDs.
   if ((idle_timeout != 0)
       && (last_message_time + idle_timeout < millis())) {
-    routines.singleSolid(0, 0, 0);
-    current_routine = eOff;
+    isOn = false;
   }
 
   loop_counter++;
@@ -172,9 +196,9 @@ void updateLEDs()
 //================================================================================
 
 /*!
- * @brief changeLightingRoutine Function that runs every loop iteration  
+ * @brief changeLightingRoutine Function that runs every loop iteration
  *        and determines how to light up the LEDs.
- *  
+ *
  * @param currentMode the current mode of the program
  */
 void changeLightingRoutine(ELightingRoutine currentMode)
@@ -253,7 +277,7 @@ void changeLightingRoutine(ELightingRoutine currentMode)
 /*!
  * @brief parsePacket This parser looks at the header of a control packet and from that determines
  *        which parameters to use and what settings to change.
- *   
+ *
  * @param header the int representation of the packet's first value.
  */
 bool parsePacket(int header)
@@ -272,8 +296,13 @@ bool parsePacket(int header)
         }
         received_hardware_index = packet_int_array[1];
         if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          // change mode to new mode
-          current_routine = (ELightingRoutine)packet_int_array[2];
+          if ((ELightingRoutine)packet_int_array[2] == eOff) {
+            isOn = false;
+          } else {
+            isOn = true;
+            // change mode to new mode
+            current_routine = (ELightingRoutine)packet_int_array[2];
+          }
         }
       }
       // pick up cases where the modes can take extra optional arguments
@@ -288,6 +317,7 @@ bool parsePacket(int header)
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             current_routine = (ELightingRoutine)packet_int_array[2];
             current_group = (EColorGroup)packet_int_array[3];
+            isOn = true;
           }
         }
       }
@@ -306,6 +336,7 @@ bool parsePacket(int header)
           routines.setMainColor(packet_int_array[2],
                                 packet_int_array[3],
                                 packet_int_array[4]);
+          isOn = true;
         }
       }
       break;
@@ -340,6 +371,7 @@ bool parsePacket(int header)
           // update brightness level
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             routines.brightness(param);
+            isOn = true;
           }
         }
         break;
@@ -349,7 +381,8 @@ bool parsePacket(int header)
         success = true;
         received_hardware_index = packet_int_array[1];
         if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          update_speed = (int)((1000.0 / DELAY_VALUE) / (packet_int_array[2] / 100.0));
+          raw_speed = packet_int_array[2];
+          update_speed = (int)((1000.0 / DELAY_VALUE) / (raw_speed / 100.0));
         }
       }
       break;
@@ -378,9 +411,12 @@ bool parsePacket(int header)
       if (int_array_size == 1) {
         // Send back update
         client.println(buildStateUpdatePacket());
-        // count this is as a valid message, despite
-        // it not setting success to true. 
-        last_message_time = millis();
+      }
+      break;
+    case eCustomArrayUpdateRequest:
+      if (int_array_size == 1) {
+        // Send back update
+        client.println(buildCustomArrayUpdatePacket());
       }
       break;
     case eResetSettingsToDefaults:
@@ -396,7 +432,7 @@ bool parsePacket(int header)
       }
       break;
     default:
-      break; 
+      break;
   }
   return success;
 }
@@ -407,28 +443,66 @@ bool parsePacket(int header)
 
 String buildStateUpdatePacket()
 {
-  String updatePacket = ""; 
-  updatePacket += (uint8_t)eStateUpdateRequest; 
-  updatePacket += ",";  
-  updatePacket += (uint8_t)hardware_index; 
-  updatePacket += ",";  
-  updatePacket += (uint8_t)routines.isOn(); 
-  updatePacket += ",";  
+  String updatePacket = "";
+  updatePacket += (uint8_t)eStateUpdateRequest;
+  updatePacket += ",";
+  updatePacket += (uint8_t)hardware_index;
+  updatePacket += ",";
+  updatePacket += (uint8_t)isOn;
+  updatePacket += ",";
   updatePacket += (uint8_t)1; // isReachable
-  updatePacket += ",";  
-  updatePacket += (uint8_t)routines.mainColor().red;  
-  updatePacket += ",";  
-  updatePacket += (uint8_t)routines.mainColor().green;  
-  updatePacket += ",";  
-  updatePacket += (uint8_t)routines.mainColor().blue;  
-  updatePacket += ",";  
-  updatePacket += (uint8_t)current_routine;  
-  updatePacket += ",";  
-  updatePacket += (uint8_t)current_group; 
-  updatePacket += ",";  
-  updatePacket += (uint8_t)routines.brightness();   
-  
+  updatePacket += ",";
+  updatePacket += (uint8_t)routines.mainColor().red;
+  updatePacket += ",";
+  updatePacket += (uint8_t)routines.mainColor().green;
+  updatePacket += ",";
+  updatePacket += (uint8_t)routines.mainColor().blue;
+  updatePacket += ",";
+  updatePacket += (uint8_t)current_routine;
+  updatePacket += ",";
+  updatePacket += (uint8_t)current_group;
+  updatePacket += ",";
+  updatePacket += (uint8_t)routines.brightness();
+  updatePacket += ",";
+  updatePacket += (uint16_t)raw_speed;
+  updatePacket += ",";
+  updatePacket += (uint16_t)(idle_timeout / 60000);
+  updatePacket += ",";
+  updatePacket += calculateMinutesUntilTimeout(last_message_time, idle_timeout);
+  updatePacket += "&";
+
   return updatePacket;
+}
+
+String buildCustomArrayUpdatePacket() {
+  String updatePacket = "";
+  updatePacket += (uint8_t)eCustomArrayUpdateRequest;
+  updatePacket += ",";
+  updatePacket += (uint8_t)hardware_index;
+  for (int i = 0; i < routines.customColorCount(); ++i) {
+    updatePacket += ",";
+    updatePacket += routines.color(i).red;
+    updatePacket += ",";
+    updatePacket += routines.color(i).green;
+    updatePacket += ",";
+    updatePacket += routines.color(i).blue;
+  }
+  updatePacket += "&";
+
+  return updatePacket;
+}
+
+unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned long timeout_max) {
+  if (timeout_max == 0) {
+    // will never timeout as this is disabled, jsut return 1.
+    return 1;
+  } else if (last_message + timeout_max < millis()) {
+    // already timed out.
+    return 0;
+  } else {
+    // we truncate the value so a +1 is added so that when theres less than a minute its not treated as already timed out.
+    return ((timeout_max + last_message - millis()) / 60000) + 1;
+  }
 }
 
 //================================================================================
@@ -436,15 +510,15 @@ String buildStateUpdatePacket()
 //================================================================================
 
 /*!
- * @brief delimitedStringToIntArray takes an Arduino string that contains a series of 
+ * @brief delimitedStringToIntArray takes an Arduino string that contains a series of
  *        numbers delimited by commas, converts it to a char array, then converts
  *        that char array into a series of integers. C functions are used here to decrease
- *        PROGMEM size and to decrease the amount of dynamic memory allocation that 
- *        is requird for String manipulation. 
+ *        PROGMEM size and to decrease the amount of dynamic memory allocation that
+ *        is requird for String manipulation.
  *        
- * @param message the input string. 
- *
- * @return true if the string was parseable, false otherwise. 
+ * @param message the input string.
+ * 
+ * @return true if the string was parseable, false otherwise.
  */
 bool delimitedStringToIntArray(String message)
 {
@@ -456,7 +530,7 @@ bool delimitedStringToIntArray(String message)
     message += ",";
     // convert to char array
     message.toCharArray(char_array, message.length());
-  
+
     // check if it contains valid characters.
     for (int i = 0; i < message.length(); i++) {
       if (!(isdigit(message[i])
@@ -465,18 +539,62 @@ bool delimitedStringToIntArray(String message)
         isValid = false;
       }
     }
-    
-    // if the string is parseable, parse it. 
+
+    // if the string is parseable, parse it.
     if (isValid) {
-      // Get the frist substring delimited by a ","  
+      // Get the frist substring delimited by a ","
       char* valuePtr = strtok(char_array, ",");
-      while (valuePtr != 0)
-      {
+      while (valuePtr != 0) {
         // convert chars to int and story in int array.
         packet_int_array[int_array_size] = atoi(valuePtr);
         int_array_size++;
         // Find the next substring delimited by a ","
         valuePtr = strtok(0, ",");
+      }
+      return isValid;
+    } else {
+      return isValid;
+    }
+  } else {
+    return false;
+  }
+}
+
+/*!
+ * @brief parseMultiMessageString takes an Arduino string that contains a series of
+ *        messages delimited by ampersands(&), and converts it to an array of strings.
+ *        C functions are used here to decrease PROGMEM size.
+ *        
+ * @param message the input string.
+ * 
+ * @return true if the string was parseable, false otherwise.
+ */
+bool parseMultiMessageString(String message)
+{
+  bool isValid = false;
+  multi_packet_size = 0;
+  // ignore messages that are too long
+  if (message.length() < sizeof(multi_packet_char_array)) {
+    // convert to char array
+    message.toCharArray(multi_packet_char_array, message.length());
+
+    // check if it contains valid characters.
+    for (int i = 0; i < message.length(); i++) {
+      if (message[i] == '&') {
+        isValid = true;
+      }
+    }
+
+    // if the string is parseable, parse it.
+    if (isValid) {
+      // Get the frist substring delimited by a "&"
+      char* valuePtr = strtok(multi_packet_char_array, "&");
+      while (valuePtr != 0) {
+        // convert chars to int and story in int array.
+        multi_packet_strings[multi_packet_size] = String(valuePtr);
+        multi_packet_size++;
+        // Find the next substring delimited by a "&"
+        valuePtr = strtok(0, "&");
       }
       return isValid;
     } else {

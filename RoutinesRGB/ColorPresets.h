@@ -1,7 +1,7 @@
 /*!
  * \file ColorPresets.h
- * \version v2.0.0
- * \date July 31, 2016
+ * \version v2.1.0
+ * \date December 26, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
