@@ -83,7 +83,6 @@
 #### Phillips Hue Update
 * Added support for the Phillips Hue to the GUI. 
 * Refactored GUI code to support more types of connections. 
-* Cleaned up API of the Arduino library. 
 * Fixed bugs.
 
 ### **v2.0.0** 
@@ -95,5 +94,10 @@
 * Removed custom sample, added multi device sample.
 * Fixed bugs.
 
-
+### **v2.1.0** 
+#### Cleanup Update
+* Fixed bugs.
+* Added new message for requesting all the used values in the custom color array.
+* Changed the message protocol format used in samples. 
+* Changed multi device sample so that it works on HTTP and UDP.
 

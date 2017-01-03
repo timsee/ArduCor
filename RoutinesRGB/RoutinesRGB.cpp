@@ -1,6 +1,6 @@
 /*!
- * \version v2.0.0
- * \date July 31, 2016
+ * \version v2.1.0
+ * \date December 26, 2016
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -130,6 +130,10 @@ RoutinesRGB::setColor(uint16_t colorIndex, uint8_t r, uint8_t g, uint8_t b)
 {
     if (colorIndex < (sizeof(m_custom_colors) / sizeof(Color))) {
         m_custom_colors[colorIndex] = {r, g, b};
+        // catch edge case 
+        if (m_current_group == eCustom) {
+            m_preprocess_flag = true;
+        }
     }
 }
 
