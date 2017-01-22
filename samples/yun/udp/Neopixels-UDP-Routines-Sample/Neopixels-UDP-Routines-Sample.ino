@@ -6,8 +6,8 @@
  * 
  * Provides a UDP interface to a set of lighting routines.
  *
- * Version 2.1.0
- * Date: December 26, 2016
+ * Version 2.1.1
+ * Date: January 22, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -594,3 +594,4 @@ bool parseMultiMessageString(String message)
     return false;
   }
 }
+
