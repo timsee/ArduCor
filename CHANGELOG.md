@@ -101,3 +101,7 @@
 * Changed the message protocol format used in samples. 
 * Changed multi device sample so that it works on HTTP and UDP.
 
+### **v2.1.1** 
+#### Cleanup Update Part 2
+* Fixed bugs in samples.
+

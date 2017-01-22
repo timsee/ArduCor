@@ -13,8 +13,8 @@
  * 
  * COM_PLACEHOLDER
  *
- * Version 2.1.0
- * Date: December 26, 2016
+ * Version 2.1.1
+ * Date: January 22, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -273,10 +273,12 @@ void loop()
   if (Serial.available()) {
     currentPacket = Serial.readStringUntil(';');
     if (currentPacket.substring(0, 16).equals("DISCOVERY_PACKET")) {
-      Serial.print("DISCOVERY_PACKET,");
-      Serial.print(MAX_HW_INDEX);
-      Serial.print(",");
-      Serial.println(buildStateUpdatePacket());
+      String discovery = "";
+      discovery += "DISCOVERY_PACKET,";
+      discovery += (uint8_t)MAX_HW_INDEX;
+      discovery += ",";
+      discovery += buildStateUpdatePacket();
+      Serial.print(discovery);
     } else {
       packetReceived = true;
     }
@@ -287,12 +289,14 @@ void loop()
   if (client) {
     currentPacket = client.readStringUntil('/');
     if (currentPacket.substring(0, 16).equals("DISCOVERY_PACKET")) {
-      client.print("DISCOVERY_PACKET,");
-      client.print(MAX_HW_INDEX);
-      client.print(",");
-      client.println(buildStateUpdatePacket());
+      String discovery = "";
+      discovery += "DISCOVERY_PACKET,";
+      discovery += (uint8_t)MAX_HW_INDEX;
+      discovery += ",";
+      discovery += buildStateUpdatePacket();
+      client.print(discovery);
     } else {
-      client.println(currentPacket); // echo packet back
+      client.print(currentPacket); // echo packet back
       packetReceived = true;
     }
   }
@@ -318,7 +322,7 @@ void loop()
             && (packet_int_array[0] < ePacketHeader_MAX)) {
           if (parsePacket(packet_int_array[0])) {
 #if IS_SERIAL
-            Serial.println(multi_packet_strings[current_multi_packet] + "&;");
+            Serial.print(multi_packet_strings[current_multi_packet] + "&;");
 #endif
             last_message_time = millis();
           }
@@ -711,9 +715,9 @@ bool parsePacket(int header)
 #if IS_MULTI
           if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
             routines_2.setColor(color_index,
-                                packet_int_array[2],
                                 packet_int_array[3],
-                                packet_int_array[4]);
+                                packet_int_array[4],
+                                packet_int_array[5]);
           }
 #endif
         }
@@ -791,11 +795,10 @@ bool parsePacket(int header)
       if (int_array_size == 1) {
         // Send back update
 #if IS_SERIAL
-        Serial.println(buildStateUpdatePacket() + ";");
-        Serial.flush();
+        Serial.print(buildStateUpdatePacket() + ";");
 #endif
 #if IS_HTTP
-        client.println(buildStateUpdatePacket());
+        client.print(buildStateUpdatePacket());
 #endif
 #if IS_UDP
         Bridge.put("state_update", buildStateUpdatePacket());
@@ -806,11 +809,10 @@ bool parsePacket(int header)
       if (int_array_size == 1) {
         // Send back update
 #if IS_SERIAL
-        Serial.println(buildCustomArrayUpdatePacket() + ";");
-        Serial.flush();
+        Serial.print(buildCustomArrayUpdatePacket() + ";");
 #endif
 #if IS_HTTP
-        client.println(buildCustomArrayUpdatePacket());
+        client.print(buildCustomArrayUpdatePacket());
 #endif
 #if IS_UDP
         Bridge.put("custom_array_update", buildCustomArrayUpdatePacket());
@@ -1046,3 +1048,4 @@ bool parseMultiMessageString(String message)
     return false;
   }
 }
+

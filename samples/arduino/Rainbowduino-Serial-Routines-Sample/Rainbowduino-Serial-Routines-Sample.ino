@@ -6,8 +6,8 @@
  * 
  * Provides a Serial interface to a set of lighting routines.
  *
- * Version 2.1.0
- * Date: December 26, 2016
+ * Version 2.1.1
+ * Date: January 22, 2016
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -115,10 +115,12 @@ void loop()
   if (Serial.available()) {
     currentPacket = Serial.readStringUntil(';');
     if (currentPacket.substring(0, 16).equals("DISCOVERY_PACKET")) {
-      Serial.print("DISCOVERY_PACKET,");
-      Serial.print(MAX_HW_INDEX);
-      Serial.print(",");
-      Serial.println(buildStateUpdatePacket());
+      String discovery = "";
+      discovery += "DISCOVERY_PACKET,";
+      discovery += (uint8_t)MAX_HW_INDEX;
+      discovery += ",";
+      discovery += buildStateUpdatePacket();
+      Serial.print(discovery);
     } else {
       packetReceived = true;
     }
@@ -135,7 +137,7 @@ void loop()
             && (int_array_size > 0)
             && (packet_int_array[0] < ePacketHeader_MAX)) {
           if (parsePacket(packet_int_array[0])) {
-            Serial.println(multi_packet_strings[current_multi_packet] + "&;");
+            Serial.print(multi_packet_strings[current_multi_packet] + "&;");
             last_message_time = millis();
           }
         }
@@ -398,15 +400,13 @@ bool parsePacket(int header)
     case eStateUpdateRequest:
       if (int_array_size == 1) {
         // Send back update
-        Serial.println(buildStateUpdatePacket() + ";");
-        Serial.flush();
+        Serial.print(buildStateUpdatePacket() + ";");
       }
       break;
     case eCustomArrayUpdateRequest:
       if (int_array_size == 1) {
         // Send back update
-        Serial.println(buildCustomArrayUpdatePacket() + ";");
-        Serial.flush();
+        Serial.print(buildCustomArrayUpdatePacket() + ";");
       }
       break;
     case eResetSettingsToDefaults:
@@ -594,3 +594,4 @@ bool parseMultiMessageString(String message)
     return false;
   }
 }
+
