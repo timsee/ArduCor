@@ -20,6 +20,7 @@ For documentation for the Yun based samples, [check here](yun).
     * [Control Packets](#control-packets)
     * [State Update Packet](#state-update)
     * [Discovery Packet](#discovery)
+    * [Cyclic Redundancy Check](#crc)
     * [Multi Serial Sample](#multi-sample)
     * [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html)
 * [Generating Samples](#generated-samples)
@@ -50,7 +51,7 @@ The sample sketches provide a serial interface that uses ASCII strings at a baud
 header,device_index,param2,param3,param4&;
 ```
 
-The header and the device index are required. The `&` is used to mark the end of a message. Up to 5 complete messages or 50 ASCII characters can be bundled together in a packet in any of the samples. For serial communication, a `;` is needed at the end of a group of messages. For UDP and HTTP, the end of their response payloads is used as the end of the group of messages.
+The header and the device index are required. The `&` is used to mark the end of a message. For serial communication, a `;` is needed at the end of a group of messages. For UDP and HTTP, the end of their response payloads is used as the end of the group of messages.
 
 Upon receiving a valid packet, the Arduino code loops through all the messages, updates its based on the content of each message, updates the LEDs based on its new states, then echoes the message back to the sender. 
 
@@ -66,8 +67,8 @@ The second argument in a message is always a device index. This value determines
 | New Routine       | (ELightingRoutine)0 - 14  |  
 | Color Group (Optional) | (EColorGroup)0 - 17        |  
 
-**Example:** `0,0,1&;` *(Header 0, Device Index 0, New Routine 1)*
- `0,0,4,6&;` *(Header 0, Device Index 0, New Routine 4, New Color Group 6)* 
+**Example:** `0,0,1&` *(Header 0, Device Index 0, New Routine 1)*
+ `0,0,4,6&` *(Header 0, Device Index 0, New Routine 4, New Color Group 6)* 
 
 *Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). *
 
@@ -79,7 +80,7 @@ The second argument in a message is always a device index. This value determines
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
-**Example:** `1,0,255,127,0&;` *(Header 1, Device Index 0, Red 255, Green 127, Blue 0)*
+**Example:** `1,0,255,127,0&` *(Header 1, Device Index 0, Red 255, Green 127, Blue 0)*
 
 
 #### Set Color in Custom Color Array
@@ -91,7 +92,7 @@ The second argument in a message is always a device index. This value determines
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
-**Example:** `2,0,3,255,127,0&;` *(Header 2, Device Index 0 Saved Color 3, Red 255, Green 127, Blue 0)*
+**Example:** `2,0,3,255,127,0&` *(Header 2, Device Index 0 Saved Color 3, Red 255, Green 127, Blue 0)*
 
 *Note: The Color Index must be smaller than the size of the custom color array, which is currently 10. These can be used in multi color routines by using the EColorGroup `eCustom`*
 
@@ -101,7 +102,7 @@ The second argument in a message is always a device index. This value determines
 | ------------- | ------------- |
 | Header        |     3         | 
 | Brightness %  | 0 - 100       |
-**Example:** `3,0,90&;` *(Header 3, Device Index 0, 90% brightness)*
+**Example:** `3,0,90&` *(Header 3, Device Index 0, 90% brightness)*
 
 #### Set Speed 
 
@@ -109,7 +110,7 @@ The second argument in a message is always a device index. This value determines
 | ------------- | ------------- |
 | Header        |     4         | 
 | Desired FPS * 100     | 1 - 2000      |
-**Example:** `4,0,500&;` *(Header 4, Device Index 0, 5 FPS)*
+**Example:** `4,0,500&` *(Header 4, Device Index 0, 5 FPS)*
 
 *Note: The value sent is the desired FPS * 100. To do 1 FPS, send 100, to do 10 FPS, send 1000. This only sets the desired FPS. When the FPS is very low, it will be close to accurate. An extremely fast FPS will be limited by the hardware being used, the number of LEDs, and other factors.  *
 
@@ -119,7 +120,7 @@ The second argument in a message is always a device index. This value determines
 | ------------- | ------------- |
 | Header        |     5         | 
 | Count         | 2 - 10        |
-**Example:** `5,0,3&;` *(Header 5, Device Index 0, 3 colors)*
+**Example:** `5,0,3&` *(Header 5, Device Index 0, 3 colors)*
 
 *Note: This setting controls the number of colors used for multi color routines using the custom color array.*
 
@@ -129,7 +130,7 @@ The second argument in a message is always a device index. This value determines
 | ------------- | ------------- |
 | Header        |     6        | 
 | Idle Timeout Minutes       | 0 - 1000      |
-**Example:** `6,0,120&;` *(Header 6, Device Index 0, 120 Minutes)*
+**Example:** `6,0,120&` *(Header 6, Device Index 0, 120 Minutes)*
 
 *Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `6,0,0&;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
 
@@ -140,7 +141,7 @@ The second argument in a message is always a device index. This value determines
 | Header        |     8         | 
 | Check 1       |     42        |
 | Check 2       |     71        |
-**Example:** `8,42,71&;` *(Header 7, Check 1, Check 2)*
+**Example:** `8,42,71&` *(Header 7, Check 1, Check 2)*
 
 *Note: This message contains two extra parameters to make it harder for it to be triggered accidentally by a corrupted packet.*
 
@@ -150,7 +151,7 @@ The second argument in a message is always a device index. This value determines
 | ------------- | ------------- |
 | Header        |     7       | 
 
-**Example:** `7&;` *(Header 7)*
+**Example:** `7&` *(Header 7)*
 
 Sending a state update gives 
 
@@ -177,7 +178,7 @@ $stateUpdate,$isOn,$isReachable,$red,$green,$blue,$routine,$colorGroup,$brightne
 | ------------- | ------------- |
 | Header        |     8       | 
 
-**Example:** `8&;` *(Header 8)*
+**Example:** `8&` *(Header 8)*
 
 Sending a state update gives 
 
@@ -203,11 +204,23 @@ The `$count` parameter denotes how many times the `,$index,$red,$green,$blue` se
 Sending the message `DISCOVERY_PACKET` to any of the samples will cause the sample to send a message back in the format of:
 
 ```
-DISCOVERY_PACKET,$numOfDevices,$stateUpdatePacket
+DISCOVERY_PACKET,$numOfDevices,$usingCRC,$maxPacketSize&
 ```
-where `$numOfDevices` is equal to the number of devices connected to this particular arduino. For nearly every sample, this number will be 1, so the packet sent from the arduino will be `DISCOVERY_PACKET,1`. For the Multi hardware sample, this number will be 3. This is an easy way to check whether or not the IP Address or Serial port that you are connecting to currently connects you to an Arduino running one of these samples. Appended to a response packet is also the current [stateUpdatePacket](#state-update). 
 
-A successful discovery call and response is not required for the samples to work. They are useful in projects like [Corluma](https://github.com/timsee/Corluma), so they are left in the samples. 
+| Parameter     | Range         |  Description   |
+| ------------- | ------------- |  ------------- |
+| numOfDevices  |     1 - 10    |  Number of RGB devices connected to arduino    |
+| usingCRC      |     0 - 1     |  1 if all packets require a CRC, 0 if skipped*  |
+| maxPacketSize |     1 - 1000  |  max number of characters accepted in a single message        |                  
+* *NOTE: even if CRC is on, discovery packets do not require or send out a CRC!*
+
+Discovery packets are used both as a way to check if an arduino is running a sketch with the proper messaging protocol and to set up the client sending messages to the arduino. 
+This is an easy way to check whether or not the IP Address or Serial port that you are connecting to currently connects you to an Arduino running one of these samples. 
+A successful discovery call and response is not required for the samples to work, although it is recommended as its lets the client know whether or not to use CRC with packets sent. For a C++ project that can parse and send messages using this protocol, check out [Corluma](https://github.com/timsee/Corluma). 
+
+### <a name="crc"></a> Cyclic Redundancy Check
+A [cylic redundancy check](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) is an optional setting for the sample code messing protocols. It is a value appended to the end of the packet that helps detect whether there were any changes to the raw data of the packet. It is recommended to turn on the CRC for serial communication with a client but turn it off if you are writing the ASCII commands yourself into the Serial Monitor (computing the CRC by hand is extra work!). It can be useful while debugging the UDP bridge code but is not necessary. It is overkill for HTTP packets as their datastreams are not at risk of getting garbled.
+These sample applications use CRC-32 which is a bit overkill with 4 billion available hash values, but this sample fell into the awkward area of needing slightly more than CRC-16 so we opted for an elegant CRC-32 that uses a minimal amount of PROGMEM. 
 
 ### <a name="multi-sample"></a>Multi Device Samples
 

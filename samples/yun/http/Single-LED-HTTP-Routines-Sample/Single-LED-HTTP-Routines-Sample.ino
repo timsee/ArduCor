@@ -3,11 +3,11 @@
  * Sample Sketch
  *
  * Supports a single RGB LED but can be easily hacked to support more.
- * 
- * Provides a HTTP interface to a set of lighting routines.
  *
- * Version 2.1.1
- * Date: January 22, 2016
+ * Provides a HTTP interface to a set of lighting routines.
+ * 
+ * Version 2.2.0
+ * Date: May 7, 2017
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -36,6 +36,10 @@ const int  DEFAULT_TIMEOUT   = 120;    // number of minutes without packets unti
 const int  DEFAULT_HW_INDEX  = 1;      // index for this particular microcontroller
 const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
 
+
+
+const bool USE_CRC           = true;   // true uses CRC, false ignores it.
+
 //=======================
 // Stored Values and States
 //=======================
@@ -44,6 +48,7 @@ ELightingRoutine current_routine = eSingleGlimmer;
 EColorGroup current_group = eCustom;
 
 bool isOn = true;
+bool skip_echo = false;
 
 // used in sketches with multiple hardware connected to one arduino.
 uint8_t received_hardware_index;
@@ -63,8 +68,6 @@ unsigned long last_message_time = 0;
 unsigned long loop_counter = 0;
 String currentPacket;
 
-BridgeClient client;
-
 //=======================
 // String Parsing
 //=======================
@@ -73,16 +76,19 @@ BridgeClient client;
 // packet is either illegal or empty and parsing can be skipped.
 bool packetReceived = false;
 
-const int max_number_of_messages = 5;
+// ints used for determining how much memory to use
+const int max_number_of_ints = 10;
 const int max_message_size = 20;
+const int max_number_of_messages = 10;
+const int max_packet_size = max_message_size * max_number_of_messages;
 
 // buffers for receiving messages
 String multi_packet_strings[max_number_of_messages];
 char multi_packet_char_array[max_message_size * max_number_of_messages];
 
-// buffers for converting ASCII to an int array 
-char char_array[20];
-int packet_int_array[10];
+// buffers for converting ASCII to an int array
+char char_array[max_message_size];
+int packet_int_array[max_number_of_ints];
 char num_buf[4];
 
 // used to manipulate the buffers for receiving messages and
@@ -92,12 +98,53 @@ int current_multi_packet = 0;
 int int_array_size = 0;
 
 //=======================
+// Yun Setup
+//=======================
+
+BridgeClient client;
+BridgeServer server;
+
+//=======================
 // RoutinesRGB Setup
 //=======================
 // Library used to generate the RGB LED routines.
 RoutinesRGB routines = RoutinesRGB(LED_COUNT);
 
-BridgeServer server;
+
+//=======================
+// CRC-32
+//=======================
+// Based on this guide http://excamera.com/sphinx/article-crc.html
+// 8-bit CRC is too little, 32-bit is a bit overkill but this method
+// is really elegant and uses very little PROGMEM
+
+const PROGMEM uint32_t crcTable[16] = {
+  0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
+  0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
+  0xedb88320, 0xf00f9344, 0xd6d6a3e8, 0xcb61b38c,
+  0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c
+};
+
+unsigned long crcUpdate(unsigned long crc, byte data)
+{
+  byte tableIndex;
+  tableIndex = crc ^ (data >> (0 * 4));
+  crc = pgm_read_dword_near(crcTable + (tableIndex & 0x0f)) ^ (crc >> 4);
+  tableIndex = crc ^ (data >> (1 * 4));
+  crc = pgm_read_dword_near(crcTable + (tableIndex & 0x0f)) ^ (crc >> 4);
+  return crc;
+}
+
+unsigned long crcCalculator(String s)
+{
+  unsigned long crc = ~0L;
+  for (uint16_t i = 0; i < s.length(); ++i) {
+    char c = s[i];
+    crc = crcUpdate(crc, c);
+  }
+  crc = ~crc;
+  return crc;
+}
 
 //================================================================================
 // Setup and Loop
@@ -125,15 +172,18 @@ void loop()
   client = server.accept();
   if (client) {
     currentPacket = client.readStringUntil('/');
-    if (currentPacket.substring(0, 16).equals("DISCOVERY_PACKET")) {
+    if (currentPacket.substring(0, 16).equals(F("DISCOVERY_PACKET"))) {
       String discovery = "";
-      discovery += "DISCOVERY_PACKET,";
+      discovery += F("DISCOVERY_PACKET");
+      discovery += ",";
       discovery += (uint8_t)MAX_HW_INDEX;
       discovery += ",";
-      discovery += buildStateUpdatePacket();
+      discovery += (uint8_t)USE_CRC;
+      discovery += ",";
+      discovery += (uint8_t)max_packet_size;
+      discovery += "&";
       client.print(discovery);
     } else {
-      client.print(currentPacket); // echo packet back
       packetReceived = true;
     }
   }
@@ -141,6 +191,7 @@ void loop()
     // remove any extraneous whitepsace or newline characters
     currentPacket.trim();
     bool multiMessageIsValid = parseMultiMessageString(currentPacket);
+    skip_echo = false;
     if (multiMessageIsValid) {
       for (current_multi_packet = 0; current_multi_packet < multi_packet_size; ++current_multi_packet) {
         bool isValid = delimitedStringToIntArray(multi_packet_strings[current_multi_packet]);
@@ -152,6 +203,9 @@ void loop()
             last_message_time = millis();
           }
         }
+      }
+      if (!skip_echo) {
+        client.print(currentPacket); // echo packet back
       }
     }
   }
@@ -279,7 +333,7 @@ void changeLightingRoutine(ELightingRoutine currentMode)
 /*!
  * @brief parsePacket This parser looks at the header of a control packet and from that determines
  *        which parameters to use and what settings to change.
- *
+ *        
  * @param header the int representation of the packet's first value.
  */
 bool parsePacket(int header)
@@ -411,12 +465,14 @@ bool parsePacket(int header)
       break;
     case eStateUpdateRequest:
       if (int_array_size == 1) {
+        skip_echo = true;
         // Send back update
         client.print(buildStateUpdatePacket());
       }
       break;
     case eCustomArrayUpdateRequest:
       if (int_array_size == 1) {
+        skip_echo = true;
         // Send back update
         client.print(buildCustomArrayUpdatePacket());
       }
@@ -473,6 +529,11 @@ String buildStateUpdatePacket()
   updatePacket += calculateMinutesUntilTimeout(last_message_time, idle_timeout);
   updatePacket += "&";
 
+  if (USE_CRC) {
+    // add the crc
+    updatePacket += crcCalculator(updatePacket);
+    updatePacket += "&";
+  }
   return updatePacket;
 }
 
@@ -491,6 +552,11 @@ String buildCustomArrayUpdatePacket() {
   }
   updatePacket += "&";
 
+  if (USE_CRC) {
+    // add the crc
+    updatePacket += crcCalculator(updatePacket);
+    updatePacket += "&";
+  }
   return updatePacket;
 }
 
@@ -512,14 +578,14 @@ unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned 
 //================================================================================
 
 /*!
- * @brief delimitedStringToIntArray takes an Arduino string that contains a series of
+ *  @brief delimitedStringToIntArray takes an Arduino string that contains a series of
  *        numbers delimited by commas, converts it to a char array, then converts
  *        that char array into a series of integers. C functions are used here to decrease
  *        PROGMEM size and to decrease the amount of dynamic memory allocation that
  *        is requird for String manipulation.
- *        
+ *
  * @param message the input string.
- * 
+ *
  * @return true if the string was parseable, false otherwise.
  */
 bool delimitedStringToIntArray(String message)
@@ -566,9 +632,9 @@ bool delimitedStringToIntArray(String message)
  * @brief parseMultiMessageString takes an Arduino string that contains a series of
  *        messages delimited by ampersands(&), and converts it to an array of strings.
  *        C functions are used here to decrease PROGMEM size.
- *        
+ *
  * @param message the input string.
- * 
+ *
  * @return true if the string was parseable, false otherwise.
  */
 bool parseMultiMessageString(String message)
@@ -587,6 +653,7 @@ bool parseMultiMessageString(String message)
       }
     }
 
+    uint32_t lastPos = 0;
     // if the string is parseable, parse it.
     if (isValid) {
       // Get the frist substring delimited by a "&"
@@ -594,16 +661,44 @@ bool parseMultiMessageString(String message)
       while (valuePtr != 0) {
         // convert chars to int and story in int array.
         multi_packet_strings[multi_packet_size] = String(valuePtr);
-        multi_packet_size++;
         // Find the next substring delimited by a "&"
         valuePtr = strtok(0, "&");
+        if (valuePtr != 0) {
+          lastPos += multi_packet_strings[multi_packet_size].length() + 1;
+        }
+        multi_packet_size++;
       }
-      return isValid;
+    }
+
+    if (isValid) {
+      if (USE_CRC) {
+        if (multi_packet_size < 2) { 
+          // using CRC, but packet is too small 
+          return false; 
+        } 
+        // create a substring of the packet without the CRC
+        unsigned long computedCRC = crcCalculator(message.substring(0, lastPos));
+        // grab the value of the crc
+        unsigned long givenCRC = multi_packet_strings[multi_packet_size - 1].toInt();
+        multi_packet_size--; // last packet is a checksum, not a valid packet.
+        if (computedCRC == givenCRC) {
+          // using CRC, computed CRC matches given
+          return true;
+        } else {
+          // using CRC, computed CRC matches given
+          return false;
+        }
+      } else {
+        // valid but not using CRC, return true
+        return true;
+      }
     } else {
-      return isValid;
+      // not valid, exit early
+      return false;
     }
   } else {
     return false;
   }
 }
+
 

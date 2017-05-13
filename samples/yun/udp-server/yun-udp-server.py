@@ -3,8 +3,8 @@
 #------------------------------------------------------------
 # Arduino Yun UDP Echo Server
 #------------------------------------------------------------
-# Version 1.2
-# December 26, 2016
+# Version 1.3
+# May 7th, 2017
 # MIT License (in root of git repo)
 # by Tim Seemann
 #
@@ -40,6 +40,9 @@ from bridgeclient import BridgeClient
 # port for the UDP connection to bind to
 UDP_PORT = 10008
 
+# set by the arduino project, defines maximum size packet it will accept
+max_packet_size = 512
+
 # Echoing back commands slows down the speed that lights update but it gives
 # more reliability since you know when a packet is received. Set this to 
 # false to increase the light update speed. 
@@ -74,25 +77,30 @@ sock.bind(("", UDP_PORT))
 while True:
     # waits until it receives data
     data, addr = sock.recvfrom(512)
-    # print "received %r from %r" % (data, addr)
+    header = data[:2]
+    print "received %r from %r" % (data, addr)
     if data == "DISCOVERY_PACKET":
-        hardware_count = bridge.get('hardware_count')  
+        hardware_count = bridge.get('hardware_count') 
+        using_crc = bridge.get('using_crc') 
+        max_packet_size = bridge.get('max_packet_size') 
         data += ','
         data += str(hardware_count)
-        state_update = bridge.get('state_update') 
         data += ','
-        data += state_update
+        data += str(using_crc)
+        data += ','
+        data += str(max_packet_size)
+        data += '&'
         # sends discovery packet
         sock.sendto(data, (addr[0], UDP_PORT))
-    elif data == "7&":
+    elif header == "7&":
         bridge.put('udp', data)
         state_update = bridge.get('state_update')
         sock.sendto(state_update, (addr[0], UDP_PORT)) 
-    elif data == "8&":
+    elif header == "8&":
         bridge.put('udp', data)
         custom_array_update = bridge.get('custom_array_update')
         sock.sendto(custom_array_update, (addr[0], UDP_PORT)) 
-    else: 
+    elif len(data) <= max_packet_size: 
         # puts data on arduino bridge
     	bridge.put('udp', data)
         if should_echo:
