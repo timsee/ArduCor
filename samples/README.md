@@ -48,7 +48,7 @@ behavior depending on whether its a common anode or a common cathode. To handle 
 The sample sketches provide a serial interface that uses ASCII strings at a baud rate of 9600. The commands are a list of integers in the following format:
 
 ```
-header,device_index,param2,param3,param4&;
+header,device_index,param2,param3,param4&
 ```
 
 The header and the device index are required. The `&` is used to mark the end of a message. For serial communication, a `;` is needed at the end of a group of messages. For UDP and HTTP, the end of their response payloads is used as the end of the group of messages.
