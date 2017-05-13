@@ -105,3 +105,9 @@
 #### Cleanup Update Part 2
 * Fixed bugs in samples.
 
+### **v2.2.0** 
+#### Samples Update
+* Added an optional CRC to messages. 
+* Updated discovery packes.
+* Fixed more bugs in samples. 
+
