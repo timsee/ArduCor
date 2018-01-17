@@ -16,6 +16,7 @@ A related project, [Corluma](https://github.com/timsee/Corluma), provides a cros
 * Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00001.html) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
 * [Sample Sketch Usage](samples)
     * [Yun Samples](samples/yun)
+    * [Raspberry Pi Sample](samples/pi)
 * [Contributing](#contributing)
 * [License](#license)
 * [Version Notes](CHANGELOG.md)
@@ -28,7 +29,7 @@ A related project, [Corluma](https://github.com/timsee/Corluma), provides a cros
 4. Build and upload to your board.
 
 
-If there are compilation issues, make sure you have the library for your hardware setup installed. For a Rainbowduino, you can find the library [here](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0). For a NeoPixel, you can find the library [here](https://github.com/adafruit/Adafruit_NeoPixel). 
+If there are compilation issues, make sure you have the library for your hardware setup installed. For a Rainbowduino, you can find the library [here](http://www.seeedstudio.com/wiki/Rainbowduino_v3.0). For a NeoPixel, you can find the library [here](https://github.com/adafruit/Adafruit_NeoPixel).
 
 
 ## <a name="library-usage"></a>Library Usage
@@ -48,7 +49,7 @@ These routines use a single color:
 
 ### <a name="multi-routines"></a>Multi Colors Routines
 
-These routines use groups of colors saved in an array to execute the routine. This can be a custom group of colors or it can come from a pallete of preset colros. All routines have a parameter used to determine the color group for the routine. A description of the different color groups is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). 
+These routines use groups of colors saved in an array to execute the routine. This can be a custom group of colors or it can come from a pallete of preset colros. All routines have a parameter used to determine the color group for the routine. A description of the different color groups is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html).
 
 * Multi Glimmer
 * Multi Random Individual
@@ -59,7 +60,7 @@ These routines use groups of colors saved in an array to execute the routine. Th
 
 ### <a name="post-processing"></a>Post Processing
 
-Tese are optional and can be applied after a routine. The `applyBrightness` option is recommended, since it simplifies dimming the LEDs by making their overall brightness a parameter between 0 and 100. 
+Tese are optional and can be applied after a routine. The `applyBrightness` option is recommended, since it simplifies dimming the LEDs by making their overall brightness a parameter between 0 and 100.
 
 * Apply Brightness
 * Draw Color on LED

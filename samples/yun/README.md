@@ -1,6 +1,6 @@
 # Arduino Yun Sample Sketches
 
-Sample Sketches for the Arduino Yun. These samples provide a messagign protocol to control LEDs over HTTP or UDP. 
+Sample Sketches for the Arduino Yun. These samples provide a messaging protocol to control LEDs over HTTP or UDP.
 
 ## <a name="toc"></a>Table of Contents
 
