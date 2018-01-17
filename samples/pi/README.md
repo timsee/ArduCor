@@ -29,7 +29,7 @@ mkdir ~/scripts
 * Next, pull the script from the web by navigating to the directory and running wget
 ```
 cd ~/scripts
-wget https://raw.githubusercontent.com/timsee/RGB-LED-Routines/master/samples/pi/UDPtoSerial.py
+wget https://raw.githubusercontent.com/timsee/RGB-LED-Routines/master/samples/pi/UDPtoSerialAdapter.py
 ```
 * Now that you have the script on the Pi, connect your Arduino running an _RGB-LED-Routines_ sample to the raspberry pi over USB.
 * Find the serial connection's name on the Raspberry Pi. Two common ones would be `/dev/ttyUSB0` and `/dev/ttyACM0` but it may be different for you. You can use the arduino IDE to find and test the serial connection if you prefer GUIs, or you can use command line with  `dmesg | grep tty`.
