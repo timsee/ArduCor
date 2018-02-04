@@ -1,15 +1,5 @@
-# Raspberry Pi
-
-Do you want to control an _RGB-LED-Routines_ sample wirelessly but you don't have an Arduino Yun laying around? This guide will allow you to use a Raspberry Pi as a wireless adapter for an Arduino.
-
-## <a name="hardware"></a>Required Hardware
-
-* An Arduino running a serial sample of `RGB-LED-Routines`
-* A Raspberry Pi
-* A usb cable for communication between the Arduino and Raspberry Pi
-
-#### <a name="setup"></a>Setup
-
+## <a name="setup"></a>Setup on a Raspberry Pi
+_This guide shows how to set up a Raspberry Pi to be a dedicated lights server. Setup steps should be similar but not identical in different Raspberry Pi environments._
 * To start out, install your favorite OS onto a Raspberry Pi. For this guide, I will be using Raspbian Stretch.
 * Next, [install pip](https://pip.pypa.io/en/stable/installing/). In many distros, you can just run:
 ```
@@ -29,11 +19,11 @@ mkdir ~/scripts
 * Next, pull the script from the web by navigating to the directory and running wget
 ```
 cd ~/scripts
-wget https://raw.githubusercontent.com/timsee/RGB-LED-Routines/master/samples/pi/UDPtoSerialAdapter.py
+wget https://raw.githubusercontent.com/timsee/RGB-LED-Routines/master/samples/pi/UDPtoSerial.py
 ```
 * Now that you have the script on the Pi, connect your Arduino running an _RGB-LED-Routines_ sample to the raspberry pi over USB.
 * Find the serial connection's name on the Raspberry Pi. Two common ones would be `/dev/ttyUSB0` and `/dev/ttyACM0` but it may be different for you. You can use the arduino IDE to find and test the serial connection if you prefer GUIs, or you can use command line with  `dmesg | grep tty`.
-* Now its time to test the script. Test the script by running this, replacing `$SERIAL` with the serial connection name from the last step:
+* Now its time to test the script. Test the script by running this, replacing `$SERIAL` with the serial connection name from the last step. If you want to connect to multiple arduino samples, add them all as arguments to the python script and separate those arguments with spaces:
 ```
 cd ~/scripts
 python UDPtoSerial.py $SERIAL
@@ -44,9 +34,4 @@ python UDPtoSerial.py $SERIAL
 python /home/$USER/scriptsUDPtoSerial.py $SERIAL
 ```
 * Save your modifications and reboot the Raspberry Pi. Congratulations, you should now be able to control the Arduino through the Raspberry Pi using UDP packets!
-
-
-#### <a name="FAQ"></a>FAQ
-
-* *Will this guide work on boards or computers other than a Raspberry Pi?* Yeah, probably! It might need one or two tweaks, but the script is not using anything that is Raspberry Pi specific.
 

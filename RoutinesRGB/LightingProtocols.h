@@ -1,7 +1,7 @@
 /*!
  * \file LightingProtocols.h
- * \version v2.1.0
- * \date December 26, 2016
+ * \version v2.1.1
+ * \date January 29, 2018
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License

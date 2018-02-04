@@ -6,14 +6,15 @@
  *
  * Provides a HTTP interface to a set of lighting routines.
  * 
- * Version 2.2.0
- * Date: May 7, 2017
+ * Version 2.8.0
+ * Date: February 3, 2018
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
 #include <RoutinesRGB.h>
 #include <BridgeServer.h>
 #include <BridgeClient.h>
+
 
 //================================================================================
 // Settings
@@ -37,8 +38,18 @@ const int  DEFAULT_HW_INDEX  = 1;      // index for this particular microcontrol
 const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
 
 
+const bool USE_CRC           = false;   // true uses CRC, false ignores it.
 
-const bool USE_CRC           = true;   // true uses CRC, false ignores it.
+//=======================
+// API level
+//=======================
+// The API level defines the messaging protocol. Major levels are incremented 
+// when the API breaks and significant features are added that cannot be 
+// supported in the old API. Minor levels are incremented when the API has 
+// new functions added that do not significantly break the existing
+// messaging protocol.
+const uint8_t API_LEVEL_MAJOR = 2;
+const uint8_t API_LEVEL_MINOR = 0;
 
 //=======================
 // Stored Values and States
@@ -48,7 +59,10 @@ ELightingRoutine current_routine = eSingleGlimmer;
 EColorGroup current_group = eCustom;
 
 bool isOn = true;
+// set this to turn off echoing all together
 bool skip_echo = false;
+// the sample sets this when it receives a valid packet
+bool should_echo = false;
 
 // used in sketches with multiple hardware connected to one arduino.
 uint8_t received_hardware_index;
@@ -66,7 +80,6 @@ unsigned long last_message_time = 0;
 // counts each loop and uses it to determine
 // when to update the LEDs.
 unsigned long loop_counter = 0;
-String currentPacket;
 
 //=======================
 // String Parsing
@@ -79,23 +92,36 @@ bool packetReceived = false;
 // ints used for determining how much memory to use
 const int max_number_of_ints = 10;
 const int max_message_size = 20;
-const int max_number_of_messages = 10;
+const int max_number_of_messages = 8;
 const int max_packet_size = max_message_size * max_number_of_messages;
 
 // buffers for receiving messages
-String multi_packet_strings[max_number_of_messages];
-char multi_packet_char_array[max_message_size * max_number_of_messages];
+char current_packet[max_message_size * max_number_of_messages];
+char echo_message[max_message_size * max_number_of_messages];
 
 // buffers for converting ASCII to an int array
 char char_array[max_message_size];
 int packet_int_array[max_number_of_ints];
-char num_buf[4];
+char temp_packet[max_packet_size];
+char echo_packet[max_packet_size];
 
 // used to manipulate the buffers for receiving messages and
 // converting them to int arrays.
 int multi_packet_size = 0;
 int current_multi_packet = 0;
 int int_array_size = 0;
+
+// buffers for char arrays
+char state_update_packet[100];
+char discovery_packet[35];
+
+// used for string manipulations
+char num_buf[16];
+const char value_delimiter[] = ",";
+const char message_delimiter[] = "&";
+const char crc_delimiter[] = "#";
+const char packet_delimiter[] = ";";
+const char new_line[] = "\n";
 
 //=======================
 // Yun Setup
@@ -118,7 +144,8 @@ RoutinesRGB routines = RoutinesRGB(LED_COUNT);
 // 8-bit CRC is too little, 32-bit is a bit overkill but this method
 // is really elegant and uses very little PROGMEM
 
-const PROGMEM uint32_t crcTable[16] = {
+const PROGMEM uint32_t crcTable[16] = 
+{
   0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
   0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
   0xedb88320, 0xf00f9344, 0xd6d6a3e8, 0xcb61b38c,
@@ -135,12 +162,13 @@ unsigned long crcUpdate(unsigned long crc, byte data)
   return crc;
 }
 
-unsigned long crcCalculator(String s)
+unsigned long crcCalculator(const char* packet)
 {
   unsigned long crc = ~0L;
-  for (uint16_t i = 0; i < s.length(); ++i) {
-    char c = s[i];
-    crc = crcUpdate(crc, c);
+  uint16_t i = 0;
+  while (packet[i] != 0) {
+    crc = crcUpdate(crc, packet[i]);
+    ++i;
   }
   crc = ~crc;
   return crc;
@@ -164,48 +192,69 @@ void setup()
   // and its set it to green in sample routines.
   // If its not set, it defaults to a faint orange.
   routines.setMainColor(0, 255, 0);
+  buildDiscoveryPacket();
 }
 
 void loop()
 {
   packetReceived = false;
+  memset(current_packet, 0, sizeof(current_packet));
   client = server.accept();
   if (client) {
-    currentPacket = client.readStringUntil('/');
-    if (currentPacket.substring(0, 16).equals(F("DISCOVERY_PACKET"))) {
-      String discovery = "";
-      discovery += F("DISCOVERY_PACKET");
-      discovery += ",";
-      discovery += (uint8_t)MAX_HW_INDEX;
-      discovery += ",";
-      discovery += (uint8_t)USE_CRC;
-      discovery += ",";
-      discovery += (uint8_t)max_packet_size;
-      discovery += "&";
-      client.print(discovery);
+    client.readBytesUntil('/',current_packet, sizeof(current_packet));
+    if (current_packet[0] == 'D') {
+      char* pch = strstr (current_packet,"DISCOVERY_PACKET");
+      // strip newline
+      pch = strtok(pch, "\r");
+      pch = strtok(pch, "\n");
+      if (strcmp(pch, "DISCOVERY_PACKET") == 0) {
+        client.print(discovery_packet);
+      }
     } else {
       packetReceived = true;
     }
   }
   if (packetReceived) {
-    // remove any extraneous whitepsace or newline characters
-    currentPacket.trim();
-    bool multiMessageIsValid = parseMultiMessageString(currentPacket);
+    memset(echo_message, 0, sizeof(echo_message));
+    /// make a pointer we can manipulate during packet parsing
+    char* packetPtr = current_packet;
+    // strip newline
+    packetPtr = strtok(packetPtr, "\r");
+    packetPtr = strtok(packetPtr, "\n");
+    bool messageIsValid = checkIfPacketIsValid(packetPtr);
     skip_echo = false;
-    if (multiMessageIsValid) {
-      for (current_multi_packet = 0; current_multi_packet < multi_packet_size; ++current_multi_packet) {
-        bool isValid = delimitedStringToIntArray(multi_packet_strings[current_multi_packet]);
+    should_echo = false;
+    if (messageIsValid) { 
+      // go through each message packet
+     char* messagePtr = strtok(packetPtr, "&");
+      while (messagePtr != 0) {
+        if (!skip_echo) {
+          strcpy(temp_packet, messagePtr); // Copy for parsing a destructive way
+          strcpy(echo_packet, messagePtr); // save for echoing 
+        }
+        // Find the next substring delimited by a "&"
+        messagePtr = strtok(0, "&");
+        
+        // convert from a array of chars into an int array
+        delimitedStringToIntArray(temp_packet);
         // parse a paceket only if its header is is in the correct range
-        if (isValid
-            && (int_array_size > 0)
+        if ((int_array_size > 0)
             && (packet_int_array[0] < ePacketHeader_MAX)) {
+          // message is valid and the first int can be interpeted as a header
+          //  attempt to parse the whole packet
           if (parsePacket(packet_int_array[0])) {
+            // if packet parsing is sucessful, echo the packet
             last_message_time = millis();
+            if (!skip_echo) {
+              strcat(echo_message, echo_packet);
+              strcat(echo_message, message_delimiter);
+              should_echo = true;
+            }
           }
         }
       }
-      if (!skip_echo) {
-        client.print(currentPacket); // echo packet back
+      if (!skip_echo && should_echo) {
+        echoPacket();
       }
     }
   }
@@ -348,8 +397,8 @@ bool parsePacket(int header)
         if (packet_int_array[2] != current_routine) {
           // Reset to 0 to draw to screen right away
           loop_counter = 0;
-          success = true;
         }
+        success = true;
         received_hardware_index = packet_int_array[1];
         if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
           if ((ELightingRoutine)packet_int_array[2] == eOff) {
@@ -367,8 +416,8 @@ bool parsePacket(int header)
           if (packet_int_array[2] != current_routine) {
             // Reset to 0 to draw to screen right away
             loop_counter = 0;
-            success = true;
           }
+          success = true;
           received_hardware_index = packet_int_array[1];
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             current_routine = (ELightingRoutine)packet_int_array[2];
@@ -385,8 +434,8 @@ bool parsePacket(int header)
             || packet_int_array[4] != routines.mainColor().blue) {
           // Reset to 0 to draw to screen right away
           loop_counter = 0;
-          success = true;
         }
+        success = true;
         received_hardware_index = packet_int_array[1];
         if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
           routines.setMainColor(packet_int_array[2],
@@ -467,14 +516,16 @@ bool parsePacket(int header)
       if (int_array_size == 1) {
         skip_echo = true;
         // Send back update
-        client.print(buildStateUpdatePacket());
+        buildStateUpdatePacket();
+        client.print(state_update_packet);
       }
       break;
     case eCustomArrayUpdateRequest:
       if (int_array_size == 1) {
         skip_echo = true;
         // Send back update
-        client.print(buildCustomArrayUpdatePacket());
+        buildCustomArrayUpdatePacket();
+        client.print(state_update_packet);
       }
       break;
     case eResetSettingsToDefaults:
@@ -499,66 +550,107 @@ bool parsePacket(int header)
 // State Update
 //================================================================================
 
-String buildStateUpdatePacket()
+void buildStateUpdatePacket() 
 {
-  String updatePacket = "";
-  updatePacket += (uint8_t)eStateUpdateRequest;
-  updatePacket += ",";
-  updatePacket += (uint8_t)hardware_index;
-  updatePacket += ",";
-  updatePacket += (uint8_t)isOn;
-  updatePacket += ",";
-  updatePacket += (uint8_t)1; // isReachable
-  updatePacket += ",";
-  updatePacket += (uint8_t)routines.mainColor().red;
-  updatePacket += ",";
-  updatePacket += (uint8_t)routines.mainColor().green;
-  updatePacket += ",";
-  updatePacket += (uint8_t)routines.mainColor().blue;
-  updatePacket += ",";
-  updatePacket += (uint8_t)current_routine;
-  updatePacket += ",";
-  updatePacket += (uint8_t)current_group;
-  updatePacket += ",";
-  updatePacket += (uint8_t)routines.brightness();
-  updatePacket += ",";
-  updatePacket += (uint16_t)raw_speed;
-  updatePacket += ",";
-  updatePacket += (uint16_t)(idle_timeout / 60000);
-  updatePacket += ",";
-  updatePacket += calculateMinutesUntilTimeout(last_message_time, idle_timeout);
-  updatePacket += "&";
+  memset(state_update_packet, 0, sizeof(state_update_packet));
 
+  strcat(state_update_packet, itoa((uint8_t)eStateUpdateRequest, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)hardware_index, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)isOn, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(1, num_buf, 10)); // isReachable
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(routines.mainColor().red, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(routines.mainColor().green, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(routines.mainColor().blue, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)current_routine, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)current_group, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(routines.brightness(), num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(raw_speed, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(idle_timeout / 60000, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(calculateMinutesUntilTimeout(last_message_time, idle_timeout), num_buf, 10));
+  strcat(state_update_packet, message_delimiter);
+
+
+  // add the crc
   if (USE_CRC) {
-    // add the crc
-    updatePacket += crcCalculator(updatePacket);
-    updatePacket += "&";
-  }
-  return updatePacket;
+    unsigned long crc = crcCalculator(state_update_packet);
+    strcat(state_update_packet, crc_delimiter);
+    strcat(state_update_packet, ultoa(crc, num_buf, 10));
+    strcat(state_update_packet, message_delimiter);
+   }  
+
 }
 
-String buildCustomArrayUpdatePacket() {
-  String updatePacket = "";
-  updatePacket += (uint8_t)eCustomArrayUpdateRequest;
-  updatePacket += ",";
-  updatePacket += (uint8_t)hardware_index;
+
+void buildCustomArrayUpdatePacket() 
+{
+  memset(state_update_packet, 0, sizeof(state_update_packet));
+
+  strcat(state_update_packet, itoa((uint8_t)eCustomArrayUpdateRequest, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)hardware_index, num_buf, 10));
   for (int i = 0; i < routines.customColorCount(); ++i) {
-    updatePacket += ",";
-    updatePacket += routines.color(i).red;
-    updatePacket += ",";
-    updatePacket += routines.color(i).green;
-    updatePacket += ",";
-    updatePacket += routines.color(i).blue;
+    strcat(state_update_packet, value_delimiter);
+    strcat(state_update_packet, itoa(routines.color(i).red, num_buf, 10));
+    strcat(state_update_packet, value_delimiter);
+    strcat(state_update_packet, itoa(routines.color(i).green, num_buf, 10));
+    strcat(state_update_packet, value_delimiter);
+    strcat(state_update_packet, itoa(routines.color(i).blue, num_buf, 10));
   }
-  updatePacket += "&";
+  strcat(state_update_packet, message_delimiter);
 
+
+  // add the crc
   if (USE_CRC) {
-    // add the crc
-    updatePacket += crcCalculator(updatePacket);
-    updatePacket += "&";
-  }
-  return updatePacket;
+    unsigned long crc = crcCalculator(state_update_packet);
+    strcat(state_update_packet, crc_delimiter);
+    strcat(state_update_packet, ultoa(crc, num_buf, 10));
+    strcat(state_update_packet, message_delimiter);
+  }  
+
 }
+
+void buildDiscoveryPacket()
+{
+  strcat(discovery_packet, "DISCOVERY_PACKET");
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)API_LEVEL_MAJOR, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)API_LEVEL_MINOR, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)USE_CRC, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)MAX_HW_INDEX, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)max_packet_size, num_buf, 10));
+  strcat(discovery_packet, message_delimiter);
+  
+}
+
+void echoPacket()
+{  
+  // add the crc
+  if (USE_CRC) {
+    unsigned long crc = crcCalculator(state_update_packet);
+    strcat(echo_message, crc_delimiter);
+    strcat(echo_message, ultoa(crc, num_buf, 10));
+    strcat(echo_message, message_delimiter);
+   }  
+  
+  client.print(echo_message); 
+}
+
 
 unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned long timeout_max) {
   if (timeout_max == 0) {
@@ -578,127 +670,101 @@ unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned 
 //================================================================================
 
 /*!
- *  @brief delimitedStringToIntArray takes an Arduino string that contains a series of
- *        numbers delimited by commas, converts it to a char array, then converts
- *        that char array into a series of integers. C functions are used here to decrease
- *        PROGMEM size and to decrease the amount of dynamic memory allocation that
- *        is requird for String manipulation.
+ * @brief checkIfPacketIsValid takes a char array as input and determines if  
+ *        it contains the proper characters. If CRC is enabled, it also runs the
+ *        CRC check. This function does not modify the char array in any way. 
  *
- * @param message the input string.
+ * @param message the input char array.
  *
- * @return true if the string was parseable, false otherwise.
+ * @return true if the string was parseable and passes CRC, false otherwise.
  */
-bool delimitedStringToIntArray(String message)
+bool checkIfPacketIsValid(char* message)
 {
   bool isValid = true;
-  int_array_size = 0;
-  // ignore messages that are too long
-  if (message.length() + 1 < sizeof(char_array)) {
-    // append a final comma to simplify parsing
-    message += ",";
-    // convert to char array
-    message.toCharArray(char_array, message.length());
 
-    // check if it contains valid characters.
-    for (int i = 0; i < message.length(); i++) {
-      if (!(isdigit(message[i])
-            || message[i] == ','
-            || message[i] == '-')) {
+  //-----
+  // Validity check
+  //-----
+  // check if it contains only valid characters
+  int hashCount = 0;
+  int i = 0;
+  while(message[i] != 0) {
+    if (!(isdigit(message[i])
+          || message[i] == ','
+          || message[i] == '&'
+          || message[i] == '#'
+          || message[i] == '-')) {
+      isValid = false;
+    }
+  
+    // # is only used in CRCs, and a valid message
+    // can only have one. 
+    if (message[i] == '#') {
+      if (USE_CRC) {
+        // count number of #
+        hashCount++;
+      } else {
+        // This should not be valid as its used for CRC only
         isValid = false;
       }
-    }
+    }  
+    ++i;
+  }
 
-    // if the string is parseable, parse it.
-    if (isValid) {
-      // Get the frist substring delimited by a ","
-      char* valuePtr = strtok(char_array, ",");
-      while (valuePtr != 0) {
-        // convert chars to int and story in int array.
-        packet_int_array[int_array_size] = atoi(valuePtr);
-        int_array_size++;
-        // Find the next substring delimited by a ","
-        valuePtr = strtok(0, ",");
-      }
-      return isValid;
+  //-----
+  // Early failures check
+  //-----
+  // exit early if packet is not valid. 
+  if ((USE_CRC && (hashCount != 1)) // CRC packets must have one #
+      || (isValid == false)) {
+    return false;
+  }
+  
+  //-----
+  // CRC check
+  //-----
+  if (USE_CRC) {
+    // get a char array of the payload
+    char* payload = strtok(message, "#");
+    // get a char array of the CRC
+    char* crcASCII = strtok(0, "&");
+    // compute the CRC of the full packet
+    unsigned long computedCRC = crcCalculator(message);
+    // grab the unsigned long value of the crc
+    unsigned long givenCRC = strtoul(crcASCII, NULL, 0);
+    if (computedCRC == givenCRC) {
+      // using CRC, computed CRC matches given
+      return true;
     } else {
-      return isValid;
+      // using CRC, computed CRC matches given
+      return false;
     }
   } else {
-    return false;
+    // valid but not using CRC, return true
+    return true;
   }
 }
 
 /*!
- * @brief parseMultiMessageString takes an Arduino string that contains a series of
- *        messages delimited by ampersands(&), and converts it to an array of strings.
- *        C functions are used here to decrease PROGMEM size.
+ *  @brief delimitedStringToIntArray takes a char array and fills the packet_int_array
+ *         variable with the integer representation of these packets. By this point in message parsing,
+ *         it is already confirmed that the messages contain only digits and "," characters, as the char
+ *         array has passed its CRC check and has been converted into a single message and has had its "&"
+ *         stripped away. This is a destructive operation and the char array cannot be used after it. 
  *
  * @param message the input string.
  *
- * @return true if the string was parseable, false otherwise.
  */
-bool parseMultiMessageString(String message)
+void delimitedStringToIntArray(char* message)
 {
-  bool isValid = false;
-  multi_packet_size = 0;
-  // ignore messages that are too long
-  if (message.length() < sizeof(multi_packet_char_array)) {
-    // convert to char array
-    message.toCharArray(multi_packet_char_array, message.length());
-
-    // check if it contains valid characters.
-    for (int i = 0; i < message.length(); i++) {
-      if (message[i] == '&') {
-        isValid = true;
-      }
-    }
-
-    uint32_t lastPos = 0;
-    // if the string is parseable, parse it.
-    if (isValid) {
-      // Get the frist substring delimited by a "&"
-      char* valuePtr = strtok(multi_packet_char_array, "&");
-      while (valuePtr != 0) {
-        // convert chars to int and story in int array.
-        multi_packet_strings[multi_packet_size] = String(valuePtr);
-        // Find the next substring delimited by a "&"
-        valuePtr = strtok(0, "&");
-        if (valuePtr != 0) {
-          lastPos += multi_packet_strings[multi_packet_size].length() + 1;
-        }
-        multi_packet_size++;
-      }
-    }
-
-    if (isValid) {
-      if (USE_CRC) {
-        if (multi_packet_size < 2) { 
-          // using CRC, but packet is too small 
-          return false; 
-        } 
-        // create a substring of the packet without the CRC
-        unsigned long computedCRC = crcCalculator(message.substring(0, lastPos));
-        // grab the value of the crc
-        unsigned long givenCRC = multi_packet_strings[multi_packet_size - 1].toInt();
-        multi_packet_size--; // last packet is a checksum, not a valid packet.
-        if (computedCRC == givenCRC) {
-          // using CRC, computed CRC matches given
-          return true;
-        } else {
-          // using CRC, computed CRC matches given
-          return false;
-        }
-      } else {
-        // valid but not using CRC, return true
-        return true;
-      }
-    } else {
-      // not valid, exit early
-      return false;
-    }
-  } else {
-    return false;
-  }
+  int_array_size = 0;
+  // Get the frist substring delimited by a ","
+  char* valuePtr = strtok(message, ",");
+  while (valuePtr != 0) {
+    // convert chars to int and story in int array.
+    packet_int_array[int_array_size] = atoi(valuePtr);
+    int_array_size++;
+    // Find the next substring delimited by a ","
+    valuePtr = strtok(0, ",");
+  } 
 }
-
-
