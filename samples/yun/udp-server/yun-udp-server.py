@@ -3,8 +3,8 @@
 #------------------------------------------------------------
 # Arduino Yun UDP Echo Server
 #------------------------------------------------------------
-# Version 1.3
-# May 7th, 2017
+# Version 1.4
+# February 3, 2018
 # MIT License (in root of git repo)
 # by Tim Seemann
 #
@@ -78,15 +78,21 @@ while True:
     # waits until it receives data
     data, addr = sock.recvfrom(512)
     header = data[:2]
-    print "received %r from %r" % (data, addr)
+    # print "received %r from %r" % (data, addr)
     if data == "DISCOVERY_PACKET":
+        major_api = bridge.get('major_api')
+        minor_api = bridge.get('minor_api')
+        using_crc = bridge.get('using_crc')
         hardware_count = bridge.get('hardware_count') 
-        using_crc = bridge.get('using_crc') 
-        max_packet_size = bridge.get('max_packet_size') 
+        max_packet_size = bridge.get('max_packet_size')
         data += ','
-        data += str(hardware_count)
+        data += str(major_api)
+        data += ','
+        data += str(minor_api)
         data += ','
         data += str(using_crc)
+        data += ','
+        data += str(hardware_count)
         data += ','
         data += str(max_packet_size)
         data += '&'

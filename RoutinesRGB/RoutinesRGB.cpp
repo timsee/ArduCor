@@ -1,6 +1,6 @@
 /*!
- * \version v2.1.0
- * \date December 26, 2016
+ * \version v2.1.1
+ * \date January 29, 2018
  * \author Tim Seemann
  * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
  *            MIT License
@@ -81,6 +81,11 @@ void RoutinesRGB::resetToDefaults()
     m_blink_speed  = DEFAULT_BLINK_SPEED;
     m_custom_count = DEFAULT_CUSTOM_COUNT;
     m_bar_size     = DEFAULT_BAR_SIZE;
+    // edge case for smaller LED arrays, rather than using multiple LEDs in a "bar"
+    // it defaults to one LED per bar.
+    if (m_LED_count < 32) {
+        m_bar_size = 1;
+    }
     
     // set temp values
     m_temp_index = 0;

@@ -114,3 +114,14 @@
 ### **v2.3.0**
 #### Raspberry Pi Sample Update
 * Added a new sample using a Raspberry Pi and an Arduino instead of an Arduino Yun. 
+
+### **v2.8.0**
+#### Samples Optimization Update
+*Note: This update modifies the messaging protocols. Applications designed to work with 2.8 or later will not work with 2.3 or earlier.*
+* Removed use of arduino's String datatype in samples, in favor of char arrays. This sacrifices readability for efficiency.
+* Modified packet echo to only echo packets that were successfully parsed.
+* Converted the Raspberry Pi sample and documentation to be a general server that can run on multiple devices.
+* Converted the server sample from working with 1 serial device to working with multiple serial devices.
+* Discovery packets in the samples now send both a major and minor API level, denoting the functions available in the sample and the messaging protocol that should be used to access them.
+* Added an edge case to the library that handles bar sizes for routines on devices using less than 32 LEDs.
+
