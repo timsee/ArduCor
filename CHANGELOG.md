@@ -125,3 +125,9 @@
 * Discovery packets in the samples now send both a major and minor API level, denoting the functions available in the sample and the messaging protocol that should be used to access them.
 * Added an edge case to the library that handles bar sizes for routines on devices using less than 32 LEDs.
 
+### **v2.8.2**
+#### Naming Update
+* Adds the option to hardcode a name for an arduino. This name is sent in the discovery packet and can be used as an identifier in other applications.
+* Added more edge case handling to the python server.
+* incremented the API level to 2.1
+

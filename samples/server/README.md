@@ -22,7 +22,7 @@ You'll get a readout similar to this if it can find a serial device, connect to 
 ```
 Setup Serial...
 Serial Device #0 found with lighting devices [1]
-Serial Stream Confirmed!
+Serial stream confirmed with 1 device.
 Setup the UDP Socket...
 ```
 
@@ -42,7 +42,7 @@ Once you see this, your server is ready for forwarding packets to the arduino. H
 
 #### <a name="FAQ"></a>FAQ
 
-* *Do I need to change anything in my sample sketches to use this server?* To connect to only one serial device through the server, nothing needs to be changed. To connect to multiple serial devices, you need to set the `DEFAULT_HW_INDEX` of each of the samples to be unique. You will also need the  `MAX_HARDWARE_INDEX` to be the largest hardware index of any light talking to the server. So if you are running 4 arduinos off of the server, you'll set each of their `MAX_HARDWARE_INDEX`  to 4, and then set one sample's `DEFAULT_HW_INDEX` to 1, one to 2, another to 3, and the final one to 4.
+* *Do I need to change anything in my sample sketches to use this server?* To connect to only one serial device through the server, nothing needs to be changed. To connect to multiple serial devices, you need to set the `DEFAULT_HW_INDEX` of each of the samples to be unique.  You may also name each device so that they are easier to discern in another application.
 
 * *What computers is this server compatible with?* I test on my 2016 Macbook Pro and deploy to a Raspberry Pi 3B+. The server isn't using any hardware specific function calls, so as long as you have a unix machine that runs python 2.7, you should be set. It has not been tested for Windows.
 

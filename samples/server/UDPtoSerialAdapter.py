@@ -132,37 +132,54 @@ def checkIfDiscoveryPacket(message):
        return False
 
 #-----
+# builds a discovery packet based on the information from the discovery serial loop
+def buildDiscoveryPacket():
+    discoveryPacket = "DISCOVERY_PACKET,"
+    discoveryPacket += str(majorAPILevel) + ","
+    discoveryPacket += str(minorAPILevel) + ","
+    discoveryPacket += str(useCRC) + ","
+    discoveryPacket += str(maxPacketSizeServer) + ","
+    discoveryPacket += str(deviceCount) + "@"
+    for i in range(deviceCount):
+        discoveryPacket += nameList[i]
+        if (i != deviceCount - 1):
+            discoveryPacket += ","
+    discoveryPacket += "&"
+    return discoveryPacket
+
+#-----
 # This parses a discovery packet, and, if its valid, sets global variables
 # that are used during creating packets and checking packet validity
 def parseDiscoveryPacket(packet, serialIndex):
     global useCRC
     global deviceCount
-    global discoveryPacket
     global maxPacketSizeList
     global majorAPILevel
     global minorAPILevel
-    discoverySplitArray = packet.split(",")
+    global nameList
+
+    packetSplitArray = packet.split("&")
+    discoveryAndNameSplitArray = packetSplitArray[0].split("@")
+    discoverySplitArray = discoveryAndNameSplitArray[0].split(",")
+    nameSplitArray = discoveryAndNameSplitArray[1].split(",")
     if len(discoverySplitArray) == 6:
         try:
             majorAPILevel = int(discoverySplitArray[1])
             minorAPILevel = int(discoverySplitArray[2])
             useCRC = int(discoverySplitArray[3])
-            deviceCount = int(discoverySplitArray[4])
-            maxPacketSize = int(discoverySplitArray[5][:-2])
+            maxPacketSize = int(discoverySplitArray[4])
+
+            count = int(discoverySplitArray[5])
+            # append to the name list
+            for x in range(count):
+                deviceCount = deviceCount + 1
+                nameList.append(nameSplitArray[x])
+
             if (useCRC == 1 or useCRC == 0) \
                 and majorAPILevel == 2 \
                 and deviceCount < 20 \
                 and maxPacketSize < 500:
                 maxPacketSizeList[serialIndex] = maxPacketSize
-                # create a stored discovery packet
-                if discoveryPacket == None:
-                    discoveryPacket = "DISCOVERY_PACKET,"
-                    discoveryPacket += str(majorAPILevel) + ","
-                    discoveryPacket += str(minorAPILevel) + ","
-                    discoveryPacket += str(useCRC) + ","
-                    discoveryPacket += str(deviceCount) + ","
-                    discoveryPacket += str(maxPacketSizeServer)
-                    discoveryPacket += "&"
                 return True
         except ValueError:
             pass
@@ -334,12 +351,13 @@ messageDict = {k: [] for k in range(numOfSerialDevices)}
 # These are treated as global variables through the main while loop
 #-----------------------------
 useCRC = None
-deviceCount = None
+deviceCount = 0
 discoveryPacket = None
 majorAPILevel = None
 minorAPILevel = None
 udp_data = None
 addr = None
+nameList = []
 # this list is used to store the max packet size for each serial device.
 maxPacketSizeList = [0 for i in xrange(numOfSerialDevices)]
 # set this to define the max packet size sent to the server. The server will
@@ -373,7 +391,21 @@ while not all(fullyDiscoveredFlags):
             index = index + 1 # move on to the next index
     time.sleep(0.1)
 
-print "Serial Stream Confirmed!"
+# get max hardware index
+maxIndex = -1
+for serialDeviceNumbers in lightHardwareIndices:
+    for lightIndex in serialDeviceNumbers:
+        if lightIndex > maxIndex:
+            maxIndex = lightIndex
+deviceCount = maxIndex
+
+# create a discovery packet
+discoveryPacket = buildDiscoveryPacket()
+
+if deviceCount == 1:
+    print "Serial stream confirmed with " + str(deviceCount) + " device."
+else:
+    print "Serial stream confirmed with " + str(deviceCount) + " devices."
 
 #-----
 print "Setup the UDP Socket..."

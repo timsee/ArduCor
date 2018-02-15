@@ -85,6 +85,7 @@ while True:
         using_crc = bridge.get('using_crc')
         hardware_count = bridge.get('hardware_count') 
         max_packet_size = bridge.get('max_packet_size')
+        hardware_name = bridge.get('hardware_name')
         data += ','
         data += str(major_api)
         data += ','
@@ -92,9 +93,11 @@ while True:
         data += ','
         data += str(using_crc)
         data += ','
-        data += str(hardware_count)
-        data += ','
         data += str(max_packet_size)
+        data += ','
+        data += str(hardware_count)
+        data += '@'
+        data += hardware_name
         data += '&'
         # sends discovery packet
         sock.sendto(data, (addr[0], UDP_PORT))

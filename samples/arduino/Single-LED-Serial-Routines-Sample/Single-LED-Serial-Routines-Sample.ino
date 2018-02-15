@@ -6,8 +6,8 @@
  *
  * Provides a Serial interface to a set of lighting routines.
  * 
- * Version 2.8.0
- * Date: February 3, 2018
+ * Version 2.8.2
+ * Date: February 13, 2018
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -33,11 +33,17 @@ const int  DEFAULT_SPEED     = 300;    // default delay for LEDs update, suggest
 const int  DEFAULT_TIMEOUT   = 120;    // number of minutes without packets until the arduino times out.
 
 const int  DEFAULT_HW_INDEX  = 1;      // index for this particular microcontroller
-const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
-
+const int  DEVICE_COUNT      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
 
 const bool USE_CRC           = true;   // true uses CRC, false ignores it.
 const bool USE_NEWLINE       = false;  // true adds newline to serial packets, false skips it.
+
+//=======================
+// Hardware Name
+//=======================
+
+// rename this whatever you want, but keep it under 16 characters
+char name_buffer[] = "MyLights";
 
 //=======================
 // API level
@@ -48,7 +54,8 @@ const bool USE_NEWLINE       = false;  // true adds newline to serial packets, f
 // new functions added that do not significantly break the existing
 // messaging protocol.
 const uint8_t API_LEVEL_MAJOR = 2;
-const uint8_t API_LEVEL_MINOR = 0;
+const uint8_t API_LEVEL_MINOR = 1;
+
 
 //=======================
 // Stored Values and States
@@ -112,7 +119,8 @@ int int_array_size = 0;
 
 // buffers for char arrays
 char state_update_packet[100];
-char discovery_packet[35];
+
+char discovery_packet[50];
 
 // used for string manipulations
 char num_buf[16];
@@ -120,6 +128,7 @@ const char value_delimiter[] = ",";
 const char message_delimiter[] = "&";
 const char crc_delimiter[] = "#";
 const char packet_delimiter[] = ";";
+const char names_delimiter[] = "@";
 const char new_line[] = "\n";
 
 
@@ -614,6 +623,7 @@ void buildCustomArrayUpdatePacket()
   }
 }
 
+
 void buildDiscoveryPacket()
 {
   strcat(discovery_packet, "DISCOVERY_PACKET");
@@ -624,11 +634,13 @@ void buildDiscoveryPacket()
   strcat(discovery_packet, value_delimiter);
   strcat(discovery_packet, itoa((uint8_t)USE_CRC, num_buf, 10));
   strcat(discovery_packet, value_delimiter);
-  strcat(discovery_packet, itoa((uint8_t)MAX_HW_INDEX, num_buf, 10));
-  strcat(discovery_packet, value_delimiter);
   strcat(discovery_packet, itoa((uint8_t)max_packet_size, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)DEVICE_COUNT, num_buf, 10));
+  strcat(discovery_packet, names_delimiter);
+  strcat(discovery_packet, name_buffer);
   strcat(discovery_packet, message_delimiter);
-  
+
   strcat(discovery_packet, packet_delimiter);
   // add the newline
   if (USE_NEWLINE) {
@@ -654,7 +666,6 @@ void echoPacket()
   Serial.write(echo_message);
 }
 
-
 unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned long timeout_max) {
   if (timeout_max == 0) {
     // will never timeout as this is disabled, jsut return 1.
@@ -667,6 +678,7 @@ unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned 
     return ((timeout_max + last_message - millis()) / 60000) + 1;
   }
 }
+
 
 //================================================================================
 // String Parsing
