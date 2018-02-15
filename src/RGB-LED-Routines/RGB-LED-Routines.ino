@@ -13,12 +13,13 @@
  *
  * COM_PLACEHOLDER
  * 
- * Version 2.8.0
- * Date: February 3, 2018
+ * Version 2.8.2
+ * Date: February 13, 2018
  * Github repository: http://www.github.com/timsee/RGB-LED-Routines
  * License: MIT-License, LICENSE provided in root of git repo
  */
 #include <RoutinesRGB.h>
+
 #if IS_NEOPIXELS
 #include <Adafruit_NeoPixel.h>
 #endif
@@ -36,7 +37,6 @@
 #include <SoftwareSerial.h>
 #include <Adafruit_NeoPixel.h>
 #endif
-
 
 //================================================================================
 // Settings
@@ -79,18 +79,17 @@ const int  DEFAULT_TIMEOUT   = 120;    // number of minutes without packets unti
 
 const int  DEFAULT_HW_INDEX  = 1;      // index for this particular microcontroller
 #if IS_NEOPIXELS
-const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
+const int  DEVICE_COUNT      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
 #endif
 #if IS_RAINBOWDUINO
-const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
+const int  DEVICE_COUNT      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
 #endif
 #if IS_SINGLE_LED
-const int  MAX_HW_INDEX      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
+const int  DEVICE_COUNT      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
 #endif
 #if IS_MULTI
-const int  MAX_HW_INDEX      = 2;      // multi sample gives access to 2 different LED devices
+const int  DEVICE_COUNT      = 2;      // multi sample gives access to 2 different LED devices
 #endif
-
 
 #if IS_SERIAL
 const bool USE_CRC           = true;   // true uses CRC, false ignores it.
@@ -106,6 +105,16 @@ const bool USE_NEWLINE       = false;  // true adds newline to serial packets, f
 #endif
 
 //=======================
+// Hardware Name
+//=======================
+
+// rename this whatever you want, but keep it under 16 characters
+char name_buffer[] = "MyLights";
+#if IS_MULTI
+char name_buffer_2[] = "MyLights 2";
+#endif
+
+//=======================
 // API level
 //=======================
 // The API level defines the messaging protocol. Major levels are incremented 
@@ -114,7 +123,8 @@ const bool USE_NEWLINE       = false;  // true adds newline to serial packets, f
 // new functions added that do not significantly break the existing
 // messaging protocol.
 const uint8_t API_LEVEL_MAJOR = 2;
-const uint8_t API_LEVEL_MINOR = 0;
+const uint8_t API_LEVEL_MINOR = 1;
+
 
 //=======================
 // Stored Values and States
@@ -183,7 +193,7 @@ const int max_number_of_messages = 8;
 const int max_number_of_messages = 8;
 #endif
 #if IS_MULTI
-const int max_number_of_messages = 4;
+const int max_number_of_messages = 3;
 #endif
 const int max_packet_size = max_message_size * max_number_of_messages;
 
@@ -205,7 +215,19 @@ int int_array_size = 0;
 
 // buffers for char arrays
 char state_update_packet[100];
-char discovery_packet[35];
+
+#if IS_NEOPIXELS
+char discovery_packet[50];
+#endif
+#if IS_RAINBOWDUINO
+char discovery_packet[50];
+#endif
+#if IS_SINGLE_LED
+char discovery_packet[50];
+#endif
+#if IS_MULTI
+char discovery_packet[68];
+#endif
 
 // used for string manipulations
 char num_buf[16];
@@ -213,6 +235,7 @@ const char value_delimiter[] = ",";
 const char message_delimiter[] = "&";
 const char crc_delimiter[] = "#";
 const char packet_delimiter[] = ";";
+const char names_delimiter[] = "@";
 const char new_line[] = "\\n";
 
 #if IS_UDP
@@ -350,7 +373,8 @@ void setup()
   Bridge.put(F("major_api"), itoa(API_LEVEL_MAJOR, num_buf, 10));
   Bridge.put(F("minor_api"), itoa(API_LEVEL_MINOR, num_buf, 10));
   Bridge.put(F("using_crc"), itoa(USE_CRC, num_buf, 10));
-  Bridge.put(F("hardware_count"), itoa(MAX_HW_INDEX, num_buf, 10));
+  Bridge.put(F("hardware_count"), itoa(DEVICE_COUNT, num_buf, 10));
+  Bridge.put(F("hardware_name"), name_buffer);
   Bridge.put(F("max_packet_size"), itoa(max_packet_size, num_buf, 10));
   buildStateUpdatePacket();
   Bridge.put(F("state_update"), state_update_packet);
@@ -1120,6 +1144,7 @@ void buildCustomArrayUpdatePacket()
 #endif
 }
 
+
 void buildDiscoveryPacket()
 {
   strcat(discovery_packet, "DISCOVERY_PACKET");
@@ -1130,11 +1155,17 @@ void buildDiscoveryPacket()
   strcat(discovery_packet, value_delimiter);
   strcat(discovery_packet, itoa((uint8_t)USE_CRC, num_buf, 10));
   strcat(discovery_packet, value_delimiter);
-  strcat(discovery_packet, itoa((uint8_t)MAX_HW_INDEX, num_buf, 10));
-  strcat(discovery_packet, value_delimiter);
   strcat(discovery_packet, itoa((uint8_t)max_packet_size, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)DEVICE_COUNT, num_buf, 10));
+  strcat(discovery_packet, names_delimiter);
+  strcat(discovery_packet, name_buffer);
+#if IS_MULTI
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, name_buffer_2);
+#endif
   strcat(discovery_packet, message_delimiter);
-  
+
 #if IS_SERIAL
   strcat(discovery_packet, packet_delimiter);
   // add the newline
@@ -1167,7 +1198,6 @@ void echoPacket()
 #endif
 }
 
-
 unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned long timeout_max) {
   if (timeout_max == 0) {
     // will never timeout as this is disabled, jsut return 1.
@@ -1180,6 +1210,7 @@ unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned 
     return ((timeout_max + last_message - millis()) / 60000) + 1;
   }
 }
+
 
 //================================================================================
 // String Parsing

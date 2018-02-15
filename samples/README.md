@@ -207,7 +207,7 @@ The `$count` parameter denotes how many times the `,$index,$red,$green,$blue` se
 Sending the message `DISCOVERY_PACKET` to any of the samples will cause the sample to send a message back in the format of:
 
 ```
-DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize&
+DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$name&
 ```
 
 | Parameter     | Range         |  Description   |
@@ -215,13 +215,21 @@ DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize&
 | majorAPI      |    2     |  major version of API and messaging protocol  |
 | minorAPI      |     0 - 10    |  minor version of API and messaging protocol  |
 | usingCRC      |     0 - 1     |  1 if all packets require a CRC, 0 if skipped*  |
-| numOfDevices  |     1 - 20    |  Number of RGB devices connected to arduino    |
 | maxPacketSize |     1 - 500  |  max number of characters accepted in a single message        |
+| numOfDevices  |     1 - 20    |  Number of RGB devices connected to arduino    |
+| name  |    N/A    |  A hardcoded identifier of up to 16 characters   |
+
 * *NOTE: even if CRC is on, discovery packets do not require or send out a CRC!*
 
 Discovery packets are used both as a way to check if an arduino is running a sketch with the proper messaging protocol and to set up the client sending messages to the arduino. An API level is provided to allow applications to know the exact features and messaging protocol of the light controller. The major API level is incremented when theres a significant change and previous protocols will no longer work. A minor API level is incremented when most messages will still work, but new protocols are added, or messages are switched around, or any other minor change was made.
 This is an easy way to check whether or not the IP Address or Serial port that you are connecting to currently connects you to an Arduino running one of these samples.
 A successful discovery call and response is not required for the samples to work, although it is recommended as its lets the client know whether or not to use CRC with packets sent. For a C++ project that can parse and send messages using this protocol, check out [Corluma](https://github.com/timsee/Corluma).
+
+### <a name="name"></a>Naming The Lights
+
+In order to make lights a bit easier to idenifty in other applications, there is the option to hardcode a name that is sent with the light's info at the end of the discovery packet. This name is defaulted to "MyLights" but can be changed to anything as long as it fits this criteria:
+* Is 16 characters or less
+* Does not contain `&`, `,`, `;`,  `@`, or `#`
 
 ### <a name="crc"></a> Cyclic Redundancy Check
 A [cylic redundancy check](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) is an optional setting for the sample code messing protocols. It is a value appended to the end of the packet that helps detect whether there were any changes to the raw data of the packet.

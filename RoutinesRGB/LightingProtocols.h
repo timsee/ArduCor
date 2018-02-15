@@ -276,7 +276,7 @@ enum EPacketHeader
   eStateUpdateRequest,
   /*!
    * <b>8</b><br>
-   * <i>Sends back a packet that contains the size of the custom array and all of the colors in it.
+   * <i>Sends back a packet that contains the size of the custom array and all of the colors in it. </i>
    */
   eCustomArrayUpdateRequest,
   /*!
