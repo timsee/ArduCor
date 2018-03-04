@@ -25,7 +25,7 @@ For a guide on how to use the server sample to control the arduino projects wire
     * [Discovery Packet](#discovery)
     * [Cyclic Redundancy Check](#crc)
     * [Multi Serial Sample](#multi-sample)
-    * [Lighting Protocols](https://timsee.github.io/ArduCor/ArduCor/html/a00003.html)
+    * [Lighting Protocols](https://timsee.github.io/ArduCor/ArduCor/html/a00011.html)
 * [Generating Samples](#generated-samples)
 
 ## <a name="hardware"></a>Supported Hardware
@@ -83,7 +83,7 @@ The second argument in a message is always a device index. This value determines
 **Example:** `1,0,1&` *(Header 1, Device Index 0, New Routine 1)*
  `1,0,4,6&` *(Header 1, Device Index 0, New Routine 4, New Color Group 6)*
 
-*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/ArduCor/ArduCor/html/a00003.html). *
+*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/ArduCor/ArduCor/html/a00011.html). *
 
 #### Set Color for Single Color Routines
 
@@ -217,7 +217,7 @@ The `$count` parameter denotes how many times the `,$index,$red,$green,$blue` se
 Sending the message `DISCOVERY_PACKET` to any of the samples will cause the sample to send a message back in the format of:
 
 ```
-DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$name,$hardwareType&
+DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$name,$hardwareType,$productType&
 ```
 
 | Parameter     | Range         |  Description   |
@@ -229,7 +229,7 @@ DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$nam
 | numOfDevices  |     1 - 20    |  Number of RGB devices connected to arduino    |
 | name  |    N/A    |  A hardcoded identifier of up to 16 characters   |
 | hardwareType  |    0 -  4   |  An enum denoting the type of hardware (light strip, light cube, etc.)  |
-
+| productType   |    0 -  2   |  An enum denoting the type of product (Neopixels, Rainbowduino, LED RGB, etc.)  |
 * *NOTE: even if CRC is on, discovery packets do not require or send out a CRC!*
 
 Discovery packets are used both as a way to check if an arduino is running a sketch with the proper messaging protocol and to set up the client sending messages to the arduino. An API level is provided to allow applications to know the exact features and messaging protocol of the light controller. The major API level is incremented when theres a significant change and previous protocols will no longer work. A minor API level is incremented when most messages will still work, but new protocols are added, or messages are switched around, or any other minor change was made.
