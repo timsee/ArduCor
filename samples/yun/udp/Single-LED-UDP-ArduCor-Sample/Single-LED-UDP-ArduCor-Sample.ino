@@ -1,17 +1,17 @@
 /*!
- * RGB-LED-Routines
+ * ArduCor
  * Sample Sketch
  *
  * Supports a single RGB LED but can be easily hacked to support more.
  *
  * Provides a UDP interface to a set of lighting routines.
  * 
- * Version 2.8.2
- * Date: February 13, 2018
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
+ * Version 2.9.0
+ * Date: March 2, 2018
+ * Github repository: http://www.github.com/timsee/ArduCor
  * License: MIT-License, LICENSE provided in root of git repo
  */
-#include <RoutinesRGB.h>
+#include <ArduCor.h>
 
 #include <Bridge.h>
 
@@ -46,6 +46,41 @@ const bool USE_CRC           = true;   // true uses CRC, false ignores it.
 char name_buffer[] = "MyLights";
 
 //=======================
+// Hardware Type
+//=======================
+
+// enum for types of hardware that can be controlled.
+enum ELightType {
+  eSingleLED,
+  eCube,
+  e2DArray,
+  eLightStrip,
+  eRing
+};
+
+/*! 
+ * Modify these to reflect the type of light hardware that is in use
+ * by your sample. This does not affect the sample's functionality. Instead,
+ * it is sent out during discovery packets to applications such as Corluma
+ * and affects how the lights are displayed in those applications. 
+ */
+ELightType light_type = eSingleLED;
+
+//=======================
+// Product Type
+//=======================
+
+// enum for types of lighting products (NeoPixel, Rainbowduino, etc.)
+enum EProductType {
+  eRainbowduino,
+  eNeoPixels,
+  eLED
+};
+
+EProductType product_type = eLED;
+
+
+//=======================
 // API level
 //=======================
 // The API level defines the messaging protocol. Major levels are incremented 
@@ -53,8 +88,8 @@ char name_buffer[] = "MyLights";
 // supported in the old API. Minor levels are incremented when the API has 
 // new functions added that do not significantly break the existing
 // messaging protocol.
-const uint8_t API_LEVEL_MAJOR = 2;
-const uint8_t API_LEVEL_MINOR = 1;
+const uint8_t API_LEVEL_MAJOR = 3;
+const uint8_t API_LEVEL_MINOR = 0;
 
 
 //=======================
@@ -64,7 +99,6 @@ const uint8_t API_LEVEL_MINOR = 1;
 ELightingRoutine current_routine = eSingleGlimmer;
 EColorGroup current_group = eCustom;
 
-bool isOn = true;
 // set this to turn off echoing all together
 bool skip_echo = false;
 // the sample sets this when it receives a valid packet
@@ -120,7 +154,7 @@ int int_array_size = 0;
 // buffers for char arrays
 char state_update_packet[100];
 
-char discovery_packet[50];
+char discovery_packet[54];
 
 // used for string manipulations
 char num_buf[16];
@@ -139,10 +173,10 @@ const char new_line[] = "\n";
 const char packet_read_string[] = "packet_read";
 
 //=======================
-// RoutinesRGB Setup
+// ArduCor Setup
 //=======================
 // Library used to generate the RGB LED routines.
-RoutinesRGB routines = RoutinesRGB(LED_COUNT);
+ArduCor routines = ArduCor(LED_COUNT);
 
 
 //=======================
@@ -198,6 +232,8 @@ void setup()
   Bridge.put(F("using_crc"), itoa(USE_CRC, num_buf, 10));
   Bridge.put(F("hardware_count"), itoa(DEVICE_COUNT, num_buf, 10));
   Bridge.put(F("hardware_name"), name_buffer);
+  Bridge.put(F("hardware_type"), itoa(light_type, num_buf, 10));
+  Bridge.put(F("product_type"), itoa(product_type, num_buf, 10));
   Bridge.put(F("max_packet_size"), itoa(max_packet_size, num_buf, 10));
   buildStateUpdatePacket();
   Bridge.put(F("state_update"), state_update_packet);
@@ -260,19 +296,15 @@ void loop()
   }
 
   if (!(loop_counter % update_speed)) {
-    if (isOn) {
-      changeLightingRoutine(current_routine);
-      routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
-    } else {
-      routines.turnOff();
-    }
+    changeLightingRoutine(current_routine);
+    routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
     updateLEDs();
   }
 
   // Timeout the LEDs.
   if ((idle_timeout != 0)
       && (last_message_time + idle_timeout < millis())) {
-    isOn = false;
+    routines.turnOff();
   }
 
   loop_counter++;
@@ -309,10 +341,6 @@ void changeLightingRoutine(ELightingRoutine currentMode)
 {
   switch (currentMode)
   {
-    case eOff:
-      routines.turnOff();
-      break;
-
     case eSingleSolid:
       routines.singleSolid(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
       break;
@@ -391,6 +419,20 @@ bool parsePacket(int header)
   boolean success = false;
   switch (header)
   {
+    case eOnOffChange:
+      if (int_array_size == 3) {
+        success = true;
+        received_hardware_index = packet_int_array[1];
+        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+          if (packet_int_array[2] == 0) {
+            routines.turnOff();
+          } else if (packet_int_array[2] == 1) {
+            loop_counter = 0;
+            routines.turnOn();
+          }
+        }
+      }
+      break;
     case eModeChange:
       if (int_array_size == 3 && packet_int_array[2] < eLightingRoutine_MAX) {
         if (packet_int_array[2] != current_routine) {
@@ -400,13 +442,7 @@ bool parsePacket(int header)
         success = true;
         received_hardware_index = packet_int_array[1];
         if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          if ((ELightingRoutine)packet_int_array[2] == eOff) {
-            isOn = false;
-          } else {
-            isOn = true;
-            // change mode to new mode
-            current_routine = (ELightingRoutine)packet_int_array[2];
-          }
+          current_routine = (ELightingRoutine)packet_int_array[2];
         }
       }
       // pick up cases where the modes can take extra optional arguments
@@ -421,7 +457,6 @@ bool parsePacket(int header)
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             current_routine = (ELightingRoutine)packet_int_array[2];
             current_group = (EColorGroup)packet_int_array[3];
-            isOn = true;
           }
         }
       }
@@ -440,7 +475,6 @@ bool parsePacket(int header)
           routines.setMainColor(packet_int_array[2],
                                 packet_int_array[3],
                                 packet_int_array[4]);
-          isOn = true;
         }
       }
       break;
@@ -475,7 +509,6 @@ bool parsePacket(int header)
           // update brightness level
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             routines.brightness(param);
-            isOn = true;
           }
         }
         break;
@@ -557,7 +590,7 @@ void buildStateUpdatePacket()
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa((uint8_t)hardware_index, num_buf, 10));
   strcat(state_update_packet, value_delimiter);
-  strcat(state_update_packet, itoa((uint8_t)isOn, num_buf, 10));
+  strcat(state_update_packet, itoa((uint8_t)routines.isOn(), num_buf, 10));
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa(1, num_buf, 10)); // isReachable
   strcat(state_update_packet, value_delimiter);
@@ -636,6 +669,10 @@ void buildDiscoveryPacket()
   strcat(discovery_packet, itoa((uint8_t)DEVICE_COUNT, num_buf, 10));
   strcat(discovery_packet, names_delimiter);
   strcat(discovery_packet, name_buffer);
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)light_type, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)product_type, num_buf, 10));
   strcat(discovery_packet, message_delimiter);
 
 }
@@ -644,7 +681,7 @@ void echoPacket()
 {  
   // add the crc
   if (USE_CRC) {
-    unsigned long crc = crcCalculator(state_update_packet);
+    unsigned long crc = crcCalculator(echo_packet);
     strcat(echo_message, crc_delimiter);
     strcat(echo_message, ultoa(crc, num_buf, 10));
     strcat(echo_message, message_delimiter);

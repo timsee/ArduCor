@@ -1,21 +1,19 @@
 /*!
- * RGB-LED-Routines
+ * ArduCor
  * Sample Sketch
  *
  * Supports Adafruit NeoPixels products.
  *
- * Provides a HTTP interface to a set of lighting routines.
+ * Provides a Serial interface to a set of lighting routines.
  * 
- * Version 2.8.2
- * Date: February 13, 2018
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
+ * Version 2.9.0
+ * Date: March 2, 2018
+ * Github repository: http://www.github.com/timsee/ArduCor
  * License: MIT-License, LICENSE provided in root of git repo
  */
-#include <RoutinesRGB.h>
+#include <ArduCor.h>
 
 #include <Adafruit_NeoPixel.h>
-#include <BridgeServer.h>
-#include <BridgeClient.h>
 
 //================================================================================
 // Settings
@@ -27,7 +25,7 @@ const int  LED_COUNT         = 64;
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
 
-const byte DELAY_VALUE       = 50;     // amount of sleep time between loops
+const byte DELAY_VALUE       = 3;      // amount of sleep time between loops
 
 const int  DEFAULT_SPEED     = 300;    // default delay for LEDs update, suggested range: 10 (fast) - 1000 (slow).
 const int  DEFAULT_TIMEOUT   = 120;    // number of minutes without packets until the arduino times out.
@@ -35,7 +33,8 @@ const int  DEFAULT_TIMEOUT   = 120;    // number of minutes without packets unti
 const int  DEFAULT_HW_INDEX  = 1;      // index for this particular microcontroller
 const int  DEVICE_COUNT      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
 
-const bool USE_CRC           = false;   // true uses CRC, false ignores it.
+const bool USE_CRC           = true;   // true uses CRC, false ignores it.
+const bool USE_NEWLINE       = false;  // true adds newline to serial packets, false skips it.
 
 //=======================
 // Hardware Name
@@ -45,6 +44,41 @@ const bool USE_CRC           = false;   // true uses CRC, false ignores it.
 char name_buffer[] = "MyLights";
 
 //=======================
+// Hardware Type
+//=======================
+
+// enum for types of hardware that can be controlled.
+enum ELightType {
+  eSingleLED,
+  eCube,
+  e2DArray,
+  eLightStrip,
+  eRing
+};
+
+/*! 
+ * Modify these to reflect the type of light hardware that is in use
+ * by your sample. This does not affect the sample's functionality. Instead,
+ * it is sent out during discovery packets to applications such as Corluma
+ * and affects how the lights are displayed in those applications. 
+ */
+ELightType light_type = e2DArray;
+
+//=======================
+// Product Type
+//=======================
+
+// enum for types of lighting products (NeoPixel, Rainbowduino, etc.)
+enum EProductType {
+  eRainbowduino,
+  eNeoPixels,
+  eLED
+};
+
+EProductType product_type = eNeoPixels;
+
+
+//=======================
 // API level
 //=======================
 // The API level defines the messaging protocol. Major levels are incremented 
@@ -52,8 +86,8 @@ char name_buffer[] = "MyLights";
 // supported in the old API. Minor levels are incremented when the API has 
 // new functions added that do not significantly break the existing
 // messaging protocol.
-const uint8_t API_LEVEL_MAJOR = 2;
-const uint8_t API_LEVEL_MINOR = 1;
+const uint8_t API_LEVEL_MAJOR = 3;
+const uint8_t API_LEVEL_MINOR = 0;
 
 
 //=======================
@@ -63,7 +97,6 @@ const uint8_t API_LEVEL_MINOR = 1;
 ELightingRoutine current_routine = eSingleGlimmer;
 EColorGroup current_group = eCustom;
 
-bool isOn = true;
 // set this to turn off echoing all together
 bool skip_echo = false;
 // the sample sets this when it receives a valid packet
@@ -119,7 +152,7 @@ int int_array_size = 0;
 // buffers for char arrays
 char state_update_packet[100];
 
-char discovery_packet[50];
+char discovery_packet[54];
 
 // used for string manipulations
 char num_buf[16];
@@ -130,18 +163,12 @@ const char packet_delimiter[] = ";";
 const char names_delimiter[] = "@";
 const char new_line[] = "\n";
 
-//=======================
-// Yun Setup
-//=======================
-
-BridgeClient client;
-BridgeServer server;
 
 //=======================
-// RoutinesRGB Setup
+// ArduCor Setup
 //=======================
 // Library used to generate the RGB LED routines.
-RoutinesRGB routines = RoutinesRGB(LED_COUNT);
+ArduCor routines = ArduCor(LED_COUNT);
 
 //=======================
 // Hardware Setup
@@ -195,14 +222,13 @@ void setup()
 {
   pixels.begin();
 
-  Bridge.begin();
-  server.listenOnLocalhost();
-  server.begin();
   // choose the default color for the single
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines.
   // If its not set, it defaults to a faint orange.
   routines.setMainColor(0, 255, 0);
+  // put your setup code here, to run once:
+  Serial.begin(9600);
   buildDiscoveryPacket();
 }
 
@@ -210,34 +236,26 @@ void loop()
 {
   packetReceived = false;
   memset(current_packet, 0, sizeof(current_packet));
-  client = server.accept();
-  if (client) {
-    client.readBytesUntil('/',current_packet, sizeof(current_packet));
-    if (current_packet[0] == 'D') {
-      char* pch = strstr (current_packet,"DISCOVERY_PACKET");
-      // strip newline
-      pch = strtok(pch, "\r");
-      pch = strtok(pch, "\n");
-      if (strcmp(pch, "DISCOVERY_PACKET") == 0) {
-        client.print(discovery_packet);
-      }
-    } else {
-      packetReceived = true;
+  if (Serial.available()) {
+    Serial.readBytesUntil(';',current_packet, sizeof(current_packet));
+ }
+ if (current_packet[0] == 'D') {
+    char* pch = strstr (current_packet,"DISCOVERY_PACKET");
+    if (strcmp(pch, "DISCOVERY_PACKET") == 0) {
+      Serial.write(discovery_packet);
     }
+  } else if (current_packet[0] != 0) {
+    packetReceived = true;
   }
+  
   if (packetReceived) {
     memset(echo_message, 0, sizeof(echo_message));
-    /// make a pointer we can manipulate during packet parsing
-    char* packetPtr = current_packet;
-    // strip newline
-    packetPtr = strtok(packetPtr, "\r");
-    packetPtr = strtok(packetPtr, "\n");
-    bool messageIsValid = checkIfPacketIsValid(packetPtr);
+    bool messageIsValid = checkIfPacketIsValid(current_packet);
     skip_echo = false;
     should_echo = false;
     if (messageIsValid) { 
       // go through each message packet
-     char* messagePtr = strtok(packetPtr, "&");
+      char* messagePtr = strtok(current_packet, "&");
       while (messagePtr != 0) {
         if (!skip_echo) {
           strcpy(temp_packet, messagePtr); // Copy for parsing a destructive way
@@ -271,24 +289,19 @@ void loop()
   }
 
   if (!(loop_counter % update_speed)) {
-    if (isOn) {
-      changeLightingRoutine(current_routine);
-      routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
-    } else {
-      routines.turnOff();
-    }
+    changeLightingRoutine(current_routine);
+    routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
     updateLEDs();
   }
 
   // Timeout the LEDs.
   if ((idle_timeout != 0)
       && (last_message_time + idle_timeout < millis())) {
-    isOn = false;
+    routines.turnOff();
   }
 
   loop_counter++;
   delay(DELAY_VALUE);
-  client.stop();
 }
 
 
@@ -317,10 +330,6 @@ void changeLightingRoutine(ELightingRoutine currentMode)
 {
   switch (currentMode)
   {
-    case eOff:
-      routines.turnOff();
-      break;
-
     case eSingleSolid:
       routines.singleSolid(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
       break;
@@ -399,6 +408,20 @@ bool parsePacket(int header)
   boolean success = false;
   switch (header)
   {
+    case eOnOffChange:
+      if (int_array_size == 3) {
+        success = true;
+        received_hardware_index = packet_int_array[1];
+        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+          if (packet_int_array[2] == 0) {
+            routines.turnOff();
+          } else if (packet_int_array[2] == 1) {
+            loop_counter = 0;
+            routines.turnOn();
+          }
+        }
+      }
+      break;
     case eModeChange:
       if (int_array_size == 3 && packet_int_array[2] < eLightingRoutine_MAX) {
         if (packet_int_array[2] != current_routine) {
@@ -408,13 +431,7 @@ bool parsePacket(int header)
         success = true;
         received_hardware_index = packet_int_array[1];
         if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          if ((ELightingRoutine)packet_int_array[2] == eOff) {
-            isOn = false;
-          } else {
-            isOn = true;
-            // change mode to new mode
-            current_routine = (ELightingRoutine)packet_int_array[2];
-          }
+          current_routine = (ELightingRoutine)packet_int_array[2];
         }
       }
       // pick up cases where the modes can take extra optional arguments
@@ -429,7 +446,6 @@ bool parsePacket(int header)
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             current_routine = (ELightingRoutine)packet_int_array[2];
             current_group = (EColorGroup)packet_int_array[3];
-            isOn = true;
           }
         }
       }
@@ -448,7 +464,6 @@ bool parsePacket(int header)
           routines.setMainColor(packet_int_array[2],
                                 packet_int_array[3],
                                 packet_int_array[4]);
-          isOn = true;
         }
       }
       break;
@@ -483,7 +498,6 @@ bool parsePacket(int header)
           // update brightness level
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             routines.brightness(param);
-            isOn = true;
           }
         }
         break;
@@ -524,7 +538,7 @@ bool parsePacket(int header)
         skip_echo = true;
         // Send back update
         buildStateUpdatePacket();
-        client.print(state_update_packet);
+        Serial.write(state_update_packet);
       }
       break;
     case eCustomArrayUpdateRequest:
@@ -532,7 +546,7 @@ bool parsePacket(int header)
         skip_echo = true;
         // Send back update
         buildCustomArrayUpdatePacket();
-        client.print(state_update_packet);
+        Serial.write(state_update_packet);
       }
       break;
     case eResetSettingsToDefaults:
@@ -565,7 +579,7 @@ void buildStateUpdatePacket()
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa((uint8_t)hardware_index, num_buf, 10));
   strcat(state_update_packet, value_delimiter);
-  strcat(state_update_packet, itoa((uint8_t)isOn, num_buf, 10));
+  strcat(state_update_packet, itoa((uint8_t)routines.isOn(), num_buf, 10));
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa(1, num_buf, 10)); // isReachable
   strcat(state_update_packet, value_delimiter);
@@ -596,6 +610,11 @@ void buildStateUpdatePacket()
     strcat(state_update_packet, ultoa(crc, num_buf, 10));
     strcat(state_update_packet, message_delimiter);
    }  
+  strcat(state_update_packet, packet_delimiter);
+  // add the newline
+  if (USE_NEWLINE) {
+    strcat(state_update_packet, new_line);
+  }
 
 }
 
@@ -626,6 +645,11 @@ void buildCustomArrayUpdatePacket()
     strcat(state_update_packet, message_delimiter);
   }  
 
+  strcat(state_update_packet, packet_delimiter);
+  // add the newline
+  if (USE_NEWLINE) {
+      strcat(state_update_packet, new_line);
+  }
 }
 
 
@@ -644,21 +668,35 @@ void buildDiscoveryPacket()
   strcat(discovery_packet, itoa((uint8_t)DEVICE_COUNT, num_buf, 10));
   strcat(discovery_packet, names_delimiter);
   strcat(discovery_packet, name_buffer);
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)light_type, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)product_type, num_buf, 10));
   strcat(discovery_packet, message_delimiter);
 
+  strcat(discovery_packet, packet_delimiter);
+  // add the newline
+  if (USE_NEWLINE) {
+    strcat(discovery_packet, new_line);
+  }
 }
 
 void echoPacket()
 {  
   // add the crc
   if (USE_CRC) {
-    unsigned long crc = crcCalculator(state_update_packet);
+    unsigned long crc = crcCalculator(echo_packet);
     strcat(echo_message, crc_delimiter);
     strcat(echo_message, ultoa(crc, num_buf, 10));
     strcat(echo_message, message_delimiter);
    }  
   
-  client.print(echo_message); 
+  strcat(echo_message, packet_delimiter);
+  // add the newline
+  if (USE_NEWLINE) {
+    strcat(echo_message, new_line);
+  }
+  Serial.write(echo_message);
 }
 
 unsigned long calculateMinutesUntilTimeout(unsigned long last_message, unsigned long timeout_max) {

@@ -3,8 +3,8 @@
 #------------------------------------------------------------
 # Arduino Yun UDP Echo Server
 #------------------------------------------------------------
-# Version 1.4
-# February 3, 2018
+# Version 1.5
+# March 2, 2018
 # MIT License (in root of git repo)
 # by Tim Seemann
 #
@@ -18,7 +18,7 @@
 # This adds a significant speed increase over the Bridge 
 # Client's implementation. 
 #
-# [Check here for setup instructions](https://github.com/timsee/RGB-LED-Routines/tree/master/samples/yun)
+# [Check here for setup instructions](https://github.com/timsee/ArduCor/tree/master/samples/yun)
 #
 #------------------------------------------------------------
 
@@ -86,6 +86,8 @@ while True:
         hardware_count = bridge.get('hardware_count') 
         max_packet_size = bridge.get('max_packet_size')
         hardware_name = bridge.get('hardware_name')
+        hardware_type = bridge.get('hardware_type')
+        product_type = bridge.get('product_type')
         data += ','
         data += str(major_api)
         data += ','
@@ -98,14 +100,18 @@ while True:
         data += str(hardware_count)
         data += '@'
         data += hardware_name
+        data += ','
+        data += hardware_type
+        data += ','
+        data += product_type
         data += '&'
         # sends discovery packet
         sock.sendto(data, (addr[0], UDP_PORT))
-    elif header == "7&":
+    elif header == "8&":
         bridge.put('udp', data)
         state_update = bridge.get('state_update')
         sock.sendto(state_update, (addr[0], UDP_PORT)) 
-    elif header == "8&":
+    elif header == "9&":
         bridge.put('udp', data)
         custom_array_update = bridge.get('custom_array_update')
         sock.sendto(custom_array_update, (addr[0], UDP_PORT)) 

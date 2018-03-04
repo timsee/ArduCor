@@ -1,9 +1,9 @@
 /*!
  * \file LightingProtocols.h
- * \version v2.1.1
- * \date January 29, 2018
+ * \version v2.9.0
+ * \date Marchn 2, 2018
  * \author Tim Seemann
- * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
+ * \copyright <a href="https://github.com/timsee/ArduCor/blob/master/LICENSE">
  *            MIT License
  *            </a>
  * 
@@ -12,9 +12,9 @@
  * This file also gets copied to other projects as part of integrating with this project. For example, 
  * the [Corluma](https://github.com/timsee/Corluma) project has a C++ version of this file. If packets
  * between the two projects seem mixed up, check that the version of the Corluma App you are using
- * matches the version of the your RoutinesRGB library. 
+ * matches the version of the your ArduCor library.
  *
- * Protocol Version: 1.0
+ * Protocol Version: 3.0
  *
  */
  
@@ -28,85 +28,80 @@ enum  ELightingRoutine
 {
     /*!
      * <b>0</b><br>
-     * <i>Turns off the LEDs.</i>
-     */
-    eOff,
-    /*!
-     * <b>1</b><br>
      * <i>Shows a single color at a fixed brightness.</i>
      */
     eSingleSolid,
     /*!
-     * <b>2</b><br>
+     * <b>1</b><br>
      * <i>Alternates between showing a single color at a fixed
      * brightness and turning the LEDs completely off.</i>
      */
     eSingleBlink,
     /*!
-     * <b>3</b><br>
+     * <b>2</b><br>
      * <i>Linear fade of the brightness of the LEDs.</i>
      */
     eSingleWave,
     /*!
-     * <b>4</b><br>
+     * <b>3</b><br>
      * <i> Randomly dims some of the LEDs to give a glimmer effect.</i>
      */
     eSingleGlimmer,
     /*!
-     * <b>5</b><br>
+     * <b>4</b><br>
      * <i>Linear fade of the brightness of the LEDs.</i>
      */
     eSingleLinearFade,
     /*!
-     * <b>6</b><br>
+     * <b>5</b><br>
      * <i>Uses a sine function to fade in and out. This makes it spend more time near the
      *  extremes of full brightness and very dim light, and less time in the mid range.
      *  of the LEDs.</i>
      */
     eSingleSineFade,
     /*!
-     * <b>7</b><br>
+     * <b>6</b><br>
      * <i>fades in starting at 0 brightness and  increases a constant rate.
      * Once it reaches  full brightness, it resets back to zero and repeats.</i>
      */
     eSingleSawtoothFadeIn,
     /*!
-     * <b>8</b><br>
+     * <b>7</b><br>
      * <i>fades out starting at 0 brightness and decreases at a constant rate.
      *  Once it reaches 0, it resets back to full brightness and repeats.</i>
      */
     eSingleSawtoothFadeOut,
     /*!
-     * <b>9</b><br>
+     * <b>8</b><br>
      * <i> Uses the first color of the array as the base color
      * and uses the other colors for a glimmer effect.</i>
      */
     eMultiGlimmer,
     /*!
-     * <b>10</b><br>
+     * <b>9</b><br>
      * <i>Fades slowly between each color in the array.</i>
      */
     eMultiFade,
     /*!
-     * <b>11</b><br>
+     * <b>10</b><br>
      * <i>Chooses a random color from the array and lights all
      * all LEDs to match that color.</i>
      */
     eMultiRandomSolid,
     /*!
-     * <b>12</b><br>
+     * <b>11</b><br>
      * <i>Chooses a random color from the array for each
      * individual LED.</i>
      */
     eMultiRandomIndividual,
     /*!
-     * <b>13</b><br>
+     * <b>12</b><br>
      * <i>Draws the colors of the array in alternating
      *  groups of equal size.</i>
      */
     eMultiBarsSolid,
     /*!
-     * <b>14</b><br>
+     * <b>13</b><br>
      * <i>Draws the colors of the array in alternating
      *  groups of equal size. On each update, it moves those
      *  groups one index to the right, creating a scrolling
@@ -233,55 +228,60 @@ enum EPacketHeader
 {
   /*!
    * <b>0</b><br>
+   * <i>Takes one parameter, 0 turns off, 1 turns on.</i>
+   */
+  eOnOffChange,
+  /*!
+   * <b>1</b><br>
    * <i>Takes one int parameter that gets cast to ELightingMode.</i>
    */
   eModeChange,
   /*!
-   * <b>1</b><br>
+   * <b>2</b><br>
    * <i>Takes 3 parameters, a 0-255 representation of Red, Green, and Blue.</i>
    */
   eMainColorChange,
   /*!
-   * <b>2</b><br>
+   * <b>3</b><br>
    * <i>Takes four parameters. The first is the index of the custom color,
    * the remaining three parameters are a 0-255 representation
    * of Red, Green, and Blue.</i>
    */
   eCustomArrayColorChange,
   /*!
-   * <b>3</b><br>
+   * <b>4</b><br>
    * <i>Takes one parameter, sets the brightness between 0 and 100.</i>
    */
   eBrightnessChange,
   /*!
-   * <b>4</b><br>
+   * <b>5</b><br>
    * <i>Takes one parameter, sets the delay value 1 - 23767.</i>
    */
   eSpeedChange,
   /*!
-   * <b>5</b><br>
+   * <b>6</b><br>
    * <i>Change the number of colors used in a custom array routine.</i>
    */
   eCustomColorCountChange,
   /*!
-   * <b>6</b><br>
+   * <b>7</b><br>
    * <i>Set to 0 to turn off, set to any other number minutes until
    * idle timeout happens.</i>
    */
   eIdleTimeoutChange,
   /*!
-   * <b>7</b><br>
+   * <b>8</b><br>
    * <i>Sends back a packet that contains basic LED state information.</i>
    */
   eStateUpdateRequest,
   /*!
-   * <b>8</b><br>
+   * <b>9</b><br>
    * <i>Sends back a packet that contains the size of the custom array and all of the colors in it. </i>
    */
   eCustomArrayUpdateRequest,
   /*!
-   * <b>9</b><br>
-   * <i>Resets all values inside of RoutinesRGB back to their
+   * <b>10</b><br>
+   * <i>Resets all values inside of ArduCor back to their
    * default values. Useful for soft reseting the LED hardware. </i>
    */
   eResetSettingsToDefaults,

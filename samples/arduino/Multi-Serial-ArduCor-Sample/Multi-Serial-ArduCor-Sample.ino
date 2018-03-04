@@ -1,25 +1,27 @@
 /*!
- * RGB-LED-Routines
+ * ArduCor
  * Sample Sketch
  *
- * Supports SeeedStudio Rainbowduino projects.
+ * Example sketch with multiple ArduCor instances used
  *
  * Provides a Serial interface to a set of lighting routines.
  * 
- * Version 2.8.2
- * Date: February 13, 2018
- * Github repository: http://www.github.com/timsee/RGB-LED-Routines
+ * Version 2.9.0
+ * Date: March 2, 2018
+ * Github repository: http://www.github.com/timsee/ArduCor
  * License: MIT-License, LICENSE provided in root of git repo
  */
-#include <RoutinesRGB.h>
+#include <ArduCor.h>
 
-#include <Rainbowduino.h>
+#include <SoftwareSerial.h>
+#include <Adafruit_NeoPixel.h>
 
 //================================================================================
 // Settings
 //================================================================================
 
-const int  LED_COUNT         = 64;
+const byte CONTROL_PIN       = 5;
+const int  LED_COUNT         = 120;
 
 const byte BAR_SIZE          = 4;      // default length of a bar for bar routines
 const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimmer routines: range: 0 - 100
@@ -30,7 +32,7 @@ const int  DEFAULT_SPEED     = 300;    // default delay for LEDs update, suggest
 const int  DEFAULT_TIMEOUT   = 120;    // number of minutes without packets until the arduino times out.
 
 const int  DEFAULT_HW_INDEX  = 1;      // index for this particular microcontroller
-const int  DEVICE_COUNT      = 1;      // number of LED devices connected, 1 for every sample except the multi sample
+const int  DEVICE_COUNT      = 2;      // multi sample gives access to 2 different LED devices
 
 const bool USE_CRC           = true;   // true uses CRC, false ignores it.
 const bool USE_NEWLINE       = false;  // true adds newline to serial packets, false skips it.
@@ -41,6 +43,44 @@ const bool USE_NEWLINE       = false;  // true adds newline to serial packets, f
 
 // rename this whatever you want, but keep it under 16 characters
 char name_buffer[] = "MyLights";
+char name_buffer_2[] = "MyLights 2";
+
+//=======================
+// Hardware Type
+//=======================
+
+// enum for types of hardware that can be controlled.
+enum ELightType {
+  eSingleLED,
+  eCube,
+  e2DArray,
+  eLightStrip,
+  eRing
+};
+
+/*! 
+ * Modify these to reflect the type of light hardware that is in use
+ * by your sample. This does not affect the sample's functionality. Instead,
+ * it is sent out during discovery packets to applications such as Corluma
+ * and affects how the lights are displayed in those applications. 
+ */
+ELightType light_type = eLightStrip;
+ELightType light_type_2 = eLightStrip;
+
+//=======================
+// Product Type
+//=======================
+
+// enum for types of lighting products (NeoPixel, Rainbowduino, etc.)
+enum EProductType {
+  eRainbowduino,
+  eNeoPixels,
+  eLED
+};
+
+EProductType product_type   = eNeoPixels;
+EProductType product_type_2 = eNeoPixels;
+
 
 //=======================
 // API level
@@ -50,8 +90,8 @@ char name_buffer[] = "MyLights";
 // supported in the old API. Minor levels are incremented when the API has 
 // new functions added that do not significantly break the existing
 // messaging protocol.
-const uint8_t API_LEVEL_MAJOR = 2;
-const uint8_t API_LEVEL_MINOR = 1;
+const uint8_t API_LEVEL_MAJOR = 3;
+const uint8_t API_LEVEL_MINOR = 0;
 
 
 //=======================
@@ -59,9 +99,10 @@ const uint8_t API_LEVEL_MINOR = 1;
 //=======================
 
 ELightingRoutine current_routine = eSingleGlimmer;
+ELightingRoutine current_routine_2 = eSingleGlimmer;
 EColorGroup current_group = eCustom;
+EColorGroup current_group_2    = eCustom;
 
-bool isOn = true;
 // set this to turn off echoing all together
 bool skip_echo = false;
 // the sample sets this when it receives a valid packet
@@ -75,9 +116,12 @@ uint8_t hardware_index = DEFAULT_HW_INDEX;
 int update_speed = (int)((1000.0 / DELAY_VALUE) / (DEFAULT_SPEED / 100.0));
 // value received from packets
 int raw_speed = update_speed;
+int update_speed_2 = (int)((1000.0 / DELAY_VALUE) / (DEFAULT_SPEED / 100.0));
+int raw_speed_2 = update_speed_2;
 
 // timeout variables
 unsigned long idle_timeout = (unsigned long)DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
+unsigned long idle_timeout_2 = (unsigned long)DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
 unsigned long last_message_time = 0;
 
 // counts each loop and uses it to determine
@@ -95,7 +139,7 @@ bool packetReceived = false;
 // ints used for determining how much memory to use
 const int max_number_of_ints = 10;
 const int max_message_size = 20;
-const int max_number_of_messages = 8;
+const int max_number_of_messages = 3;
 const int max_packet_size = max_message_size * max_number_of_messages;
 
 // buffers for receiving messages
@@ -117,7 +161,7 @@ int int_array_size = 0;
 // buffers for char arrays
 char state_update_packet[100];
 
-char discovery_packet[50];
+char discovery_packet[72];
 
 // used for string manipulations
 char num_buf[16];
@@ -129,11 +173,23 @@ const char names_delimiter[] = "@";
 const char new_line[] = "\n";
 
 
+
 //=======================
-// RoutinesRGB Setup
+// Hardware Setup
 //=======================
-// Library used to generate the RGB LED routines.
-RoutinesRGB routines = RoutinesRGB(LED_COUNT);
+/*
+ * This demo sketch shows routines that use these indices for their light groups:
+ *    1 (routines)   :  first half of a 2 meter neopixel strip
+ *    2 (routines_2) :  second half of 2 meter neopixel strip
+ */
+// NeoPixels controller object
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(LED_COUNT, CONTROL_PIN, NEO_GRB + NEO_KHZ800);
+
+uint8_t routines_2_index  = DEFAULT_HW_INDEX + 1;
+
+ArduCor routines = ArduCor(LED_COUNT / 2);
+ArduCor routines_2 = ArduCor(LED_COUNT / 2);
+
 
 
 //=======================
@@ -179,13 +235,14 @@ unsigned long crcCalculator(const char* packet)
 
 void setup()
 {
-  Rb.init();
+  pixels.begin();
 
   // choose the default color for the single
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines.
   // If its not set, it defaults to a faint orange.
   routines.setMainColor(0, 255, 0);
+  routines_2.setMainColor(0, 255, 0);
   // put your setup code here, to run once:
   Serial.begin(9600);
   buildDiscoveryPacket();
@@ -248,19 +305,27 @@ void loop()
   }
 
   if (!(loop_counter % update_speed)) {
-    if (isOn) {
-      changeLightingRoutine(current_routine);
-      routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
-    } else {
-      routines.turnOff();
-    }
+    changeLightingRoutine(current_routine);
+    routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
+  }
+  if (!(loop_counter % update_speed_2)) {
+    changeLightingRoutine_2(current_routine_2);
+    routines_2.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
+  }
+
+  // update happens here for edge case handling
+  if (!(loop_counter % update_speed_2) || !(loop_counter % update_speed)) {
     updateLEDs();
   }
 
   // Timeout the LEDs.
   if ((idle_timeout != 0)
       && (last_message_time + idle_timeout < millis())) {
-    isOn = false;
+    routines.turnOff();
+  }
+  if ((idle_timeout_2 != 0)
+      && (last_message_time + idle_timeout_2 < millis())) {
+    routines_2.turnOff();
   }
 
   loop_counter++;
@@ -270,16 +335,21 @@ void loop()
 
 void updateLEDs()
 {
-  int index = 0;
-  for (int x = 0; x < 8; x++) {
-    for (int y = 0; y < 8; y++)  {
-      Rb.setPixelXY(x, y,
-                    routines.red(index),
-                    routines.green(index),
-                    routines.blue(index));
-      index++;
-    }
+  for (int x = 0; x < LED_COUNT / 2; x++) {
+    pixels.setPixelColor(x, pixels.Color(routines.red(x),
+                                         routines.green(x),
+                                         routines.blue(x)));
   }
+
+  int y = 0;
+  for (int x = LED_COUNT / 2; x < LED_COUNT; x++) {
+    pixels.setPixelColor(x, pixels.Color(routines_2.red(y),
+                                         routines_2.green(y),
+                                         routines_2.blue(y)));
+    y++;
+  }
+  // Neopixels use the show function to update the pixels
+  pixels.show();
 }
 
 
@@ -297,10 +367,6 @@ void changeLightingRoutine(ELightingRoutine currentMode)
 {
   switch (currentMode)
   {
-    case eOff:
-      routines.turnOff();
-      break;
-
     case eSingleSolid:
       routines.singleSolid(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue);
       break;
@@ -362,6 +428,71 @@ void changeLightingRoutine(ELightingRoutine currentMode)
   }
 }
 
+void changeLightingRoutine_2(ELightingRoutine currentMode)
+{
+  switch (currentMode)
+  {
+    case eSingleSolid:
+      routines_2.singleSolid(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue);
+      break;
+
+    case eSingleBlink:
+      routines_2.singleBlink(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue);
+      break;
+
+    case eSingleWave:
+      routines_2.singleWave(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue);
+      break;
+
+    case eSingleGlimmer:
+      routines_2.singleGlimmer(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, GLIMMER_PERCENT);
+      break;
+
+    case eSingleLinearFade:
+      routines_2.singleFade(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, false);
+      break;
+
+    case eSingleSineFade:
+      routines_2.singleFade(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, true);
+      break;
+
+    case eSingleSawtoothFadeIn:
+      routines_2.singleSawtoothFade(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, true);
+      break;
+
+    case eSingleSawtoothFadeOut:
+      routines_2.singleSawtoothFade(routines_2.mainColor().red, routines_2.mainColor().green, routines_2.mainColor().blue, false);
+      break;
+
+    case eMultiGlimmer:
+      routines_2.multiGlimmer(current_group_2, GLIMMER_PERCENT);
+      break;
+
+    case eMultiFade:
+      routines_2.multiFade(current_group_2);
+      break;
+
+    case eMultiRandomSolid:
+      routines_2.multiRandomSolid(current_group_2);
+      break;
+
+    case eMultiRandomIndividual:
+      routines_2.multiRandomIndividual(current_group_2);
+      break;
+
+    case eMultiBarsSolid:
+      routines_2.multiBarsSolid(current_group_2, BAR_SIZE);
+      break;
+
+    case eMultiBarsMoving:
+      routines_2.multiBarsMoving(current_group_2, BAR_SIZE);
+      break;
+
+    default:
+      break;
+  }
+}
+
 //================================================================================
 //  Packet Parsing
 //================================================================================
@@ -379,6 +510,28 @@ bool parsePacket(int header)
   boolean success = false;
   switch (header)
   {
+    case eOnOffChange:
+      if (int_array_size == 3) {
+        success = true;
+        received_hardware_index = packet_int_array[1];
+        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+          if (packet_int_array[2] == 0) {
+            routines.turnOff();
+          } else if (packet_int_array[2] == 1) {
+            loop_counter = 0;
+            routines.turnOn();
+          }
+        }
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          if (packet_int_array[2] == 0) {
+            routines_2.turnOff();
+          } else if (packet_int_array[2] == 1) {
+            loop_counter = 0;
+            routines_2.turnOn();
+          }
+        }
+      }
+      break;
     case eModeChange:
       if (int_array_size == 3 && packet_int_array[2] < eLightingRoutine_MAX) {
         if (packet_int_array[2] != current_routine) {
@@ -388,13 +541,10 @@ bool parsePacket(int header)
         success = true;
         received_hardware_index = packet_int_array[1];
         if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          if ((ELightingRoutine)packet_int_array[2] == eOff) {
-            isOn = false;
-          } else {
-            isOn = true;
-            // change mode to new mode
-            current_routine = (ELightingRoutine)packet_int_array[2];
-          }
+          current_routine = (ELightingRoutine)packet_int_array[2];
+        }
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          current_routine_2 = (ELightingRoutine)packet_int_array[2];
         }
       }
       // pick up cases where the modes can take extra optional arguments
@@ -409,7 +559,10 @@ bool parsePacket(int header)
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             current_routine = (ELightingRoutine)packet_int_array[2];
             current_group = (EColorGroup)packet_int_array[3];
-            isOn = true;
+          }
+          if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+            current_routine_2 = (ELightingRoutine)packet_int_array[2];
+            current_group_2   = (EColorGroup)packet_int_array[3];
           }
         }
       }
@@ -428,7 +581,11 @@ bool parsePacket(int header)
           routines.setMainColor(packet_int_array[2],
                                 packet_int_array[3],
                                 packet_int_array[4]);
-          isOn = true;
+        }
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          routines_2.setMainColor(packet_int_array[2],
+                                  packet_int_array[3],
+                                  packet_int_array[4]);
         }
       }
       break;
@@ -451,6 +608,12 @@ bool parsePacket(int header)
                               packet_int_array[4],
                               packet_int_array[5]);
           }
+          if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+            routines_2.setColor(color_index,
+                                packet_int_array[3],
+                                packet_int_array[4],
+                                packet_int_array[5]);
+          }
         }
       }
       break;
@@ -463,7 +626,9 @@ bool parsePacket(int header)
           // update brightness level
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             routines.brightness(param);
-            isOn = true;
+          }
+          if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+            routines_2.brightness(param);
           }
         }
         break;
@@ -476,6 +641,10 @@ bool parsePacket(int header)
           raw_speed = packet_int_array[2];
           update_speed = (int)((1000.0 / DELAY_VALUE) / (raw_speed / 100.0));
         }
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          raw_speed_2 = packet_int_array[2];
+          update_speed_2 = (int)((1000.0 / DELAY_VALUE) / (raw_speed_2 / 100.0));
+        }
       }
       break;
     case eIdleTimeoutChange:
@@ -486,6 +655,10 @@ bool parsePacket(int header)
           unsigned long new_timeout = (unsigned long)packet_int_array[2];
           idle_timeout = new_timeout * 60 * 1000;
         }
+        if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+          unsigned long new_timeout = (unsigned long)packet_int_array[2];
+          idle_timeout_2 = new_timeout * 60 * 1000;
+        }
       }
       break;
     case eCustomColorCountChange:
@@ -495,6 +668,9 @@ bool parsePacket(int header)
           received_hardware_index = packet_int_array[1];
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
             routines.setCustomColorCount(packet_int_array[2]);
+          }
+          if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
+            routines_2.setCustomColorCount(packet_int_array[2]);
           }
         }
       }
@@ -545,7 +721,7 @@ void buildStateUpdatePacket()
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa((uint8_t)hardware_index, num_buf, 10));
   strcat(state_update_packet, value_delimiter);
-  strcat(state_update_packet, itoa((uint8_t)isOn, num_buf, 10));
+  strcat(state_update_packet, itoa((uint8_t)routines.isOn(), num_buf, 10));
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa(1, num_buf, 10)); // isReachable
   strcat(state_update_packet, value_delimiter);
@@ -566,6 +742,33 @@ void buildStateUpdatePacket()
   strcat(state_update_packet, itoa(idle_timeout / 60000, num_buf, 10));
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa(calculateMinutesUntilTimeout(last_message_time, idle_timeout), num_buf, 10));
+  strcat(state_update_packet, message_delimiter);
+
+  strcat(state_update_packet, itoa((uint8_t)eStateUpdateRequest, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)routines_2_index, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)routines_2.isOn(), num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(1, num_buf, 10)); // isReachable
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(routines_2.mainColor().red, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(routines_2.mainColor().green, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(routines_2.mainColor().blue, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)current_routine_2, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)current_group_2, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(routines_2.brightness(), num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(raw_speed_2, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(idle_timeout_2 / 60000, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa(calculateMinutesUntilTimeout(last_message_time, idle_timeout_2), num_buf, 10));
   strcat(state_update_packet, message_delimiter);
 
 
@@ -602,6 +805,19 @@ void buildCustomArrayUpdatePacket()
   }
   strcat(state_update_packet, message_delimiter);
 
+  strcat(state_update_packet, itoa((uint8_t)eCustomArrayUpdateRequest, num_buf, 10));
+  strcat(state_update_packet, value_delimiter);
+  strcat(state_update_packet, itoa((uint8_t)hardware_index, num_buf, 10));
+  for (int i = 0; i < routines.customColorCount(); ++i) {
+    strcat(state_update_packet, value_delimiter);
+    strcat(state_update_packet, itoa(routines_2.color(i).red, num_buf, 10));
+    strcat(state_update_packet, value_delimiter);
+    strcat(state_update_packet, itoa(routines_2.color(i).green, num_buf, 10));
+    strcat(state_update_packet, value_delimiter);
+    strcat(state_update_packet, itoa(routines_2.color(i).blue, num_buf, 10));
+  }
+  strcat(state_update_packet, message_delimiter);
+  
 
   // add the crc
   if (USE_CRC) {
@@ -634,6 +850,16 @@ void buildDiscoveryPacket()
   strcat(discovery_packet, itoa((uint8_t)DEVICE_COUNT, num_buf, 10));
   strcat(discovery_packet, names_delimiter);
   strcat(discovery_packet, name_buffer);
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)light_type, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)product_type, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, name_buffer_2);
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)light_type_2, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)product_type_2, num_buf, 10));
   strcat(discovery_packet, message_delimiter);
 
   strcat(discovery_packet, packet_delimiter);
@@ -647,7 +873,7 @@ void echoPacket()
 {  
   // add the crc
   if (USE_CRC) {
-    unsigned long crc = crcCalculator(state_update_packet);
+    unsigned long crc = crcCalculator(echo_packet);
     strcat(echo_message, crc_delimiter);
     strcat(echo_message, ultoa(crc, num_buf, 10));
     strcat(echo_message, message_delimiter);

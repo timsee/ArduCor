@@ -1,14 +1,14 @@
-#ifndef RoutinesRGB_h
-#define RoutinesRGB_h
+#ifndef ArduCor_h
+#define ArduCor_h
 
 #include "Arduino.h"
 #include "LightingProtocols.h"
 
 /*!
- * \version v2.1.1
- * \date January 29, 2018
+ * \version v2.9.0
+ * \date March 2, 2018
  * \author Tim Seemann
- * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
+ * \copyright <a href="https://github.com/timsee/ArduCor/blob/master/LICENSE">
  *            MIT License
  *            </a>
  *
@@ -24,7 +24,7 @@
  * arduino sketch:
  *
  * ~~~~~~~~~~~~~~~~~~~~~
- * RoutinesRGB routines = RoutinesRGB(LED_COUNT);
+ * ArduCor routines = ArduCor(LED_COUNT);
  * ~~~~~~~~~~~~~~~~~~~~~
  *
  * where `LED_COUNT` is the number of LEDs in your array.  
@@ -60,7 +60,7 @@
  *
  *
  */
-class RoutinesRGB
+class ArduCor
 {
 public:
     
@@ -84,7 +84,7 @@ public:
      *
      * \param ledCount number of individual RGB LEDs.
      */
-    RoutinesRGB(uint16_t ledCount);
+    ArduCor(uint16_t ledCount);
     
     /*!
      * Resets all internal values to the original values.
@@ -92,8 +92,13 @@ public:
     void resetToDefaults();
     
     /*!
-     *  Turns off all the LEDs. To turn the lights back on, call any other
-     *  light routine. 
+     *  Turns on all the LEDs.
+     */
+    void turnOn();
+    
+    /*!
+     *  Turns off all the LEDs. To turn the lights back on, call any
+     *  light routine or call `turnOn()`.
      */
     void turnOff();
 
@@ -101,7 +106,7 @@ public:
     // Getters and Setters
     //================================================================================
     /*! @defgroup gettersetters Getters and Setters
-     *  These are the getters and setters for RoutinesRGB that are used to control
+     *  These are the getters and setters for ArduCor that are used to control
      *  the settings and the colors.
      *  @{
      */
@@ -498,4 +503,4 @@ private:
     void fillColorBuffers(uint8_t r, uint8_t g, uint8_t b);
 };
 
-#endif //RoutinesRGB_h
+#endif //ArduCor_h

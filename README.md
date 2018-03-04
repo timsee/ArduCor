@@ -1,9 +1,7 @@
 
-# RGB LED Routines for Arduino
+# ArduCor: RGB LED Routines for Arduino
 
-This project is based around an arduino library that generates a set of lighting routines for various arduino-based lighting arrays. It works for all arduinos except the ATtiny series.
-
-Sample sketches are provided for NeoPixel products, Rainbowduinos, and a single RGB LED. All samples implement an ASCII based interface to change the lighting routines, and to change settings such as the brightness of the LEDs.
+ArduCor is an arduino library that generates a set of lighting routines for arduino-based lighting arrays. It works for all arduinos except the ATtiny series and is compatible with Neopixels, Rainbowduinos, and standard RGB LEDs. Sample sketches provide an ASCII based messaging protocol for controlling the arduino from other devices. These samples can either use Serial communication or use arduino Yuns or Raspberry Pis for wireless communication.
 
 A related project, [Corluma](https://github.com/timsee/Corluma), provides a cross-platform GUI to control the lights with this interface.
 
@@ -13,7 +11,7 @@ A related project, [Corluma](https://github.com/timsee/Corluma), provides a cros
 * [Library Usage](#library-usage)
     * [Single Color Routines](#single-routines)
     * [Multi Color Routines](#multi-routines)
-* Arduino Library API ([html](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00001.html) ([pdf](https://github.com/timsee/RGB-LED-Routines/blob/master/docs/RoutinesRGB-API.pdf))
+* Arduino Library API ([html](https://timsee.github.io/ArduCor/ArduCor/html/a00001.html) ([pdf](https://github.com/timsee/ArduCor/blob/master/docs/ArduCor-API.pdf))
 * [Sample Sketch Usage](samples)
     * [Yun Samples](samples/yun)
     * [Raspberry Pi Sample](samples/pi)
@@ -24,7 +22,7 @@ A related project, [Corluma](https://github.com/timsee/Corluma), provides a cros
 ## <a name="installation"></a>Installation
 
 1. Download the git repository
-2. Copy the RoutinesRGB directory into your [Arduino Libraries directory](https://www.arduino.cc/en/Hacking/Libraries).
+2. Copy the `ArduCor` directory into your [Arduino Libraries directory](https://www.arduino.cc/en/Hacking/Libraries).
 3. Choose the proper sample for your hardware setup from the [samples folder](samples).
 4. Build and upload to your board.
 
@@ -49,7 +47,7 @@ These routines use a single color:
 
 ### <a name="multi-routines"></a>Multi Colors Routines
 
-These routines use groups of colors saved in an array to execute the routine. This can be a custom group of colors or it can come from a pallete of preset colros. All routines have a parameter used to determine the color group for the routine. A description of the different color groups is [here](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html).
+These routines use groups of colors saved in an array to execute the routine. This can be a custom group of colors or it can come from a pallete of preset colros. All routines have a parameter used to determine the color group for the routine. A description of the different color groups is [here](https://timsee.github.io/ArduCor/ArduCor/html/a00003.html).
 
 * Multi Glimmer
 * Multi Random Individual

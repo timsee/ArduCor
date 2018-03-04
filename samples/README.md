@@ -1,4 +1,4 @@
-# Sample Sketches for RGB LED Routines
+# Sample Sketches for ArduCor
 
 The sample sketches for Adafruit NeoPixels, SeeedStudio Rainbowduino, and a single RGB LED.
 
@@ -25,7 +25,7 @@ For a guide on how to use the server sample to control the arduino projects wire
     * [Discovery Packet](#discovery)
     * [Cyclic Redundancy Check](#crc)
     * [Multi Serial Sample](#multi-sample)
-    * [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html)
+    * [Lighting Protocols](https://timsee.github.io/ArduCor/ArduCor/html/a00003.html)
 * [Generating Samples](#generated-samples)
 
 ## <a name="hardware"></a>Supported Hardware
@@ -62,40 +62,50 @@ Upon receiving a valid packet, the Arduino code loops through all the messages, 
 
 The second argument in a message is always a device index. This value determines which device will use the rest of the contents of the message. This is only used to its potential in the [Multi Serial Sample](#multi-sample), as its the only sample that has more than one device connected to a single arduino. If the device_index is set to 0, all connected devices will be updated by the message. If its set to any other value, only the device that has the same index as the one in the mesasge will use the message.
 
+#### On/Off Change
+
+| Parameter         | Values        |
+| ----------------- | ------------- |
+| Header            |     0          |
+| Off or On        | 0 or 1 |
+
+**Example:** `0,0,1&` *(Header 1, Device Index 0,  Turn On)*
+`0,0,0&` *(Header 1, Device Index 0, Turn Off)*
+
 #### Lighting Routine Change
 
 | Parameter         | Values        |
 | ----------------- | ------------- |
-| Header            |     0         |
-| New Routine       | (ELightingRoutine)0 - 14  |  
+| Header            |     1          |
+| New Routine       | (ELightingRoutine)0 - 13  |
 | Color Group (Optional) | (EColorGroup)0 - 17        |  
 
-**Example:** `0,0,1&` *(Header 0, Device Index 0, New Routine 1)*
- `0,0,4,6&` *(Header 0, Device Index 0, New Routine 4, New Color Group 6)*
+**Example:** `1,0,1&` *(Header 1, Device Index 0, New Routine 1)*
+ `1,0,4,6&` *(Header 1, Device Index 0, New Routine 4, New Color Group 6)*
 
-*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/RGB-LED-Routines/RoutinesRGB/html/a00003.html). *
+*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/ArduCor/ArduCor/html/a00003.html). *
 
 #### Set Color for Single Color Routines
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     1         |
+| Header        |     2         |
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
-**Example:** `1,0,255,127,0&` *(Header 1, Device Index 0, Red 255, Green 127, Blue 0)*
+**Example:** `2,0,255,127,0&` *(Header 2, Device Index 0, Red 255, Green 127, Blue 0)*
 
 
 #### Set Color in Custom Color Array
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     2         |
+| Header        |     3         |
 | Color Index   | 0 - 10        |
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
-**Example:** `2,0,3,255,127,0&` *(Header 2, Device Index 0 Saved Color 3, Red 255, Green 127, Blue 0)*
+**Example:** `3,0,3,255,127,0&` *(Header 3, Device Index 0 Saved Color 3, Red 255, Green 127, Blue 0)*
 
 *Note: The Color Index must be smaller than the size of the custom color array, which is currently 10. These can be used in multi color routines by using the EColorGroup `eCustom`*
 
@@ -103,17 +113,17 @@ The second argument in a message is always a device index. This value determines
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     3         |
+| Header        |     4         |
 | Brightness %  | 0 - 100       |
-**Example:** `3,0,90&` *(Header 3, Device Index 0, 90% brightness)*
+**Example:** `4,0,90&` *(Header 4, Device Index 0, 90% brightness)*
 
 #### Set Speed
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     4         |
+| Header        |     5         |
 | Desired FPS * 100     | 1 - 2000      |
-**Example:** `4,0,500&` *(Header 4, Device Index 0, 5 FPS)*
+**Example:** `5,0,500&` *(Header 5, Device Index 0, 5 FPS)*
 
 *Note: The value sent is the desired FPS * 100. To do 1 FPS, send 100, to do 10 FPS, send 1000. This only sets the desired FPS. When the FPS is very low, it will be close to accurate. An extremely fast FPS will be limited by the hardware being used, the number of LEDs, and other factors.  *
 
@@ -121,9 +131,9 @@ The second argument in a message is always a device index. This value determines
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     5         |
+| Header        |     6         |
 | Count         | 2 - 10        |
-**Example:** `5,0,3&` *(Header 5, Device Index 0, 3 colors)*
+**Example:** `6,0,3&` *(Header 6, Device Index 0, 3 colors)*
 
 *Note: This setting controls the number of colors used for multi color routines using the custom color array.*
 
@@ -131,9 +141,9 @@ The second argument in a message is always a device index. This value determines
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     6        |
+| Header        |     7        |
 | Idle Timeout Minutes       | 0 - 1000      |
-**Example:** `6,0,120&` *(Header 6, Device Index 0, 120 Minutes)*
+**Example:** `7,0,120&` *(Header 7, Device Index 0, 120 Minutes)*
 
 *Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `6,0,0&;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
 
@@ -141,41 +151,14 @@ The second argument in a message is always a device index. This value determines
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     9         |
+| Header        |     10         |
 | Check 1       |     42        |
 | Check 2       |     71        |
-**Example:** `9,42,71&` *(Header 7, Check 1, Check 2)*
+**Example:** `10,42,71&` *(Header 10, Check 1, Check 2)*
 
 *Note: This message contains two extra parameters to make it harder for it to be triggered accidentally by a corrupted packet, even if CRC is off.*
 
 ### <a name="state-update"></a>State Update Packet
-
-| Parameter     | Values        |
-| ------------- | ------------- |
-| Header        |     7       |
-
-**Example:** `7&` *(Header 7)*
-
-Sending a state update gives
-
-The packet is formatted as:
-
-```
-$stateUpdate,$isOn,$isReachable,$red,$green,$blue,$routine,$colorGroup,$brightness&
-```
-
-| Parameter        | Range        |  Description |
-| -------------        | ------------- |  ------------- |
-| stateUpdate    |     7            |                    |
-| isOn              |     0 or 1     |     0 if the current routine is eOff, 1 otherwise             |
-| isReachable    |     1            |  Only 1 if it is expected to be connected but it is not connected to the controller. Used by [Corluma](https://github.com/timsee/Corluma)                    |
-| red, green, blue    |    0  - 255            |     Color used by single color routines                |
-| routine    |    0 - 14            |      Current lighting routine          |
-| colorGroup      |    0 - 17            |      Current color group         |
-| brightness          |    0 - 100          |     Brightness setting of the RoutinesRGB library         |
-
-
-### <a name="custom-array-update"></a>Custom Array State Update Packet
 
 | Parameter     | Values        |
 | ------------- | ------------- |
@@ -188,12 +171,39 @@ Sending a state update gives
 The packet is formatted as:
 
 ```
+$stateUpdate,$isOn,$isReachable,$red,$green,$blue,$routine,$colorGroup,$brightness&
+```
+
+| Parameter        | Range        |  Description |
+| -------------        | ------------- |  ------------- |
+| stateUpdate    |     8            |                    |
+| isOn              |     0 or 1     |     0 if the current routine is eOff, 1 otherwise             |
+| isReachable    |     1            |  Only 1 if it is expected to be connected but it is not connected to the controller. Used by [Corluma](https://github.com/timsee/Corluma)                    |
+| red, green, blue    |    0  - 255            |     Color used by single color routines                |
+| routine    |    0 - 14            |      Current lighting routine          |
+| colorGroup      |    0 - 17            |      Current color group         |
+| brightness          |    0 - 100          |     Brightness setting of the ArduCor library         |
+
+
+### <a name="custom-array-update"></a>Custom Array State Update Packet
+
+| Parameter     | Values        |
+| ------------- | ------------- |
+| Header        |     9       |
+
+**Example:** `9&` *(Header 9)*
+
+Sending a state update gives
+
+The packet is formatted as:
+
+```
 $customArrayStateUpdate,$count,$index,$red,$green,$blue...,$index,$red,$green,$blue&
 ```
 
 | Parameter              | Range         |  Description   |
 | -------------          | ------------- |  ------------- |
-| customArrayStateUpdate |     8         |                |
+| customArrayStateUpdate |     9         |                |
 | count                  |     2 - 10    |  Custom color count             |
 | index                  |     0 - 10    |             |                  
 | red      |    0  - 255   |   Red value for index |
@@ -207,7 +217,7 @@ The `$count` parameter denotes how many times the `,$index,$red,$green,$blue` se
 Sending the message `DISCOVERY_PACKET` to any of the samples will cause the sample to send a message back in the format of:
 
 ```
-DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$name&
+DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$name,$hardwareType&
 ```
 
 | Parameter     | Range         |  Description   |
@@ -218,6 +228,7 @@ DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$nam
 | maxPacketSize |     1 - 500  |  max number of characters accepted in a single message        |
 | numOfDevices  |     1 - 20    |  Number of RGB devices connected to arduino    |
 | name  |    N/A    |  A hardcoded identifier of up to 16 characters   |
+| hardwareType  |    0 -  4   |  An enum denoting the type of hardware (light strip, light cube, etc.)  |
 
 * *NOTE: even if CRC is on, discovery packets do not require or send out a CRC!*
 
@@ -241,29 +252,49 @@ where `$crc` is the CRC computed by the sample code.
 It is recommended to turn on the CRC for serial communication with a client but turn it off if you are writing the ASCII commands yourself into the Serial Monitor (computing the CRC by hand is extra work!). As for what samples to use it with, it is strongly recommended for use with the Serial or any samples that have serial somewhere in their communication stream, such as the server samples. It is not recommended for UDP or HTTP.
 
 If you want to test if cyclic redundancy is working properly, I would recommend using this packet, which requests a state update packet with the proper CRC appended (add a `;` to the end of the packet if communicating with a serial device):
+
 ```
 # state update packet
-7&#64173878&
+8&#2219518969&
 
-# green wave on device 1
-0,1,3&1,1,25,230,0&#2514933459&
+# turn on device 1
+0,1,1&#3692676612&
+
+# turn off device 1
+0,1,0&#3305305925&
+
+# single glimmer on device 1
+1,1,3&#628324131&
 
 # multi glimmer on device 1
-0,1,9,7&#3717981335&
+1,1,8,0&#3872134571&
 
-# blue glimmer on device 1
-0,1,4&1,1,0,0,255&#4181657516&
+# set main color red on device 1
+2,1,228,0,0&#881768640&
+
+# set main color blue on device 1
+2,1,0,0,227&#1592330869&
+
+# set main color green on device 1
+2,1,0,252,0&#656950832&
 
 # set main color of all devices orange
-1,0,150,17,0&#1415641120&
+2,0,241,107,0&#1261323016&
+
+# set device 1 to glimmer, set all devices blue
+1,1,3&2,1,0,0,255&#71223677&
+
+# set device 1 to wave and green
+1,1,2&2,1,25,230,0&#1177936301&
+
 ```
 
 ### <a name="multi-sample"></a>Multi Device Samples
 
-The Multi Device Samples are an example of how to use the device index in the control packets to control multiple sets of LEDs from one Arduino. The sample uses two RoutinesRGB objects to control two halves of a Neopixels Light Strip separately. The samples work with Serial communication.
+The Multi Device Samples are an example of how to use the device index in the control packets to control multiple sets of LEDs from one Arduino. The sample uses two ArduCor objects to control two halves of a Neopixels Light Strip separately. The samples work with Serial communication.
 
 ### <a name="generating-samples"></a>Generating Samples
 
-Samples are generated off of the `RGB-LED-Routines` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates 3 versions of the sketch.
+Samples are generated off of the `ArduCor` sketch in the `src` folder of this repo. It uses the script `generate_samples.sh` which reads preprocessor directives and creates multiple versions of the sketch.
 
-To make changes to all the samples, edit the sketch in `src/RGB-LED-Routines` and then run the `generate_samples.sh` script.
+To make changes to all the samples, edit the sketch in `src/ArduCorSample` and then run the `generate_samples.sh` script.

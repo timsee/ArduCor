@@ -7,8 +7,8 @@
 # need to run the proper project.
 #
 #
-# Script Version: 1.4
-# Github repository: http://www.github.com/timsee/RGB-LED-Routines
+# Script Version: 1.5
+# Github repository: http://www.github.com/timsee/ArduCor
 # License: MIT-License, LICENSE provided in root of git repo
 #
 #------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ PROJECT_DESCRIPTION=(
     " * Supports SeeedStudio Rainbowduino projects."
     " * Supports Adafruit NeoPixels products."
     " * Supports a single RGB LED but can be easily hacked to support more."
-    " * Example sketch with multiple routinesRGB instances used"
+    " * Example sketch with multiple ArduCor instances used"
 )
 
 
@@ -100,7 +100,7 @@ DESCRIPTION_PLACEHOLDER=" * DESCRIPTION_PLACEHOLDER"
 COM_PLACEHOLDER=" * COM_PLACEHOLDER"
 
 #paths
-PROJ_PATH="RGB-LED-Routines.ino"
+PROJ_PATH="ArduCorSample.ino"
 SAMPLES_PATH=../../samples
 
 END_FLAG="#endif"
@@ -123,7 +123,7 @@ function generate_hardware_specific_sample()
     comm_num=0
     for comm_id in "${COMM_TYPES[@]}"
     do
-        WRITE_PROJ="${1}-${comm_id}-Routines-Sample"
+        WRITE_PROJ="${1}-${comm_id}-ArduCor-Sample"
         COMM_FLAG="${COMM_FLAGS[${comm_num}]}"
         COMM_DESCRIPTION="${COMM_DESCRIPTION_START}${comm_id}${COMM_DESCRIPTION_END}"
         WRITE_PATH_DIR="${SAMPLES_PATH}/${COMM_PATHS[${comm_num}]}/${WRITE_PROJ}"
@@ -240,8 +240,10 @@ do
 done
 
 # remove samples that combine incompatible hardware, such as a rainbowduino with Yun capabilities.
-rm -r ${SAMPLES_PATH}/yun/http/Rainbowduino-HTTP-Routines-Sample
-rm -r ${SAMPLES_PATH}/yun/udp/Rainbowduino-UDP-Routines-Sample
+rm -r ${SAMPLES_PATH}/yun/http/Rainbowduino-HTTP-ArduCor-Sample
+rm -r ${SAMPLES_PATH}/yun/udp/Rainbowduino-UDP-ArduCor-Sample
+rm -r ${SAMPLES_PATH}/yun/http/Multi-HTTP-ArduCor-Sample
+rm -r ${SAMPLES_PATH}/yun/udp/Multi-UDP-ArduCor-Sample
 
 # reset the second line to be #define IS_NEOPIXELS 1 since thats the default testing environment
 sed "2s/.*/#define IS_NEOPIXELS 1 /" $PROJ_PATH > temp.txt ; mv temp.txt $PROJ_PATH
