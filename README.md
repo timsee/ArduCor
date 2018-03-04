@@ -11,7 +11,7 @@ A related project, [Corluma](https://github.com/timsee/Corluma), provides a cros
 * [Library Usage](#library-usage)
     * [Single Color Routines](#single-routines)
     * [Multi Color Routines](#multi-routines)
-* Arduino Library API ([html](https://timsee.github.io/ArduCor/ArduCor/html/a00001.html) ([pdf](https://github.com/timsee/ArduCor/blob/master/docs/ArduCor-API.pdf))
+* Arduino Library API ([html](https://timsee.github.io/ArduCor/ArduCor/html/a00021.html)) ([pdf](https://github.com/timsee/ArduCor/blob/master/docs/ArduCor-API.pdf))
 * [Sample Sketch Usage](samples)
     * [Yun Samples](samples/yun)
     * [Raspberry Pi Sample](samples/pi)
@@ -47,7 +47,7 @@ These routines use a single color:
 
 ### <a name="multi-routines"></a>Multi Colors Routines
 
-These routines use groups of colors saved in an array to execute the routine. This can be a custom group of colors or it can come from a pallete of preset colros. All routines have a parameter used to determine the color group for the routine. A description of the different color groups is [here](https://timsee.github.io/ArduCor/ArduCor/html/a00003.html).
+These routines use groups of colors saved in an array to execute the routine. This can be a custom group of colors or it can come from a pallete of preset colros. All routines have a parameter used to determine the color group for the routine. A description of the different color groups is [here](https://timsee.github.io/ArduCor/ArduCor/html/a00011.html).
 
 * Multi Glimmer
 * Multi Random Individual
