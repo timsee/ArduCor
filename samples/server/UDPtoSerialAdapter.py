@@ -3,8 +3,8 @@
 #------------------------------------------------------------
 # UDPtoSerial.py
 #------------------------------------------------------------
-# Version 2.0
-# February 3, 2018
+# Version 2.1
+# March 1, 2018
 # MIT License (in root of git repo)
 # by Tim Seemann
 #
@@ -68,7 +68,7 @@ def sortMessages(packet):
             values = message.split(",")
             if len(values) > 0:
                 if values[0] != '':
-                    if (int(values[0]) in [7,8,9]):
+                    if (int(values[0]) in [8,9,10]):
                         multiCastMessage(message)
                     if len(values) > 1:
                         hardwareIndex = int(values[1])
@@ -142,6 +142,10 @@ def buildDiscoveryPacket():
     discoveryPacket += str(deviceCount) + "@"
     for i in range(deviceCount):
         discoveryPacket += nameList[i]
+        discoveryPacket += ","
+        discoveryPacket += typeList[i]
+        discoveryPacket += ","
+        discoveryPacket += productList[i]
         if (i != deviceCount - 1):
             discoveryPacket += ","
     discoveryPacket += "&"
@@ -157,6 +161,8 @@ def parseDiscoveryPacket(packet, serialIndex):
     global majorAPILevel
     global minorAPILevel
     global nameList
+    global typeList
+    global productList
 
     packetSplitArray = packet.split("&")
     discoveryAndNameSplitArray = packetSplitArray[0].split("@")
@@ -170,13 +176,21 @@ def parseDiscoveryPacket(packet, serialIndex):
             maxPacketSize = int(discoverySplitArray[4])
 
             count = int(discoverySplitArray[5])
-            # append to the name list
-            for x in range(count):
-                deviceCount = deviceCount + 1
-                nameList.append(nameSplitArray[x])
+            packetIndex = 0
+            for x in range(count * 3):
+                if packetIndex == 0:
+                    deviceCount = deviceCount + 1
+                    nameList.append(nameSplitArray[x])
+                    packetIndex = 1
+                elif packetIndex == 1:
+                    typeList.append(nameSplitArray[x])
+                    packetIndex = 2
+                elif packetIndex == 2:
+                    productList.append(nameSplitArray[x])
+                    packetIndex = 0
 
             if (useCRC == 1 or useCRC == 0) \
-                and majorAPILevel == 2 \
+                and majorAPILevel == 3 \
                 and deviceCount < 20 \
                 and maxPacketSize < 500:
                 maxPacketSizeList[serialIndex] = maxPacketSize
@@ -217,7 +231,7 @@ def parseStateUpdateForHardwareIndices(serialPort, serialIndex):
                     # split each message by its delimiter
                     values = message.split(",")
                     if len(values) == 13:
-                        if values[0] == "7":
+                        if values[0] == "8":
                             lightHardwareIndices[serialIndex].append(int(values[1]))
                             messageIsValid = True
                 return messageIsValid
@@ -226,7 +240,7 @@ def parseStateUpdateForHardwareIndices(serialPort, serialIndex):
 #-----
 # Builds a packet to request state updates
 def stateUpdatePacket():
-    packet = "7&"
+    packet = "8&"
     if useCRC:
         crc = crcCalculator(packet)
         packet += "#"
@@ -358,6 +372,8 @@ minorAPILevel = None
 udp_data = None
 addr = None
 nameList = []
+typeList = []
+productList = []
 # this list is used to store the max packet size for each serial device.
 maxPacketSizeList = [0 for i in xrange(numOfSerialDevices)]
 # set this to define the max packet size sent to the server. The server will

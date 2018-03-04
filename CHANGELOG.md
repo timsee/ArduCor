@@ -131,3 +131,13 @@
 * Added more edge case handling to the python server.
 * incremented the API level to 2.1
 
+### **v2.9.0**
+#### Reinventing the Light Switch Update
+* Renamed the project from `RGB-LED-Routines` to `ArduCor`
+* Changed turning lights on/off from being handled as a mode. Instead, now on/off commands have their own packet header.
+* Discovery Packets now send a `ELightType` with each discovery packet, to denote the type of hardware they are (light cube, single LED, light strip, etc.)
+* Discovery Packets now send a `EProductType` with each discovery packet, to denote the type of product they are (Neopixels, Rainbowduino, etc.)
+* Modified the "Frozen" color group.
+* Fixed miscellaneous bugs.
+* Incremented API level to 3.0
+

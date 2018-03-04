@@ -1,9 +1,9 @@
 /*!
  * \file ColorPresets.h
- * \version v2.1.1
- * \date January 29, 2018
+ * \version v2.9.0
+ * \date March 2, 2018
  * \author Tim Seemann
- * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
+ * \copyright <a href="https://github.com/timsee/ArduCor/blob/master/LICENSE">
  *            MIT License
  *            </a>
  *
@@ -33,9 +33,9 @@ const PROGMEM uint8_t waterColors[]        = { 0,   0,   255,
 // Frozen 
 //==========                                   
 const PROGMEM uint8_t frozenColors[]       = { 0,   127, 255,
-                                               0,   127, 127,
+                                               169, 228, 247,
                                                200, 0,   255,    
-                                               40,  127, 40,
+                                               200, 200, 200,
                                                127, 127, 127,
                                                127, 127, 255 };
            

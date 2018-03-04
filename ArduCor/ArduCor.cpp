@@ -1,8 +1,8 @@
 /*!
- * \version v2.1.1
- * \date January 29, 2018
+ * \version v2.9.0
+ * \date March 2, 2018
  * \author Tim Seemann
- * \copyright <a href="https://github.com/timsee/RGB-LED-Routines/blob/master/LICENSE">
+ * \copyright <a href="https://github.com/timsee/ArduCor/blob/master/LICENSE">
  *            MIT License
  *            </a>
  *
@@ -12,7 +12,7 @@
  *
  */
  
-#include "RoutinesRGB.h"
+#include "ArduCor.h"
 #include "ColorPresets.h"
 
 // Default brightness of LEDS, must be a value between 0 and 100.
@@ -36,7 +36,7 @@ const uint8_t  DEFAULT_BAR_SIZE = 2;
 // Constructors
 //================================================================================
 
-RoutinesRGB::RoutinesRGB(uint16_t ledCount)
+ArduCor::ArduCor(uint16_t ledCount)
 {
     m_LED_count = ledCount;
     // catch an illegal argument
@@ -65,7 +65,7 @@ RoutinesRGB::RoutinesRGB(uint16_t ledCount)
     resetToDefaults(); 
 }
 
-void RoutinesRGB::resetToDefaults()
+void ArduCor::resetToDefaults()
 {
     // By default, this is set to orange. However,
     // most sample sketches will override this value
@@ -118,7 +118,7 @@ void RoutinesRGB::resetToDefaults()
 //================================================================================
 
 bool
-RoutinesRGB::setMainColor(uint8_t r, uint8_t g, uint8_t b)
+ArduCor::setMainColor(uint8_t r, uint8_t g, uint8_t b)
 {
     if ((m_main_color.red == r) 
         && (m_main_color.green == g)
@@ -131,7 +131,7 @@ RoutinesRGB::setMainColor(uint8_t r, uint8_t g, uint8_t b)
 }
 
 void
-RoutinesRGB::setColor(uint16_t colorIndex, uint8_t r, uint8_t g, uint8_t b)
+ArduCor::setColor(uint16_t colorIndex, uint8_t r, uint8_t g, uint8_t b)
 {
     if (colorIndex < (sizeof(m_custom_colors) / sizeof(Color))) {
         m_custom_colors[colorIndex] = {r, g, b};
@@ -144,7 +144,7 @@ RoutinesRGB::setColor(uint16_t colorIndex, uint8_t r, uint8_t g, uint8_t b)
 
 
 void 
-RoutinesRGB::setCustomColorCount(uint8_t count)
+ArduCor::setCustomColorCount(uint8_t count)
 {
     if (count != 0) {
         m_custom_count = count;
@@ -156,13 +156,13 @@ RoutinesRGB::setCustomColorCount(uint8_t count)
 }
 
 uint8_t 
-RoutinesRGB::customColorCount()
+ArduCor::customColorCount()
 {
     return m_custom_count;
 }
 
 void 
-RoutinesRGB::brightness(uint8_t brightness)
+ArduCor::brightness(uint8_t brightness)
 {
     if (brightness <= 100) {
         m_bright_level = brightness;
@@ -176,7 +176,7 @@ RoutinesRGB::brightness(uint8_t brightness)
 }
 
 void 
-RoutinesRGB::barSize(uint8_t barSize)
+ArduCor::barSize(uint8_t barSize)
 {
     if ((barSize != 0) 
         && (barSize < m_LED_count) 
@@ -188,7 +188,7 @@ RoutinesRGB::barSize(uint8_t barSize)
 
 
 void 
-RoutinesRGB::fadeSpeed(uint8_t fadeSpeed)
+ArduCor::fadeSpeed(uint8_t fadeSpeed)
 {
     if (fadeSpeed != 0 && fadeSpeed < 200) {
         m_fade_speed = fadeSpeed;
@@ -197,7 +197,7 @@ RoutinesRGB::fadeSpeed(uint8_t fadeSpeed)
 
 
 void 
-RoutinesRGB::blinkSpeed(uint8_t blinkSpeed)
+ArduCor::blinkSpeed(uint8_t blinkSpeed)
 {
     if (blinkSpeed != 0) {
         m_blink_speed = blinkSpeed;
@@ -205,15 +205,15 @@ RoutinesRGB::blinkSpeed(uint8_t blinkSpeed)
 }
 
 
-RoutinesRGB::Color
-RoutinesRGB::mainColor()
+ArduCor::Color
+ArduCor::mainColor()
 {  
     return m_main_color;
 }
 
 
-RoutinesRGB::Color
-RoutinesRGB::color(uint16_t i)
+ArduCor::Color
+ArduCor::color(uint16_t i)
 {
     if (i < (sizeof(m_custom_colors) / sizeof(Color))) {
         return m_custom_colors[i];
@@ -223,9 +223,9 @@ RoutinesRGB::color(uint16_t i)
 }
 
 uint8_t
-RoutinesRGB::red(uint16_t i)
+ArduCor::red(uint16_t i)
 {
-    if (i < m_LED_count) {
+    if ((i < m_LED_count) && m_is_on) {
         return r_buffer[i];
     } else {
         return 0;
@@ -233,9 +233,9 @@ RoutinesRGB::red(uint16_t i)
 }
 
 uint8_t
-RoutinesRGB::green(uint16_t i)
+ArduCor::green(uint16_t i)
 {
-    if (i < m_LED_count) {
+    if ((i < m_LED_count) && m_is_on) {
         return g_buffer[i];
     } else {
         return 0;
@@ -243,9 +243,9 @@ RoutinesRGB::green(uint16_t i)
 }
 
 uint8_t
-RoutinesRGB::blue(uint16_t i)
+ArduCor::blue(uint16_t i)
 {
-    if (i < m_LED_count) {
+    if ((i < m_LED_count) && m_is_on) {
         return b_buffer[i];
     } else {
         return 0;
@@ -259,11 +259,8 @@ RoutinesRGB::blue(uint16_t i)
 //================================================================================
  
 void
-RoutinesRGB::preProcess(ELightingRoutine routine, EColorGroup group)
-{    
-    // if it receives any new routine, turn the lights back on
-    m_is_on = true;
-
+ArduCor::preProcess(ELightingRoutine routine, EColorGroup group)
+{
     // prevent illegal values
     if (group >= eColorGroup_MAX) {
         group = (EColorGroup)((uint8_t)eColorGroup_MAX - 1);
@@ -337,7 +334,7 @@ RoutinesRGB::preProcess(ELightingRoutine routine, EColorGroup group)
 
 
 void 
-RoutinesRGB::setupColorGroup(EColorGroup colorGroup)
+ArduCor::setupColorGroup(EColorGroup colorGroup)
 {
     // Set up the m_temp_array used for the multi color routines
     // This is done by copying the relevant colors into the 
@@ -371,17 +368,24 @@ RoutinesRGB::setupColorGroup(EColorGroup colorGroup)
 //================================================================================
 
 void 
-RoutinesRGB::turnOff()
+ArduCor::turnOff()
 {
     if (m_is_on) {
-        fillColorBuffers(0,0,0); 
+      fillColorBuffers(0,0,0);
     }
-    m_is_on = false; 
+    m_is_on = false;
 }
-    
+
+void ArduCor::turnOn() {
+    if (!m_is_on) {
+      fillColorBuffers(m_temp_color.red, m_temp_color.green, m_temp_color.blue);
+    }
+    m_is_on = true;
+}
+
 
 void
-RoutinesRGB::singleSolid(uint8_t red, uint8_t green, uint8_t blue)
+ArduCor::singleSolid(uint8_t red, uint8_t green, uint8_t blue)
 {
     m_temp_color = {red, green, blue};
     preProcess(eSingleSolid, m_current_group);
@@ -393,7 +397,7 @@ RoutinesRGB::singleSolid(uint8_t red, uint8_t green, uint8_t blue)
 
 
 void
-RoutinesRGB::singleBlink(uint8_t red, uint8_t green, uint8_t blue)
+ArduCor::singleBlink(uint8_t red, uint8_t green, uint8_t blue)
 {
     preProcess(eSingleBlink, m_current_group);
     // switches states between on/off based off of m_blink_speed
@@ -411,7 +415,7 @@ RoutinesRGB::singleBlink(uint8_t red, uint8_t green, uint8_t blue)
 
 
 void
-RoutinesRGB::singleWave(uint8_t red, uint8_t green, uint8_t blue)
+ArduCor::singleWave(uint8_t red, uint8_t green, uint8_t blue)
 {
     preProcess(eSingleWave, m_current_group);   
     m_repeat_index = 0;
@@ -434,7 +438,7 @@ RoutinesRGB::singleWave(uint8_t red, uint8_t green, uint8_t blue)
 
 
 void
-RoutinesRGB::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, uint8_t percent)
+ArduCor::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, uint8_t percent)
 {
     preProcess(eSingleGlimmer, m_current_group);
     // set all LEDs to the base color before applying glimmer
@@ -455,7 +459,7 @@ RoutinesRGB::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, uint8_t per
 
 
 void
-RoutinesRGB::singleFade(uint8_t red, uint8_t green, uint8_t blue, bool isSine)
+ArduCor::singleFade(uint8_t red, uint8_t green, uint8_t blue, bool isSine)
 {
     if (isSine) {
         preProcess(eSingleSineFade, m_current_group); 
@@ -483,7 +487,7 @@ RoutinesRGB::singleFade(uint8_t red, uint8_t green, uint8_t blue, bool isSine)
 }
 
 void
-RoutinesRGB::singleSawtoothFade(uint8_t red, uint8_t green, uint8_t blue, bool fadeIn)
+ArduCor::singleSawtoothFade(uint8_t red, uint8_t green, uint8_t blue, bool fadeIn)
 {
     // set up values based on whether its a fade in or a fade out. 
     if (fadeIn) {
@@ -519,7 +523,7 @@ RoutinesRGB::singleSawtoothFade(uint8_t red, uint8_t green, uint8_t blue, bool f
 //================================================================================
 
 void
-RoutinesRGB::multiGlimmer(EColorGroup colorGroup, uint8_t percent)
+ArduCor::multiGlimmer(EColorGroup colorGroup, uint8_t percent)
 {
     preProcess(eMultiGlimmer, colorGroup);
     // set all LEDs to the base color before applying glimmer
@@ -553,7 +557,7 @@ RoutinesRGB::multiGlimmer(EColorGroup colorGroup, uint8_t percent)
 
 
 void
-RoutinesRGB::multiFade(EColorGroup colorGroup)
+ArduCor::multiFade(EColorGroup colorGroup)
 {
     preProcess(eMultiFade, colorGroup); 
     // checks if it should change the colors it is fading between.
@@ -588,7 +592,7 @@ RoutinesRGB::multiFade(EColorGroup colorGroup)
 
 
 void
-RoutinesRGB::multiRandomSolid(EColorGroup colorGroup)
+ArduCor::multiRandomSolid(EColorGroup colorGroup)
 {
     preProcess(eMultiRandomSolid, colorGroup); 
     if (!(m_temp_counter % m_blink_speed)) {
@@ -616,7 +620,7 @@ RoutinesRGB::multiRandomSolid(EColorGroup colorGroup)
 }
 
 void
-RoutinesRGB::multiRandomIndividual(EColorGroup colorGroup)
+ArduCor::multiRandomIndividual(EColorGroup colorGroup)
 {   
     preProcess(eMultiRandomIndividual, colorGroup);  
     switch ((EColorGroup)colorGroup) {
@@ -645,7 +649,7 @@ RoutinesRGB::multiRandomIndividual(EColorGroup colorGroup)
 
 
 void
-RoutinesRGB::multiBarsSolid(EColorGroup colorGroup, uint8_t barSizeSetting)
+ArduCor::multiBarsSolid(EColorGroup colorGroup, uint8_t barSizeSetting)
 {   
     barSize(barSizeSetting);
     preProcess(eMultiBarsSolid, colorGroup);  
@@ -668,7 +672,7 @@ RoutinesRGB::multiBarsSolid(EColorGroup colorGroup, uint8_t barSizeSetting)
 
 
 void
-RoutinesRGB::multiBarsMoving(EColorGroup colorGroup, uint8_t barSizeSetting)
+ArduCor::multiBarsMoving(EColorGroup colorGroup, uint8_t barSizeSetting)
 {   
     barSize(barSizeSetting);
     preProcess(eMultiBarsMoving, colorGroup);
@@ -695,7 +699,7 @@ RoutinesRGB::multiBarsMoving(EColorGroup colorGroup, uint8_t barSizeSetting)
 //================================================================================
 
 void
-RoutinesRGB::applyBrightness()
+ArduCor::applyBrightness()
 {
     //  brightness is required
     if (m_brightness_flag && m_is_on) {
@@ -719,7 +723,7 @@ RoutinesRGB::applyBrightness()
 
     
 bool 
-RoutinesRGB::drawColor(uint16_t i, uint8_t red, uint8_t green, uint8_t blue)
+ArduCor::drawColor(uint16_t i, uint8_t red, uint8_t green, uint8_t blue)
 {
     // checks if its valid draw
     if (i < m_LED_count) {
@@ -736,7 +740,7 @@ RoutinesRGB::drawColor(uint16_t i, uint8_t red, uint8_t green, uint8_t blue)
 //================================================================================
 
 void
-RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t groupSize, uint8_t startingValue)
+ArduCor::movingBufferSetup(uint16_t colorCount, uint8_t groupSize, uint8_t startingValue)
 {
     if ((groupSize * colorCount) > m_LED_count) {
         // edge case handled for memory reasons, a full loop must
@@ -771,7 +775,7 @@ RoutinesRGB::movingBufferSetup(uint16_t colorCount, uint8_t groupSize, uint8_t s
 
 
 void 
-RoutinesRGB::fillColorBuffers(uint8_t r, uint8_t g, uint8_t b)
+ArduCor::fillColorBuffers(uint8_t r, uint8_t g, uint8_t b)
 {
     memset(r_buffer, r, m_LED_count);
     memset(g_buffer, g, m_LED_count);
@@ -779,7 +783,7 @@ RoutinesRGB::fillColorBuffers(uint8_t r, uint8_t g, uint8_t b)
 }
 
 void
-RoutinesRGB::chooseRandomFromArray(Color *array, uint8_t max_index, boolean canRepeat)
+ArduCor::chooseRandomFromArray(Color *array, uint8_t max_index, boolean canRepeat)
 {   
     m_possible_array_color = random(0, max_index);
     if (!canRepeat && max_index > 2) {

@@ -26,7 +26,7 @@ compile_doxygen()
     fi
 }
 
-compile_doxygen "RoutinesRGB"
+compile_doxygen "ArduCor"
 
 
 

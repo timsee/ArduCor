@@ -1,10 +1,10 @@
 # Server
 
-This sample is meant for controlling _RGB-LED-Routines_ wirelessly without using the Arduino Yun samples. Instead, we use a computer running this server as a passthrough which takes UDP packets and sends them over serial to one or more arduino devices.
+This sample is meant for controlling _ArduCor_ wirelessly without using the Arduino Yun samples. Instead, we use a computer running this server as a passthrough which takes UDP packets and sends them over serial to one or more arduino devices.
 
 ## <a name="hardware"></a>Required Hardware
 
-* An Arduino running a serial sample of `RGB-LED-Routines`
+* An Arduino running a serial sample of `ArduCor`
 * A computer running python 2.7
 * A usb cable for communication between the Arduino and Raspberry Pi
 

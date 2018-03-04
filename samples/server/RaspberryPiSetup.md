@@ -19,16 +19,16 @@ mkdir ~/scripts
 * Next, pull the script from the web by navigating to the directory and running wget
 ```
 cd ~/scripts
-wget https://raw.githubusercontent.com/timsee/RGB-LED-Routines/master/samples/pi/UDPtoSerial.py
+wget https://raw.githubusercontent.com/timsee/ArduCor/master/samples/pi/UDPtoSerial.py
 ```
-* Now that you have the script on the Pi, connect your Arduino running an _RGB-LED-Routines_ sample to the raspberry pi over USB.
+* Now that you have the script on the Pi, connect your Arduino running an _ArduCor_ sample to the raspberry pi over USB.
 * Find the serial connection's name on the Raspberry Pi. Two common ones would be `/dev/ttyUSB0` and `/dev/ttyACM0` but it may be different for you. You can use the arduino IDE to find and test the serial connection if you prefer GUIs, or you can use command line with  `dmesg | grep tty`.
 * Now its time to test the script. Test the script by running this, replacing `$SERIAL` with the serial connection name from the last step. If you want to connect to multiple arduino samples, add them all as arguments to the python script and separate those arguments with spaces:
 ```
 cd ~/scripts
 python UDPtoSerial.py $SERIAL
 ```
-* Use whatever method you want to try to connect to the lights over UDP. I tend to use [Corluma](https://github.com/timsee/Corluma).  A good test of communication is to send a UDP packet with the ASCII string `DISCOVERY_PACKET`. You should receive a discovery packet back from _RGB-LED-Routines_ sample.
+* Use whatever method you want to try to connect to the lights over UDP. I tend to use [Corluma](https://github.com/timsee/Corluma).  A good test of communication is to send a UDP packet with the ASCII string `DISCOVERY_PACKET`. You should receive a discovery packet back from _ArduCor_ sample.
 * Almost there, Now that you've proven that you can communicate with the Arduino through the Raspberry Pi, the last steps set things ups so the python script runs automatically on bootup. Modify your startup script to call the `UDPtoSerialAdapter.py`. The startup script is commonly located at `/etc/rc.local` but it may be different for you. Once you find your script, add this line before the script's end, replacing `$USER` with your username (this will typically be _pi_ unless you created a new user) and `$SERIAL` with the serial connection's name:
 ```
 python /home/$USER/scriptsUDPtoSerial.py $SERIAL
