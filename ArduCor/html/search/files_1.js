@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lightingprotocols_2eh',['LightingProtocols.h',['../a00011.html',1,'']]]
+  ['palettes_2eh',['Palettes.h',['../a00011.html',1,'']]]
 ];

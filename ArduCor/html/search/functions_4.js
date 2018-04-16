@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fadespeed',['fadeSpeed',['../a00014.html#ga8e73641e15e86246f6238f312669b8ab',1,'ArduCor']]]
+  ['green',['green',['../a00014.html#ga74f3b1dc051ddf8973fcb679a0fe00fc',1,'ArduCor']]]
 ];

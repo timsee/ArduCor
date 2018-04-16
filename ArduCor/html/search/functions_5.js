@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['green',['green',['../a00014.html#ga74f3b1dc051ddf8973fcb679a0fe00fc',1,'ArduCor']]]
+  ['ison',['isOn',['../a00014.html#ga0f33ad606331d561917ae39b0c8dee92',1,'ArduCor']]]
 ];

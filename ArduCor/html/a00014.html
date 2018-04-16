@@ -83,12 +83,6 @@ Functions</h2></td></tr>
 <tr class="separator:gacbfd398b55afbea53a8bc7f211465bf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3f15efc2d86ed097e60e7daff68a8d50"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html#ga3f15efc2d86ed097e60e7daff68a8d50">ArduCor::brightness</a> ()</td></tr>
 <tr class="separator:ga3f15efc2d86ed097e60e7daff68a8d50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8e73641e15e86246f6238f312669b8ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html#ga8e73641e15e86246f6238f312669b8ab">ArduCor::fadeSpeed</a> (uint8_t fadeSpeed)</td></tr>
-<tr class="separator:ga8e73641e15e86246f6238f312669b8ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa238226df710b70f324ba7072b24b3f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html#gaa238226df710b70f324ba7072b24b3f8">ArduCor::blinkSpeed</a> (uint8_t blinkSpeed)</td></tr>
-<tr class="separator:gaa238226df710b70f324ba7072b24b3f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae879aec3f8fd22236f49a440682c0c6b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html#gae879aec3f8fd22236f49a440682c0c6b">ArduCor::barSize</a> (uint8_t barSize)</td></tr>
-<tr class="separator:gae879aec3f8fd22236f49a440682c0c6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac483f4e99e9623368effe331c47950e1"><td class="memItemLeft" align="right" valign="top">Color&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html#gac483f4e99e9623368effe331c47950e1">ArduCor::mainColor</a> ()</td></tr>
 <tr class="separator:gac483f4e99e9623368effe331c47950e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga41de410fb30823bd90e09bb9c97eba46"><td class="memItemLeft" align="right" valign="top">Color&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="a00014.html#ga41de410fb30823bd90e09bb9c97eba46">ArduCor::color</a> (uint16_t i)</td></tr>
@@ -103,51 +97,6 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>These are the getters and setters for <a class="el" href="a00021.html" title="An Arduino library that provides a set of RGB lighting routines for compatible LED array hardware...">ArduCor</a> that are used to control the settings and the colors. </p>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="gae879aec3f8fd22236f49a440682c0c6b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gae879aec3f8fd22236f49a440682c0c6b">&#9670;&nbsp;</a></span>barSize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ArduCor::barSize </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>barSize</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Sets the size of bars in routines that use them. Bars are groups of LEDs that all display the same color. The routines SingleWave, MultiBarsSolid, and MultiBarsMoving use them.</p>
-<p>a number greater than 0 and less than the number of LEDs being used. </p>
-
-</div>
-</div>
-<a id="gaa238226df710b70f324ba7072b24b3f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaa238226df710b70f324ba7072b24b3f8">&#9670;&nbsp;</a></span>blinkSpeed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ArduCor::blinkSpeed </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>blinkSpeed</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Sets how many updates to wait before changing the light state in the blink routine and in routines that switch between solid colors.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">blinkSpeed</td><td>a value between 1 and 255 representing how fast to blink. A value of 1 will make it blink on every frame, which may be too fast when used with other routines. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="ga5c147965ba6184328402c14be01616cb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga5c147965ba6184328402c14be01616cb">&#9670;&nbsp;</a></span>blue()</h2>
 
@@ -246,25 +195,6 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Retrieve the amount of colors that are used from the custom array. </p>
-
-</div>
-</div>
-<a id="ga8e73641e15e86246f6238f312669b8ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga8e73641e15e86246f6238f312669b8ab">&#9670;&nbsp;</a></span>fadeSpeed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ArduCor::fadeSpeed </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>fadeSpeed</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Sets the speed of routines that fade between colors between 1 and 200. A fade speed of 200 is the slowest possible fade. </p>
 
 </div>
 </div>
