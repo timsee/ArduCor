@@ -72,40 +72,59 @@ The second argument in a message is always a device index. This value determines
 **Example:** `0,0,1&` *(Header 1, Device Index 0,  Turn On)*
 `0,0,0&` *(Header 1, Device Index 0, Turn Off)*
 
-#### Lighting Routine Change
+####  Routine Change
+Routine changes are the most complex packets, as they can have a variety of parameters based off of their routine parameter. 
 
+#### Single Light Routines
 | Parameter         | Values        |
 | ----------------- | ------------- |
 | Header            |     1          |
-| New Routine       | (ELightingRoutine)0 - 13  |
-| Color Group (Optional) | (EColorGroup)0 - 17        |  
+| New Routine       | (ERoutine)0 - 5  |
+| Red       | 0 - 255  |
+| Green    | 0 - 255  |
+| Blue      | 0 - 255  |
+| Speed (required for everything but eSolid) |   0 - 200 |
+| Extra Parameter (required for eSingleGlimmer, eSingleFade, eSingleSawtoothFade) |   N/A  |
 
-**Example:** `1,0,1&` *(Header 1, Device Index 0, New Routine 1)*
- `1,0,4,6&` *(Header 1, Device Index 0, New Routine 4, New Color Group 6)*
+The extra parameter is required for eSingleGlimmer, eSingleFade, and eSingleSawtoothFade:
+* *eSingleGlimmer*: between 0 - 100. Determines what percent LEDs to dim to produce a glimmering effect.
+* *eFade*: either 0 or 1. 0 is a linear fade in and out, 1 is a sine fade in and out.
+* *eSawtoothFade*: either 0 or 1. 0 is a fade in, 1 is a fade out.
 
-*Note: By default, it will use its last EColorGroup for multi color routines if no color group is provided. To find a description and number representation of ELightingRoutine and EColorGroup, check out the [Lighting Protocols](https://timsee.github.io/ArduCor/ArduCor/html/a00011.html). *
 
-#### Set Color for Single Color Routines
+**Example:** `1,0,1,255,0,0&` *(Header 1, Device Index 0, New Routine 1, Red 255, Green 0, Blue 0)*
+`1,0,3,0,255,0,100,20&` *(Header 1, Device Index 0, New Routine 1, Red 0, Green 255, Blue 0, Speed 100, Extra Parameter 20)*
 
-| Parameter     | Values        |
-| ------------- | ------------- |
-| Header        |     2         |
-| Red           | 0 - 255       |
-| Green         | 0 - 255       |
-| Blue          | 0 - 255       |
-**Example:** `2,0,255,127,0&` *(Header 2, Device Index 0, Red 255, Green 127, Blue 0)*
+#### Multi Light Routines
+| Parameter         | Values        |
+| ----------------- | ------------- |
+| Header            |     1          |
+| New Routine       | (ERoutine)6 - 10  |
+| Palette | (EPalette)0 - 16       |  
+| Speed  |   0 - 200 |
+| Extra Parameter (required for eMultiGlimmer, eMultiBars) |   N/A  |
 
+The extra parameter is required for eMultiGlimmer and eMultiBars:
+* *eMultiGlimmer*: between 0 - 100. Determines what percent LEDs to dim to produce a glimmering effect.
+* *eMultiBars*:  between 0 - 100. Determines how large each bar of colors should be.
+
+**Example:** `1,0,7,3&` *(Header 1, Device Index 0, New Routine 7, Palette 3)*
+`1,0,6,5,20&` *(Header 1, Device Index 0, New Routine 6, Palette 5, Extra Parameter 20)*
+
+#### Speed Parameter
+
+The speed parameter is required for every routine except eSingleSolid, since they all change over time. The parameter uses values between 0 and 200. Each unit represents between 10 and 15 milliseconds depending on the specific arduino and its load. A value of 0 pauses the routine in its current state. A value or 1 runs the routines as slow as they can go. A value of 200 makes the routines go as fast as they can. 
 
 #### Set Color in Custom Color Array
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     3         |
+| Header        |     2         |
 | Color Index   | 0 - 10        |
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
-**Example:** `3,0,3,255,127,0&` *(Header 3, Device Index 0 Saved Color 3, Red 255, Green 127, Blue 0)*
+**Example:** `2,0,3,255,127,0&` *(Header 2, Device Index 0 Saved Color 3, Red 255, Green 127, Blue 0)*
 
 *Note: The Color Index must be smaller than the size of the custom color array, which is currently 10. These can be used in multi color routines by using the EColorGroup `eCustom`*
 
@@ -113,27 +132,17 @@ The second argument in a message is always a device index. This value determines
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     4         |
+| Header        |     3         |
 | Brightness %  | 0 - 100       |
-**Example:** `4,0,90&` *(Header 4, Device Index 0, 90% brightness)*
-
-#### Set Speed
-
-| Parameter     | Values        |
-| ------------- | ------------- |
-| Header        |     5         |
-| Desired FPS * 100     | 1 - 2000      |
-**Example:** `5,0,500&` *(Header 5, Device Index 0, 5 FPS)*
-
-*Note: The value sent is the desired FPS * 100. To do 1 FPS, send 100, to do 10 FPS, send 1000. This only sets the desired FPS. When the FPS is very low, it will be close to accurate. An extremely fast FPS will be limited by the hardware being used, the number of LEDs, and other factors.  *
+**Example:** `3,0,90&` *(Header 4, Device Index 0, 90% brightness)*
 
 #### Set Custom Color Count
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     6         |
+| Header        |     4         |
 | Count         | 2 - 10        |
-**Example:** `6,0,3&` *(Header 6, Device Index 0, 3 colors)*
+**Example:** `4,0,3&` *(Header 4, Device Index 0, 3 colors)*
 
 *Note: This setting controls the number of colors used for multi color routines using the custom color array.*
 
@@ -141,57 +150,49 @@ The second argument in a message is always a device index. This value determines
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     7        |
+| Header        |     5        |
 | Idle Timeout Minutes       | 0 - 1000      |
-**Example:** `7,0,120&` *(Header 7, Device Index 0, 120 Minutes)*
+**Example:** `5,0,120&` *(Header 5, Device Index 0, 120 Minutes)*
 
-*Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `6,0,0&;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
-
-#### Reset to Default Values
-
-| Parameter     | Values        |
-| ------------- | ------------- |
-| Header        |     10         |
-| Check 1       |     42        |
-| Check 2       |     71        |
-**Example:** `10,42,71&` *(Header 10, Check 1, Check 2)*
-
-*Note: This message contains two extra parameters to make it harder for it to be triggered accidentally by a corrupted packet, even if CRC is off.*
+*Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `5,0,0&;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
 
 ### <a name="state-update"></a>State Update Packet
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     8       |
+| Header        |     6       |
 
-**Example:** `8&` *(Header 8)*
+**Example:** `6&` *(Header 6)*
 
 Sending a state update gives
 
 The packet is formatted as:
 
 ```
-$stateUpdate,$isOn,$isReachable,$red,$green,$blue,$routine,$colorGroup,$brightness&
+$stateUpdate,$isOn,$isReachable,$red,$green,$blue,$routine,$palette,$brightness,$speed,$idleTimeout,$minutesUntilTimeout&
 ```
 
 | Parameter        | Range        |  Description |
 | -------------        | ------------- |  ------------- |
-| stateUpdate    |     8            |                    |
+| stateUpdate    |     6            |                    |
 | isOn              |     0 or 1     |     0 if the current routine is eOff, 1 otherwise             |
 | isReachable    |     1            |  Only 1 if it is expected to be connected but it is not connected to the controller. Used by [Corluma](https://github.com/timsee/Corluma)                    |
 | red, green, blue    |    0  - 255            |     Color used by single color routines                |
-| routine    |    0 - 14            |      Current lighting routine          |
-| colorGroup      |    0 - 17            |      Current color group         |
+| routine    |    0 - 10            |      Current  routine          |
+| palette      |    0 - 16            |      Current  palette       |
 | brightness          |    0 - 100          |     Brightness setting of the ArduCor library         |
+| speed          |    0 - 200          |     Speed of light updates, 0 is paused, 1 is slowest, 200 is fastest      |
+| idleTimeout          |    0 - 1000          |     0 to turn off, all other numbers are number of minutes until timeout     |
+| minutesUntilTimeout          |    0 - 1000          |     0 if off, all other numbers are number of minutes until timeout    |
 
 
 ### <a name="custom-array-update"></a>Custom Array State Update Packet
 
 | Parameter     | Values        |
 | ------------- | ------------- |
-| Header        |     9       |
+| Header        |     7       |
 
-**Example:** `9&` *(Header 9)*
+**Example:** `7&` *(Header 7)*
 
 Sending a state update gives
 
@@ -203,7 +204,7 @@ $customArrayStateUpdate,$count,$index,$red,$green,$blue...,$index,$red,$green,$b
 
 | Parameter              | Range         |  Description   |
 | -------------          | ------------- |  ------------- |
-| customArrayStateUpdate |     9         |                |
+| customArrayStateUpdate |     7         |                |
 | count                  |     2 - 10    |  Custom color count             |
 | index                  |     0 - 10    |             |                  
 | red      |    0  - 255   |   Red value for index |
@@ -217,7 +218,7 @@ The `$count` parameter denotes how many times the `,$index,$red,$green,$blue` se
 Sending the message `DISCOVERY_PACKET` to any of the samples will cause the sample to send a message back in the format of:
 
 ```
-DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$name,$hardwareType,$productType&
+DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$capabilities,$maxPacketSize@$name,$hardwareType,$productType&
 ```
 
 | Parameter     | Range         |  Description   |
@@ -225,6 +226,7 @@ DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$maxPacketSize@$nam
 | majorAPI      |    2     |  major version of API and messaging protocol  |
 | minorAPI      |     0 - 10    |  minor version of API and messaging protocol  |
 | usingCRC      |     0 - 1     |  1 if all packets require a CRC, 0 if skipped*  |
+| capabilities      |     0 - 1     |  0 if just arduino, 1 if arduino controlled by Raspberry Pi |
 | maxPacketSize |     1 - 500  |  max number of characters accepted in a single message        |
 | numOfDevices  |     1 - 20    |  Number of RGB devices connected to arduino    |
 | name  |    N/A    |  A hardcoded identifier of up to 16 characters   |
@@ -249,13 +251,13 @@ The CRC packet is formatted like this:
 #$crc&
 ```
 where `$crc` is the CRC computed by the sample code. 
-It is recommended to turn on the CRC for serial communication with a client but turn it off if you are writing the ASCII commands yourself into the Serial Monitor (computing the CRC by hand is extra work!). As for what samples to use it with, it is strongly recommended for use with the Serial or any samples that have serial somewhere in their communication stream, such as the server samples. It is not recommended for UDP or HTTP.
+It is recommended to turn on the CRC for serial communication with a client but turn it off if you are writing the ASCII commands yourself into the Serial Monitor (computing the CRC by hand is extra work!). As for what samples to use it with, it is strongly recommended for use with the Serial or any samples that have serial somewhere in their communication stream, such as the server samples. It is not recommended for HTTP. 
 
 If you want to test if cyclic redundancy is working properly, I would recommend using this packet, which requests a state update packet with the proper CRC appended (add a `;` to the end of the packet if communicating with a serial device):
 
 ```
 # state update packet
-8&#2219518969&
+6&#449316471&
 
 # turn on device 1
 0,1,1&#3692676612&
@@ -263,29 +265,14 @@ If you want to test if cyclic redundancy is working properly, I would recommend 
 # turn off device 1
 0,1,0&#3305305925&
 
-# single glimmer on device 1
-1,1,3&#628324131&
+# single glimmer green with 100 speed on device 1
+1,1,3,0,255,0,100,15&#3938804531&
 
-# multi glimmer on device 1
-1,1,8,0&#3872134571&
+# single wave green with 100 speed on device 1
+1,1,2,0,255,0,100&#2246576319&
 
-# set main color red on device 1
-2,1,228,0,0&#881768640&
-
-# set main color blue on device 1
-2,1,0,0,227&#1592330869&
-
-# set main color green on device 1
-2,1,0,252,0&#656950832&
-
-# set main color of all devices orange
-2,0,241,107,0&#1261323016&
-
-# set device 1 to glimmer, set all devices blue
-1,1,3&2,1,0,0,255&#71223677&
-
-# set device 1 to wave and green
-1,1,2&2,1,25,230,0&#1177936301&
+# multi bars with bar size 4, using fire palette and speed 100 on device 1 
+1,1,10,6,100,4&#3942318360&
 
 ```
 

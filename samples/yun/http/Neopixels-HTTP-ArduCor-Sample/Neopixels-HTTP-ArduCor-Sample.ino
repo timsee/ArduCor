@@ -6,8 +6,8 @@
  *
  * Provides a HTTP interface to a set of lighting routines.
  * 
- * Version 2.9.0
- * Date: March 2, 2018
+ * Version 3.0.0
+ * Date: April 14, 2018
  * Github repository: http://www.github.com/timsee/ArduCor
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -29,7 +29,9 @@ const byte GLIMMER_PERCENT   = 10;     // percent of "glimmering" LEDs in glimme
 
 const byte DELAY_VALUE       = 50;     // amount of sleep time between loops
 
-const int  DEFAULT_SPEED     = 300;    // default delay for LEDs update, suggested range: 10 (fast) - 1000 (slow).
+const int  DEFAULT_SPEED     = 100;    // default delay for LEDs update, suggested range: 0 (paused) - 200 (fast).
+const int  MAX_SPEED_VALUE   = 200;    // max speed value allowed to be sent
+
 const int  DEFAULT_TIMEOUT   = 120;    // number of minutes without packets until the arduino times out.
 
 const int  DEFAULT_HW_INDEX  = 1;      // index for this particular microcontroller
@@ -88,15 +90,15 @@ EProductType product_type = eNeoPixels;
 // new functions added that do not significantly break the existing
 // messaging protocol.
 const uint8_t API_LEVEL_MAJOR = 3;
-const uint8_t API_LEVEL_MINOR = 0;
+const uint8_t API_LEVEL_MINOR = 3;
 
 
 //=======================
 // Stored Values and States
 //=======================
 
-ELightingRoutine current_routine = eSingleGlimmer;
-EColorGroup current_group = eCustom;
+ERoutine current_routine = eSingleGlimmer;
+EPalette current_palette = eCustom;
 
 // set this to turn off echoing all together
 bool skip_echo = false;
@@ -108,9 +110,9 @@ uint8_t received_hardware_index;
 uint8_t hardware_index = DEFAULT_HW_INDEX;
 
 // value determines how quickly the LEDs udpate. Lower values lead to faster updates
-int update_speed = (int)((1000.0 / DELAY_VALUE) / (DEFAULT_SPEED / 100.0));
-// value received from packets
-int raw_speed = update_speed;
+int update_speed = DEFAULT_SPEED;
+bool should_update_no_speed = false;
+
 
 // timeout variables
 unsigned long idle_timeout = (unsigned long)DEFAULT_TIMEOUT * 60 * 1000; // convert to milliseconds
@@ -163,6 +165,15 @@ const char crc_delimiter[] = "#";
 const char packet_delimiter[] = ";";
 const char names_delimiter[] = "@";
 const char new_line[] = "\n";
+
+int  single_glimmer_param = GLIMMER_PERCENT;
+int  multi_glimmer_param  = GLIMMER_PERCENT;
+bool sawtooth_param       = false;
+bool fade_param           = false;
+int  multi_bars_param     = BAR_SIZE;
+
+
+bool reset_counter = false;
 
 //=======================
 // Yun Setup
@@ -269,6 +280,7 @@ void loop()
     bool messageIsValid = checkIfPacketIsValid(packetPtr);
     skip_echo = false;
     should_echo = false;
+    should_update_no_speed = false; 
     if (messageIsValid) { 
       // go through each message packet
      char* messagePtr = strtok(packetPtr, "&");
@@ -304,9 +316,15 @@ void loop()
     }
   }
 
-  if (!(loop_counter % update_speed)) {
-    changeLightingRoutine(current_routine);
-    routines.applyBrightness(); // Optional. Dims the LEDs based on the routines.brightness() setting
+  if (update_speed == 0) { 
+    if (should_update_no_speed) { 
+      changeRoutine(current_routine); 
+      routines.applyBrightness();  
+      updateLEDs();
+    } 
+  } else if (!(loop_counter % ((MAX_SPEED_VALUE + 5) - update_speed))) { 
+    changeRoutine(current_routine);
+    routines.applyBrightness();
     updateLEDs();
   }
 
@@ -338,12 +356,12 @@ void updateLEDs()
 //================================================================================
 
 /*!
- * @brief changeLightingRoutine Function that runs every loop iteration
+ * @brief changeRoutine Function that runs every loop iteration
  *        and determines how to light up the LEDs.
  *
  * @param currentMode the current mode of the program
  */
-void changeLightingRoutine(ELightingRoutine currentMode)
+void changeRoutine(ERoutine currentMode)
 {
   switch (currentMode)
   {
@@ -360,47 +378,35 @@ void changeLightingRoutine(ELightingRoutine currentMode)
       break;
 
     case eSingleGlimmer:
-      routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, GLIMMER_PERCENT);
+      routines.singleGlimmer(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, single_glimmer_param);
       break;
 
-    case eSingleLinearFade:
-      routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, false);
+    case eSingleFade:
+      routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, fade_param);
       break;
 
-    case eSingleSineFade:
-      routines.singleFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, true);
-      break;
-
-    case eSingleSawtoothFadeIn:
-      routines.singleSawtoothFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, true);
-      break;
-
-    case eSingleSawtoothFadeOut:
-      routines.singleSawtoothFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, false);
+    case eSingleSawtoothFade:
+      routines.singleSawtoothFade(routines.mainColor().red, routines.mainColor().green, routines.mainColor().blue, sawtooth_param);
       break;
 
     case eMultiGlimmer:
-      routines.multiGlimmer(current_group, GLIMMER_PERCENT);
+      routines.multiGlimmer(current_palette, multi_glimmer_param);
       break;
 
     case eMultiFade:
-      routines.multiFade(current_group);
+      routines.multiFade(current_palette);
       break;
 
     case eMultiRandomSolid:
-      routines.multiRandomSolid(current_group);
+      routines.multiRandomSolid(current_palette);
       break;
 
     case eMultiRandomIndividual:
-      routines.multiRandomIndividual(current_group);
+      routines.multiRandomIndividual(current_palette);
       break;
 
-    case eMultiBarsSolid:
-      routines.multiBarsSolid(current_group, BAR_SIZE);
-      break;
-
-    case eMultiBarsMoving:
-      routines.multiBarsMoving(current_group, BAR_SIZE);
+    case eMultiBars:
+      routines.multiBars(current_palette, multi_bars_param);
       break;
 
     default:
@@ -440,59 +446,17 @@ bool parsePacket(int header)
       }
       break;
     case eModeChange:
-      if (int_array_size == 3 && packet_int_array[2] < eLightingRoutine_MAX) {
-        if (packet_int_array[2] != current_routine) {
-          // Reset to 0 to draw to screen right away
-          loop_counter = 0;
-        }
-        success = true;
-        received_hardware_index = packet_int_array[1];
-        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          current_routine = (ELightingRoutine)packet_int_array[2];
-        }
-      }
-      // pick up cases where the modes can take extra optional arguments
-      if (int_array_size == 4) {
-        if (packet_int_array[2] >= (int)eMultiGlimmer) {
-          if (packet_int_array[2] != current_routine) {
-            // Reset to 0 to draw to screen right away
-            loop_counter = 0;
-          }
-          success = true;
-          received_hardware_index = packet_int_array[1];
-          if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-            current_routine = (ELightingRoutine)packet_int_array[2];
-            current_group = (EColorGroup)packet_int_array[3];
-          }
-        }
-      }
-      break;
-    case eMainColorChange:
-      if (int_array_size == 5) {
-        if (packet_int_array[2] != routines.mainColor().red
-            || packet_int_array[3] != routines.mainColor().green
-            || packet_int_array[4] != routines.mainColor().blue) {
-          // Reset to 0 to draw to screen right away
-          loop_counter = 0;
-        }
-        success = true;
-        received_hardware_index = packet_int_array[1];
-        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          routines.setMainColor(packet_int_array[2],
-                                packet_int_array[3],
-                                packet_int_array[4]);
-        }
-      }
+      success = routineParser(success);
       break;
     case eCustomArrayColorChange:
       if (int_array_size == 6) {
         int color_index = packet_int_array[2];
-        if (color_index >= 0 && color_index < eLightingRoutine_MAX) {
+        if (color_index >= 0 && color_index < eRoutine_MAX) {
           success = true;
 
           // only tell the routines to reset themselves if a custom routine is used.
-          if ((current_routine > eSingleSawtoothFadeOut)
-              && (current_group == eCustom)) {
+          if ((current_routine > eSingleSawtoothFade)
+              && (current_palette == eCustom)) {
             // Reset LEDS
             loop_counter = 0;
           }
@@ -514,21 +478,14 @@ bool parsePacket(int header)
           received_hardware_index = packet_int_array[1];
           // update brightness level
           if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-            routines.brightness(param);
+            if (param != routines.brightness()) { 
+              should_update_no_speed = true; 
+              routines.brightness(param); 
+            } 
           }
         }
         break;
       }
-    case eSpeedChange:
-      if (int_array_size == 3) {
-        success = true;
-        received_hardware_index = packet_int_array[1];
-        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          raw_speed = packet_int_array[2];
-          update_speed = (int)((1000.0 / DELAY_VALUE) / (raw_speed / 100.0));
-        }
-      }
-      break;
     case eIdleTimeoutChange:
       if (int_array_size == 3) {
         success = true;
@@ -566,23 +523,229 @@ bool parsePacket(int header)
         client.print(state_update_packet);
       }
       break;
-    case eResetSettingsToDefaults:
-      if (int_array_size == 3) {
-        // reset requires a message with exactly 2 parameters:
-        // 42 and 71. This drops the probability of buffer
-        // issues causing causing false positives.
-        if ((packet_int_array[1] == 42)
-            && (packet_int_array[2] == 71)) {
-          success = true;
-          routines.resetToDefaults();
-        }
-      }
-      break;
     default:
       break;
   }
   return success;
 }
+
+
+/*!
+ * @brief routineParser Parses a routine packet, checking that the received packets are the proper
+ *        size and that their values fall into the proper ranges. If they do, this function sets
+ *        the values in memory.
+ *        
+ * @param currentSuccess the current success status of the packet parsing. This will only ever
+ *        set the success packet to true
+ */
+bool routineParser(bool currentSuccess)
+{
+  bool success = currentSuccess;
+  // check theres at least enough information to get a routine and hardware index
+  // and check if routine is in a valid range
+  if (int_array_size > 2) {
+      if ((packet_int_array[2] < (int)eRoutine_MAX)
+           && (packet_int_array[1] <= (DEFAULT_HW_INDEX + DEVICE_COUNT - 1))) {
+      // required values
+      received_hardware_index = packet_int_array[1];
+      ERoutine routine        = (ERoutine)packet_int_array[2];
+      bool isValid            = false;
+      reset_counter           = false;
+  
+      // routine specific values
+      EPalette palette        = ePalette_MAX;
+      int speedValue          = 0;
+
+      // check that packets are the correct size and fill in parameters
+      // check if loop counter should reset
+      switch (routine) {
+        case eSingleSolid:
+        {
+          if (int_array_size == 6) {
+            isValid = parseColor(packet_int_array[3],
+                                 packet_int_array[4],
+                                 packet_int_array[5]);
+          }
+          // check if reset counter
+          if (routine != current_routine) {
+            reset_counter = true;            
+          }
+          break;
+        }
+        case eSingleBlink:
+        case eSingleWave:     
+        {
+          if (int_array_size == 7) {
+            speedValue = packet_int_array[6];
+            if (speedValue >= 0 && speedValue <= MAX_SPEED_VALUE) {
+              isValid = parseColor(packet_int_array[3],
+                                   packet_int_array[4],
+                                   packet_int_array[5]);           
+            }
+            // check if reset counter
+            if (routine != current_routine) {
+              reset_counter = true;            
+            }
+          }
+          break;
+        }
+        case eSingleFade:
+        case eSingleSawtoothFade:        
+        case eSingleGlimmer:
+        {
+          if (int_array_size == 8) {
+            speedValue = packet_int_array[6];
+
+            // handle the optional parameters
+            if (routine == eSingleFade) {
+              if (speedValue >= 0 
+                  && speedValue <= MAX_SPEED_VALUE
+                  && packet_int_array[7] <= 1) {
+                isValid = parseColor(packet_int_array[3],
+                                     packet_int_array[4],
+                                     packet_int_array[5]);
+                if (packet_int_array[7] != fade_param) {
+                  fade_param = packet_int_array[7];
+                  reset_counter = true;            
+                }
+              }
+            } else if (routine == eSingleSawtoothFade) {
+              if (speedValue >= 0 
+                  && speedValue <= MAX_SPEED_VALUE
+                  && packet_int_array[7] <= 1) {
+                isValid = parseColor(packet_int_array[3],
+                                     packet_int_array[4],
+                                     packet_int_array[5]);
+                if (packet_int_array[7] != sawtooth_param) {
+                  sawtooth_param = packet_int_array[7];
+                  reset_counter = true;            
+                }
+              }
+            } else if (routine == eSingleGlimmer) {
+               if (speedValue >= 0 
+                  && speedValue <= MAX_SPEED_VALUE
+                  && packet_int_array[7] <= 100) {
+                isValid = parseColor(packet_int_array[3],
+                                     packet_int_array[4],
+                                     packet_int_array[5]);
+                if (packet_int_array[7] != single_glimmer_param) {
+                  single_glimmer_param = packet_int_array[7];
+                  reset_counter = true;            
+                }
+              }
+            }
+
+            // check if reset counter
+            if (routine != current_routine) {
+              reset_counter = true;            
+            }
+          }
+          break;
+        } 
+        case eMultiGlimmer:
+        case eMultiBars:
+        {
+          if (int_array_size == 6) {
+            palette = (EPalette)packet_int_array[3];
+            speedValue = packet_int_array[4];
+            isValid = true;
+  
+            if (routine == eMultiGlimmer) {
+              if (speedValue >= 0 
+                  && speedValue <= MAX_SPEED_VALUE
+                  && packet_int_array[5] <= 100) {
+                 isValid = true;
+                 if (packet_int_array[5] != multi_glimmer_param) {
+                    multi_glimmer_param = packet_int_array[5];
+                    reset_counter = true;            
+                 }
+               }
+             } else if (routine == eMultiBars) {
+               if (speedValue >= 0 
+                  && speedValue <= MAX_SPEED_VALUE
+                  && packet_int_array[5] <= 10) {
+                 isValid = true;
+                 if (packet_int_array[5] != multi_bars_param) {
+                   multi_bars_param = packet_int_array[5];
+                   reset_counter = true;            
+                }
+              }
+            }
+            if (speedValue >= 0 && speedValue <= MAX_SPEED_VALUE) {
+              isValid = true;
+              // check if reset counter
+              if (palette != current_palette || routine != current_routine) {
+                reset_counter = true;            
+              }
+            }
+          }
+          break;
+        }
+        case eMultiFade:
+        case eMultiRandomSolid:
+        case eMultiRandomIndividual:
+        {
+          if (int_array_size == 5) {
+            palette = (EPalette)packet_int_array[3];
+            if (speedValue >= 0 && speedValue <= MAX_SPEED_VALUE) {
+              isValid = true;
+              // check if reset counter
+              if (palette != current_palette || routine != current_routine) {
+                reset_counter = true;            
+              }
+            }
+          }
+          break;
+        }
+        default:
+          break;
+      }
+      // if the packet was valid, do some final checks
+      if (isValid) {
+        // update stored values
+        if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+          if (speedValue >= 0 && speedValue <= MAX_SPEED_VALUE) {
+            update_speed = speedValue;
+            current_routine = routine;
+            if (routine > eSingleSawtoothFade) {
+              current_palette = palette;
+            }
+          }
+        }
+        
+        if (reset_counter) {
+          // Reset to 0 to draw to screen right away
+          loop_counter = 0;
+          if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+            should_update_no_speed = true;            
+          }
+        }     
+        success = true;
+      }
+    } 
+  }
+  return success;
+}
+
+bool parseColor(int red, int green, int blue) {
+  bool success = false;
+  if (red >= 0 && red <= 255
+      || green >= 0 && green <= 255
+      || blue >= 0 && blue <= 255) {
+    if (red != routines.mainColor().red
+        || green != routines.mainColor().green
+        || blue  != routines.mainColor().blue) {
+      reset_counter = true;
+      if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
+        routines.setMainColor(red, green, blue);
+      }
+
+    }
+    success = true;
+  }
+  return success;
+}
+
 
 //================================================================================
 // State Update
@@ -608,11 +771,11 @@ void buildStateUpdatePacket()
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa((uint8_t)current_routine, num_buf, 10));
   strcat(state_update_packet, value_delimiter);
-  strcat(state_update_packet, itoa((uint8_t)current_group, num_buf, 10));
+  strcat(state_update_packet, itoa((uint8_t)current_palette, num_buf, 10));
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa(routines.brightness(), num_buf, 10));
   strcat(state_update_packet, value_delimiter);
-  strcat(state_update_packet, itoa(raw_speed, num_buf, 10));
+  strcat(state_update_packet, itoa(update_speed, num_buf, 10));
   strcat(state_update_packet, value_delimiter);
   strcat(state_update_packet, itoa(idle_timeout / 60000, num_buf, 10));
   strcat(state_update_packet, value_delimiter);
@@ -669,6 +832,8 @@ void buildDiscoveryPacket()
   strcat(discovery_packet, itoa((uint8_t)API_LEVEL_MINOR, num_buf, 10));
   strcat(discovery_packet, value_delimiter);
   strcat(discovery_packet, itoa((uint8_t)USE_CRC, num_buf, 10));
+  strcat(discovery_packet, value_delimiter);
+  strcat(discovery_packet, itoa((uint8_t)0, num_buf, 10)); // Hardware Capabilities flag (0 for arduino, 1 for raspberry pi)
   strcat(discovery_packet, value_delimiter);
   strcat(discovery_packet, itoa((uint8_t)max_packet_size, num_buf, 10));
   strcat(discovery_packet, value_delimiter);

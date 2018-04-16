@@ -141,3 +141,13 @@
 * Fixed miscellaneous bugs.
 * Incremented API level to 3.0
 
+
+### **v3.0.0**
+#### API Update
+* Renamed ELightingRoutine to ERoutine, EColorGroup to EPalette, and LightingProtocols.h to ArduCorProtocols.h.
+* Refactored routines, color, and speed. They are now combined into a single command instead of requiring three separate for certain changes. 
+* Refactor value range for speed. It is now between 0-200. 0 pauses a lighting routine, 1 is the slowest a routine can be, and 200 is the fastest.
+* Refactored eSawToothFadeIn and eSawToothFadeOut into eSawtoothFade with a single parameter. Refactored eLinearFade and eSineFade into eFade with a single parameter.
+* Added a hardware capabilities flag to discovery packets.
+* Incremeneted API level to 3.3.
+

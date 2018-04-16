@@ -40,10 +40,10 @@ These routines use a single color:
 * Single Blink
 * Single Wave
 * Single Glimmer
-* Single Linear Fade
-* Single Sawtooth Fade In
-* Single Sawtooth Fade Out
-* Single Singe Fade
+* Single Fade
+    * in and out, linear or sine
+* Single Sawtooth Fade
+    * in or out
 
 ### <a name="multi-routines"></a>Multi Colors Routines
 
@@ -53,15 +53,7 @@ These routines use groups of colors saved in an array to execute the routine. Th
 * Multi Random Individual
 * Multi Random Solid
 * Multi Fade
-* Multi Bars Solid
-* Multi Bars Moving
-
-### <a name="post-processing"></a>Post Processing
-
-Tese are optional and can be applied after a routine. The `applyBrightness` option is recommended, since it simplifies dimming the LEDs by making their overall brightness a parameter between 0 and 100.
-
-* Apply Brightness
-* Draw Color on LED
+* Multi Bars
 
 ## <a name="contributing"></a>Contributing
 

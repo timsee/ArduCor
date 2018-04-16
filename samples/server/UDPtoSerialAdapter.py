@@ -3,8 +3,8 @@
 #------------------------------------------------------------
 # UDPtoSerial.py
 #------------------------------------------------------------
-# Version 2.1
-# March 1, 2018
+# Version 2.5
+# Aprilm 14, 2018
 # MIT License (in root of git repo)
 # by Tim Seemann
 #
@@ -68,7 +68,7 @@ def sortMessages(packet):
             values = message.split(",")
             if len(values) > 0:
                 if values[0] != '':
-                    if (int(values[0]) in [8,9,10]):
+                    if (int(values[0]) in [6,7]):
                         multiCastMessage(message)
                     if len(values) > 1:
                         hardwareIndex = int(values[1])
@@ -138,6 +138,7 @@ def buildDiscoveryPacket():
     discoveryPacket += str(majorAPILevel) + ","
     discoveryPacket += str(minorAPILevel) + ","
     discoveryPacket += str(useCRC) + ","
+    discoveryPacket += str(1) + "," # hardware capabilities flag, 1 for raspberry pi
     discoveryPacket += str(maxPacketSizeServer) + ","
     discoveryPacket += str(deviceCount) + "@"
     for i in range(deviceCount):
@@ -163,19 +164,19 @@ def parseDiscoveryPacket(packet, serialIndex):
     global nameList
     global typeList
     global productList
-
+    hardwareCapabilities = 0  # arduinos will give a 0, server will override with 1
     packetSplitArray = packet.split("&")
     discoveryAndNameSplitArray = packetSplitArray[0].split("@")
     discoverySplitArray = discoveryAndNameSplitArray[0].split(",")
     nameSplitArray = discoveryAndNameSplitArray[1].split(",")
-    if len(discoverySplitArray) == 6:
+    if len(discoverySplitArray) == 7:
         try:
             majorAPILevel = int(discoverySplitArray[1])
             minorAPILevel = int(discoverySplitArray[2])
             useCRC = int(discoverySplitArray[3])
-            maxPacketSize = int(discoverySplitArray[4])
-
-            count = int(discoverySplitArray[5])
+            hardwareCapabilities = int(discoverySplitArray[4])
+            maxPacketSize = int(discoverySplitArray[5])
+            count = int(discoverySplitArray[6])
             packetIndex = 0
             for x in range(count * 3):
                 if packetIndex == 0:
@@ -231,7 +232,7 @@ def parseStateUpdateForHardwareIndices(serialPort, serialIndex):
                     # split each message by its delimiter
                     values = message.split(",")
                     if len(values) == 13:
-                        if values[0] == "8":
+                        if values[0] == "6":
                             lightHardwareIndices[serialIndex].append(int(values[1]))
                             messageIsValid = True
                 return messageIsValid
@@ -240,7 +241,7 @@ def parseStateUpdateForHardwareIndices(serialPort, serialIndex):
 #-----
 # Builds a packet to request state updates
 def stateUpdatePacket():
-    packet = "8&"
+    packet = "6&"
     if useCRC:
         crc = crcCalculator(packet)
         packet += "#"
