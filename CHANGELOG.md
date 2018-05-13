@@ -151,3 +151,11 @@
 * Added a hardware capabilities flag to discovery packets.
 * Incremeneted API level to 3.3.
 
+### **v3.1.0**
+#### Simple Samples Update
+* Added simple samples for different hardware. The Corluma samples have gotten sufficiently complex enough that they are no longer a good learning tool for getting started. 
+* Refactored the old samples to be Corluma specific.
+* Fixed bugs with custom color updates in Corluma samples.
+* Fixed miscellaneous bugs.
+
+
