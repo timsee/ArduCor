@@ -277,7 +277,7 @@ If you want to test if cyclic redundancy is working properly, I would recommend 
 
 ### <a name="multi-sample"></a>Multi Device Samples
 
-The Multi Device Samples are an example of how to use the device index in the control packets to control multiple sets of LEDs from one Arduino. The sample uses two ArduCor objects to control two halves of a Neopixels Light Strip separately. The samples work with Serial communication.
+The Multi Device Samples are an example of how to use the device index in the control packets to control multiple sets of LEDs from one Arduino. The sample uses two ArduCor objects to control two halves of a Neopixels Light Strip separately. The samples work with Serial communication. When dealing with significantly more than 64 LEDs on a single arduino, it is recommended that you use a Arduino Mega so that you have more memory. The current samples is designed for Arduino Unos, but it takes a hit on max_packet_size in order to conserve memory. This requires packets to be broken up to be sent to the application, leading to slower to update speeds. 
 
 ### <a name="generating-samples"></a>Generating Samples
 
