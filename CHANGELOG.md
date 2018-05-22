@@ -158,4 +158,8 @@
 * Fixed bugs with custom color updates in Corluma samples.
 * Fixed miscellaneous bugs.
 
+### **v3.2.0**
+#### Minor Bug Fixes Update
+* Fixed a bug with speed updates for Corluma samples with multi random individual, multi single solid, and multi fade routines. 
+* Fixed a bug with multi device samples running out of memory.
 

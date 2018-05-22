@@ -6,8 +6,8 @@
  *
  * Provides a UDP interface to a set of lighting routines.
  * 
- * Version 3.1.0
- * Date: May 13, 2018
+ * Version 3.2.0
+ * Date: May 21, 2018
  * Github repository: http://www.github.com/timsee/ArduCor
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -676,6 +676,8 @@ bool routineParser(bool currentSuccess)
         {
           if (int_array_size == 5) {
             palette = (EPalette)packet_int_array[3];
+            speedValue = packet_int_array[4];
+
             if (speedValue >= 0 && speedValue <= MAX_SPEED_VALUE) {
               isValid = true;
               // check if reset counter

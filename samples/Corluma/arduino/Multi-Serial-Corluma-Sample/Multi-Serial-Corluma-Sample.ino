@@ -6,8 +6,8 @@
  *
  * Provides a Serial interface to a set of lighting routines.
  * 
- * Version 3.1.0
- * Date: May 13, 2018
+ * Version 3.2.0
+ * Date: May 21, 2018
  * Github repository: http://www.github.com/timsee/ArduCor
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -139,7 +139,7 @@ unsigned long loop_counter = 0;
 bool packetReceived = false;
 
 // ints used for determining how much memory to use
-const int max_packet_size = 100;
+const int max_packet_size = 75;
 
 // buffers for receiving messages
 char current_packet[max_packet_size];
@@ -794,6 +794,8 @@ bool routineParser(bool currentSuccess)
         {
           if (int_array_size == 5) {
             palette = (EPalette)packet_int_array[3];
+            speedValue = packet_int_array[4];
+
             if (speedValue >= 0 && speedValue <= MAX_SPEED_VALUE) {
               isValid = true;
               // check if reset counter
