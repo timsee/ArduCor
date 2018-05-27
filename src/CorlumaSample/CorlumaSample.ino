@@ -13,8 +13,8 @@
  *
  * COM_PLACEHOLDER
  * 
- * Version 3.2.0
- * Date: May 21, 2018
+ * Version 3.3.0
+ * Date: May 27, 2018
  * Github repository: http://www.github.com/timsee/ArduCor
  * License: MIT-License, LICENSE provided in root of git repo
  */
@@ -1028,10 +1028,6 @@ bool routineParser(bool currentSuccess)
                                  packet_int_array[4],
                                  packet_int_array[5]);
           }
-          // check if reset counter
-          if (routine != current_routine) {
-            reset_counter = true;            
-          }
           break;
         }
         case eSingleBlink:
@@ -1168,7 +1164,13 @@ bool routineParser(bool currentSuccess)
       if (isValid) {
         // update stored values
         if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-          if (speedValue >= 0 && speedValue <= MAX_SPEED_VALUE) {
+          if (routine == eSingleSolid) {
+            // check reset counter
+            if (routine != current_routine) {
+              reset_counter = true;            
+            }
+            current_routine = routine;
+          } else if ((speedValue >= 0 && speedValue <= MAX_SPEED_VALUE)) {
             update_speed = speedValue;
             current_routine = routine;
             if (routine > eSingleSawtoothFade) {
@@ -1179,7 +1181,13 @@ bool routineParser(bool currentSuccess)
         
 #if IS_MULTI
         if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
-          if (speedValue >= 0 && speedValue <= MAX_SPEED_VALUE) {
+          if (routine == eSingleSolid) {
+            // check reset counter
+            if (routine != current_routine_2) {
+              reset_counter = true;            
+            }
+            current_routine_2 = routine;
+          } else if ((speedValue >= 0 && speedValue <= MAX_SPEED_VALUE)) {
             update_speed_2 = speedValue;
             current_routine_2 = routine;
             if (routine > eSingleSawtoothFade) {
@@ -1209,23 +1217,28 @@ bool routineParser(bool currentSuccess)
 
 bool parseColor(int red, int green, int blue) {
   bool success = false;
+  // first check if the values are in a valid range
   if (red >= 0 && red <= 255
       || green >= 0 && green <= 255
       || blue >= 0 && blue <= 255) {
-    if (red != routines.mainColor().red
-        || green != routines.mainColor().green
-        || blue  != routines.mainColor().blue) {
-      reset_counter = true;
       if ((received_hardware_index == hardware_index) || (received_hardware_index == 0)) {
-        routines.setMainColor(red, green, blue);
+        if (red != routines.mainColor().red
+            || green != routines.mainColor().green
+            || blue  != routines.mainColor().blue) {
+          reset_counter = true;
+          routines.setMainColor(red, green, blue);
+        }
       }
-
 #if IS_MULTI
       if ((received_hardware_index == routines_2_index) || (received_hardware_index == 0)) {
-        routines_2.setMainColor(red, green, blue);
+        if (red != routines_2.mainColor().red
+            || green != routines_2.mainColor().green
+            || blue  != routines_2.mainColor().blue) {
+          reset_counter = true;
+          routines_2.setMainColor(red, green, blue);
+        }
       }
 #endif
-    }
     success = true;
   }
   return success;

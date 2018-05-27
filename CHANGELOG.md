@@ -163,3 +163,10 @@
 * Fixed a bug with speed updates for Corluma samples with multi random individual, multi single solid, and multi fade routines. 
 * Fixed a bug with multi device samples running out of memory.
 
+### **v3.3.0**
+#### Another Bug Fixes Update
+* Fixed an edge case in parsing packets for Corluma's multi hardware sample.
+* Handled multicast packets to the Corluma server sample when it has multiple serial devices connected more elegantly.
+* Fixed a bug in the Corluma samples when setting the Single Solid routine. 
+
+
