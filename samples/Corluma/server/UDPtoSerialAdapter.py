@@ -3,8 +3,8 @@
 #------------------------------------------------------------
 # UDPtoSerial.py
 #------------------------------------------------------------
-# Version 2.6
-# May 13, 2018
+# Version 2.8
+# May 27, 2018
 # MIT License (in root of git repo)
 # by Tim Seemann
 #
@@ -28,6 +28,9 @@ from numpy import bitwise_xor, right_shift
 
 # Change this port if it conflicts with another program on your system
 UDP_PORT = 10008
+# Header values for packets for state updates and custom color updates
+stateUpdatePacketHeader = 6
+customColorUpdatePacketHeader = 7
 
 #--------------------------------
 # Message Parsing Functions
@@ -47,11 +50,7 @@ def convertMessageListToPacket(messageList, serialIndex):
             if (len(packet) + len(message) < maxPacketSizeList[serialIndex] - 16):
                 packet += message
                 packet += "&"
-        if useCRC:
-            crc = crcCalculator(packet)
-            packet += "#"
-            packet += str(crc)
-            packet += "&"
+        packet = appendCRC(packet)
     packet += ";"
     return packet
 
@@ -68,7 +67,7 @@ def sortMessages(packet):
             values = message.split(",")
             if len(values) > 0:
                 if values[0] != '':
-                    if (int(values[0]) in [6,7]):
+                    if (int(values[0]) in [stateUpdatePacketHeader,customColorUpdatePacketHeader]):
                         multiCastMessage(message)
                     if len(values) > 1:
                         hardwareIndex = int(values[1])
@@ -100,31 +99,79 @@ def multiCastMessage(message):
         index = index + 1
 
 #-----
+# takes a message and, if theres more than one serial device and theres a 0
+# as hardware index, convert it into multiple packets
+def convertMultiCastPackets(message, serialIndex):
+    global lightHardwareIndices
+    individualMessage = message.split("&")
+    values = individualMessage[0].split(",")
+    messageArray = []
+    headerIndex = 0
+    if (len(values) > 0):
+        headerIndex = values[0]
+        # send the message as is if its a state update or custom color update
+        if not(headerIndex == str(stateUpdatePacket) or headerIndex == str (customColorUpdatePacketHeader)):
+            return [message]
+    if (len(values) > 1):
+        headerIndex = values[0]
+        hardwareIndex = values[1]
+        if (hardwareIndex == "0"):
+            hardwareIndexArray = lightHardwareIndices[serialIndex]
+            # for each device, create a packet
+            for hardwareIndex in hardwareIndexArray:
+                values[1] = hardwareIndex
+                packet = createPacket(values)
+                messageArray.append(packet)
+        else:
+            packet = createPacket(values)
+            messageArray.append(packet)
+    return messageArray
+
+#-----
 # Takes a message that contains a CRC, splits it and stores the given CRC,
 # then it computes a new CRC and checks if they are the same. If they are the
 # same, this function return true, otherwise, it returns false.
 def checkCRC(message):
-    #print message
-    crcSplitArray = message.split("#")
-    if len(crcSplitArray) == 2:
-        payload = crcSplitArray[0]
-        givenCRC = crcSplitArray[1].rstrip()[:-1]
-        #print "Given: " + givenCRC
-        computedCRC = crcCalculator(payload)
-        #print "Computed: " + str(computedCRC)
-        if str(computedCRC) == givenCRC:
-            return payload, True
+    # check for packet with no &
+    ampCheckList = message.split("&")
+    if (len(ampCheckList) != 1):
+        crcSplitArray = message.split("#")
+        if len(crcSplitArray) == 2:
+            payload = crcSplitArray[0]
+            givenCRC = crcSplitArray[1].rstrip()[:-1]
+            #print "Given: " + givenCRC
+            computedCRC = crcCalculator(payload)
+            #print "Computed: " + str(computedCRC)
+            if str(computedCRC) == givenCRC:
+                return payload, True
+            else:
+                return payload, False
         else:
-            return payload, False
+            return message, False
     else:
         return message, False
+
+#-----
+# create a packet based on an array of integers. This automatically adds a
+# CRC but it does not add a ";"
+def createPacket(valueArray):
+    packet = ""
+    # generate the packet again
+    for value in valueArray:
+        packet += str(value)
+        packet += ","
+    # remove the last comma
+    packet = packet[:-1]
+    packet += "&"
+    packet = appendCRC(packet)
+    return packet
 
 #--------------------------------
 # Discovery Functions
 #--------------------------------
 
 #-----
-# True if a discovery packet, False if not
+# True if a discovery packet, Faxlse if not
 def checkIfDiscoveryPacket(message):
    if (message == "DISCOVERY_PACKET"):
        return True
@@ -151,6 +198,16 @@ def buildDiscoveryPacket():
             discoveryPacket += ","
     discoveryPacket += "&"
     return discoveryPacket
+
+#-----
+# append a CRC packet with the correct delimiters based on a packet
+def appendCRC(packet):
+    if useCRC:
+        crc = crcCalculator(packet)
+        packet += "#"
+        packet += str(crc)
+        packet += "&"
+    return packet
 
 #-----
 # This parses a discovery packet, and, if its valid, sets global variables
@@ -232,7 +289,7 @@ def parseStateUpdateForHardwareIndices(serialPort, serialIndex):
                     # split each message by its delimiter
                     values = message.split(",")
                     if len(values) == 13:
-                        if values[0] == "6":
+                        if values[0] == str(stateUpdatePacketHeader):
                             lightHardwareIndices[serialIndex].append(int(values[1]))
                             messageIsValid = True
                 return messageIsValid
@@ -241,12 +298,9 @@ def parseStateUpdateForHardwareIndices(serialPort, serialIndex):
 #-----
 # Builds a packet to request state updates
 def stateUpdatePacket():
-    packet = "6&"
-    if useCRC:
-        crc = crcCalculator(packet)
-        packet += "#"
-        packet += str(crc)
-        packet += "&"
+    packet = str(stateUpdatePacketHeader)
+    packet += "&"
+    packet = appendCRC(packet)
     packet += ";"
     return packet
 
@@ -285,7 +339,10 @@ def crcCalculator(message):
     for c in message:
         crc = crcUpdate(crc, ord(c))
         #print "CRC: " + str(crc)
-    crc = long(~crc)
+    try:
+        crc = long(~crc)
+    except:
+        crc = long(0)
     #print "final crc: " + str(crc)
     return crc
 
@@ -306,15 +363,26 @@ def writeSerialMessages():
 #-----
 # Takes a serial port as an argument, reads all available
 # characters, then echoes them on UDP
-def echoSerial(serialPort):
+def echoSerial(serialPort, serialIndex):
     message = readSerialPort(serialPort)
     if message != '':
         # strip off the delimiting character
         message = message.rstrip()[:-1]
-        #print "ARDUINO:  %r " % (message)
-        # send over UDP
-        if (len(message) > 1):
-            sock.sendto(message, (addr[0], UDP_PORT))
+        # split into individual packets
+        messageSplitArray = message.split(";")
+        for message in messageSplitArray:
+            messageNoCRC, passedCRC = checkCRC(message)
+            # if serial device count is larger than zero, rewrite hardware index
+            if (passedCRC):
+                #print "ARDUINO: %r " % (message)
+                if (numOfSerialDevices > 1):
+                    messageArray = convertMultiCastPackets(message, serialIndex)
+                    for multiCastMessage in messageArray:
+                        if (len(multiCastMessage) > 1):
+                            sock.sendto(multiCastMessage, (addr[0], UDP_PORT))
+                else:
+                    if (len(message) > 1):
+                        sock.sendto(message, (addr[0], UDP_PORT))
 
 
 #-----
@@ -380,7 +448,7 @@ maxPacketSizeList = [0 for i in xrange(numOfSerialDevices)]
 # set this to define the max packet size sent to the server. The server will
 # simplify packets and only send relevant information to different arduinos,
 # so it can accept a larger packet size.
-maxPacketSizeServer = 200
+maxPacketSizeServer = 250
 #-----------------------------
 
 #--------------------------------
@@ -475,6 +543,6 @@ while True:
         # loop through all serial devices
         for x in range(0, numOfSerialDevices):
             # check for serial packets and echo if needed
-            echoSerial(serialDevices[x])
+            echoSerial(serialDevices[x], x)
     except socket.timeout:
         pass
