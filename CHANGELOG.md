@@ -170,3 +170,7 @@
 * Fixed a bug in the Corluma samples when setting the Single Solid routine. 
 
 
+### **v3.3.1** 
+#### Spelling Update 
+* Fixed spelling of "Corrosive."
+

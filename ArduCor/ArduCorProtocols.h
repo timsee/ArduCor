@@ -151,7 +151,7 @@ enum EPalette
      * <i>Greens and whites, similar to radioactive goo from
      * a 90s kids cartoon.</i>
      */
-    eCorrorsive,
+    eCorrosive,
     /*!
      * <b>9</b><br>
      * <i>A purple-based theme. Similar to poison vials from
