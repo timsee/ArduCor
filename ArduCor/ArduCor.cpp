@@ -13,7 +13,7 @@
  */
 
 #include "ArduCor.h"
-#include "ColorPresets.h"
+#include "Palettes.h"
 
 // Default brightness of LEDS, must be a value between 0 and 100.
 const uint8_t  DEFAULT_BRIGHTNESS  = 50;
