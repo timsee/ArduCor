@@ -174,3 +174,8 @@
 #### Spelling Update 
 * Fixed spelling of "Corrosive."
 
+
+### **v3.3.3** 
+#### Brightness Update 
+* Adjusted brightness so that it only impacts multi color routines. This simplifies packets for single color routines, since now they don't control brightness with a separate packeet, instead its encoded into the RGB values. 
+

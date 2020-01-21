@@ -224,7 +224,8 @@ enum EPacketHeader
   eCustomArrayColorChange,
   /*!
    * <b>3</b><br>
-   * <i>Takes one parameter, sets the brightness between 0 and 100.</i>
+   * <i>Takes one parameter, sets the palette brightness between 0 and 100. Used only in multi
+   * color routines and ignored in single routines. </i>
    */
   eBrightnessChange,
   /*!

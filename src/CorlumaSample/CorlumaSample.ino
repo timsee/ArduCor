@@ -456,9 +456,9 @@ void setup()
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines.
   // If its not set, it defaults to a faint orange.
-  routines.setMainColor(0, 255, 0);
+  routines.setMainColor(0, 127, 0);
 #if IS_MULTI
-  routines_2.setMainColor(0, 255, 0);
+  routines_2.setMainColor(0, 127, 0);
 #endif
 #if IS_SERIAL
   // put your setup code here, to run once:

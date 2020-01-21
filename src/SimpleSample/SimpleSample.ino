@@ -79,10 +79,11 @@ void setup()
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines.
   // If its not set, it defaults to a faint orange.
-  routines.setMainColor(0, 255, 0);
+  routines.setMainColor(0, 127, 0);
 
-  // This sets how bright the LEDs shine.It expects a value between
-  // 0 and 100. 0 means off, 100 means full brightness.
+  // This sets how bright the LEDs shine in multi color routines.
+  // It expects a value between 0 and 100. 0 means off, 100 
+  // means full brightness.
   routines.brightness(50);
 }
 
@@ -160,4 +161,3 @@ void updateLEDs()
   }
 }
 #endif
-

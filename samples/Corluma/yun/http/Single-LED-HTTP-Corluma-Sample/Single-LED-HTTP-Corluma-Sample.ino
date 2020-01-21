@@ -241,7 +241,7 @@ void setup()
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines.
   // If its not set, it defaults to a faint orange.
-  routines.setMainColor(0, 255, 0);
+  routines.setMainColor(0, 127, 0);
   buildDiscoveryPacket();
 }
 

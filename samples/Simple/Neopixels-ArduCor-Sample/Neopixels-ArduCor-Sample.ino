@@ -47,10 +47,11 @@ void setup()
   // color routines. This can be changed at any time.
   // and its set it to green in sample routines.
   // If its not set, it defaults to a faint orange.
-  routines.setMainColor(0, 255, 0);
+  routines.setMainColor(0, 127, 0);
 
-  // This sets how bright the LEDs shine.It expects a value between
-  // 0 and 100. 0 means off, 100 means full brightness.
+  // This sets how bright the LEDs shine in multi color routines.
+  // It expects a value between 0 and 100. 0 means off, 100 
+  // means full brightness.
   routines.brightness(50);
 }
 
@@ -64,7 +65,7 @@ void loop()
   
   // the simple sample shows both a single and a multi color routine, 
   // set this flag to switch between them.
-  bool useMultiColorRoutine = true;
+  bool useMultiColorRoutine = false;
   // For the glimmer routine, a parameter determines how many LEDs get the "glimmer" effect.
   const byte glimmerPercent = 15;
   if (useMultiColorRoutine) {
@@ -96,4 +97,3 @@ void updateLEDs()
   }
   pixels.show();
 }
-

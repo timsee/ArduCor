@@ -144,12 +144,13 @@ public:
     uint8_t customColorCount();
 
     /*!
-     * Set the brightness between 0 and 100. 0 is off, 100 is full brightness.
+     * Set the  palette brightness between 0 and 100. 0 is off, 100 is full brightness. Note
+     * this only impacts multi color routines.
      */
     void brightness(uint8_t brightness);
 
     /*!
-     * Retrieve the brightness level, which is a value between 0 and 100 where
+     * Retrieve the palette brightness level, which is a value between 0 and 100 where
      * 100 is full brightness.
      */
     int brightness() { return m_bright_level; }

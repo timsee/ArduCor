@@ -360,6 +360,7 @@ ArduCor::singleSolid(uint8_t red, uint8_t green, uint8_t blue)
         fillColorBuffers(red, green, blue);
         m_temp_bool = false;
     }
+    m_brightness_flag = false;
 }
 
 
@@ -371,12 +372,12 @@ ArduCor::singleBlink(uint8_t red, uint8_t green, uint8_t blue)
     if (!(m_temp_counter % m_blink_speed)) {
         if (m_temp_bool) {
             fillColorBuffers(red, green, blue);
-            m_brightness_flag = true;
         } else {
             fillColorBuffers(0,0,0);
         }
         m_temp_bool = !m_temp_bool;
     }
+    m_brightness_flag = false;
     m_temp_counter++;
 }
 
@@ -400,6 +401,7 @@ ArduCor::singleWave(uint8_t red, uint8_t green, uint8_t blue)
             m_repeat_index = (x + 1) % m_loop_index;
         }
     }
+    m_brightness_flag = false;
     m_temp_index = (m_temp_index + 1) % m_loop_index;
 }
 
@@ -422,6 +424,7 @@ ArduCor::singleGlimmer(uint8_t red, uint8_t green, uint8_t blue, uint8_t percent
             b_buffer[x] = blue / m_scale_factor;
         }
     }
+    m_brightness_flag = false;
 }
 
 
@@ -451,6 +454,8 @@ ArduCor::singleFade(uint8_t red, uint8_t green, uint8_t blue, bool isSine)
     fillColorBuffers(red * m_temp_float,
                      green * m_temp_float,
                      blue * m_temp_float);
+    
+    m_brightness_flag = false;
 }
 
 void
@@ -482,6 +487,7 @@ ArduCor::singleSawtoothFade(uint8_t red, uint8_t green, uint8_t blue, bool fadeI
     fillColorBuffers((red * (m_temp_counter / (float)m_fade_speed)),
                      (green * (m_temp_counter / (float)m_fade_speed)),
                      (blue * (m_temp_counter / (float)m_fade_speed)));
+    m_brightness_flag = false;
 }
 
 

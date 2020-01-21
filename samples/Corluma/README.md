@@ -128,13 +128,15 @@ The speed parameter is required for every routine except eSingleSolid, since the
 
 *Note: The Color Index must be smaller than the size of the custom color array, which is currently 10. These can be used in multi color routines by using the EColorGroup `eCustom`*
 
-#### Set Brightness
+#### Set Palette Brightness
 
 | Parameter     | Values        |
 | ------------- | ------------- |
 | Header        |     3         |
 | Brightness %  | 0 - 100       |
 **Example:** `3,0,90&` *(Header 4, Device Index 0, 90% brightness)*
+
+*Note: This brightness setting only impacts multi color routines that use palettes. For single color routines, brightness should be encoded into the RGB values used. For example, to show red at 50% brightness, set the light to R=127, G=0, B=0.*
 
 #### Set Custom Color Count
 
