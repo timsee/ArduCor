@@ -124,6 +124,7 @@ The speed parameter is required for every routine except eSingleSolid, since the
 | Red           | 0 - 255       |
 | Green         | 0 - 255       |
 | Blue          | 0 - 255       |
+
 **Example:** `2,0,3,255,127,0&` *(Header 2, Device Index 0 Saved Color 3, Red 255, Green 127, Blue 0)*
 
 *Note: The Color Index must be smaller than the size of the custom color array, which is currently 10. These can be used in multi color routines by using the EColorGroup `eCustom`*
@@ -134,6 +135,7 @@ The speed parameter is required for every routine except eSingleSolid, since the
 | ------------- | ------------- |
 | Header        |     3         |
 | Brightness %  | 0 - 100       |
+
 **Example:** `3,0,90&` *(Header 4, Device Index 0, 90% brightness)*
 
 *Note: This brightness setting only impacts multi color routines that use palettes. For single color routines, brightness should be encoded into the RGB values used. For example, to show red at 50% brightness, set the light to R=127, G=0, B=0.*
@@ -144,6 +146,7 @@ The speed parameter is required for every routine except eSingleSolid, since the
 | ------------- | ------------- |
 | Header        |     4         |
 | Count         | 2 - 10        |
+
 **Example:** `4,0,3&` *(Header 4, Device Index 0, 3 colors)*
 
 *Note: This setting controls the number of colors used for multi color routines using the custom color array.*
@@ -154,6 +157,7 @@ The speed parameter is required for every routine except eSingleSolid, since the
 | ------------- | ------------- |
 | Header        |     5        |
 | Idle Timeout Minutes       | 0 - 1000      |
+
 **Example:** `5,0,120&` *(Header 5, Device Index 0, 120 Minutes)*
 
 *Note: If no serial packet is parsed in the amount of minutes specified, the lighting mode gets set to off. If the packet `5,0,0&;` is sent, the idle timeout is turned off and the lights will stay on indefinitely.*
@@ -188,7 +192,7 @@ $stateUpdate,$isOn,$isReachable,$red,$green,$blue,$routine,$palette,$brightness,
 | idleTimeout          |    0 - 1000          |     0 to turn off, all other numbers are number of minutes until timeout     |
 | minutesUntilTimeout          |    0 - 1000          |     0 if off, all other numbers are number of minutes until timeout    |
 
-**Example:**`6,1,1,1,255,127,0,3,1,80,200,120,60&` (hardwareIndex 1,isOn,isReachable,R:255,G:127,B:0,Routine 3,Palette 1,brightness 80,speed 120,Idle Timeout 120,minutesUntilTimeout 60)
+**Example:**`6,1,1,1,255,127,0,3,1,80,200,120,60&` *(hardwareIndex 1,isOn,isReachable,R:255,G:127,B:0,Routine 3,Palette 1,brightness 80,speed 120,Idle Timeout 120,minutesUntilTimeout 60)*
 
 ### <a name="custom-array-update"></a>Custom Array State Update Packet
 
@@ -239,7 +243,7 @@ DISCOVERY_PACKET,$majorAPI,$minorAPI,$usingCRC,$capabilities,$maxPacketSize,$num
 
 **Example:** `DISCOVERY_PACKET,3,3,0,0,200,1@Cool Light,1,1&` *(v3.3,no CRC,only arduino,max packet size of 200,1 device@named "Cool Light",hardware type 1,product type 1)*
 
-* *NOTE: even if CRC is on, discovery packets do not require or send out a CRC!*
+**NOTE:** *even if CRC is on, discovery packets do not require or send out a CRC!*
 
 Discovery packets are used both as a way to check if an arduino is running a sketch with the proper messaging protocol and to set up the client sending messages to the arduino. An API level is provided to allow applications to know the exact features and messaging protocol of the light controller. The major API level is incremented when theres a significant change and previous protocols will no longer work. A minor API level is incremented when most messages will still work, but new protocols are added, or messages are switched around, or any other minor change was made.
 This is an easy way to check whether or not the IP Address or Serial port that you are connecting to currently connects you to an Arduino running one of these samples.
