@@ -73,7 +73,7 @@ The second argument in a message is always a device index. This value determines
 `0,0,0&` *(Header 1, Device Index 0, Turn Off)*
 
 ####  Routine Change
-Routine changes are the most complex packets, as they can have a variety of parameters based off of their routine parameter. 
+Routine changes are the most complex packets, as they can have a variety of parameters based off of their routine parameter.
 
 #### Single Light Routines
 | Parameter         | Values        |
@@ -113,7 +113,7 @@ The extra parameter is required for eMultiGlimmer and eMultiBars:
 
 #### Speed Parameter
 
-The speed parameter is required for every routine except eSingleSolid, since they all change over time. The parameter uses values between 0 and 200. Each unit represents between 10 and 15 milliseconds depending on the specific arduino and its load. A value of 0 pauses the routine in its current state. A value or 1 runs the routines as slow as they can go. A value of 200 makes the routines go as fast as they can. 
+The speed parameter is required for every routine except eSingleSolid, since they all change over time. The parameter uses values between 0 and 200. Each unit represents between 10 and 15 milliseconds depending on the specific arduino and its load. A value of 0 pauses the routine in its current state. A value or 1 runs the routines as slow as they can go. A value of 200 makes the routines go as fast as they can.
 
 #### Set Color in Custom Color Array
 
@@ -177,6 +177,7 @@ $stateUpdate,$isOn,$isReachable,$red,$green,$blue,$routine,$palette,$brightness,
 | Parameter        | Range        |  Description |
 | -------------        | ------------- |  ------------- |
 | stateUpdate    |     6            |                    |
+| hardwareIndex    |     1 to maxHardwareIndex            |   index of light that the stateUpdate maps to, for an arduino with a single light this is always 1.                  |
 | isOn              |     0 or 1     |     0 if the current routine is eOff, 1 otherwise             |
 | isReachable    |     1            |  Only 1 if it is expected to be connected but it is not connected to the controller. Used by [Corluma](https://github.com/timsee/Corluma)                    |
 | red, green, blue    |    0  - 255            |     Color used by single color routines                |
@@ -187,6 +188,7 @@ $stateUpdate,$isOn,$isReachable,$red,$green,$blue,$routine,$palette,$brightness,
 | idleTimeout          |    0 - 1000          |     0 to turn off, all other numbers are number of minutes until timeout     |
 | minutesUntilTimeout          |    0 - 1000          |     0 if off, all other numbers are number of minutes until timeout    |
 
+**Example:**`6,1,1,1,255,127,0,3,1,80,200,120,60&` (hardwareIndex 1,isOn,isReachable,R:255,G:127,B:0,Routine 3,Palette 1,brightness 80,speed 120,Idle Timeout 120,minutesUntilTimeout 60)
 
 ### <a name="custom-array-update"></a>Custom Array State Update Packet
 
@@ -219,7 +221,7 @@ The `$count` parameter denotes how many times the `,$index,$red,$green,$blue` se
 Sending the message `DISCOVERY_PACKET` to any of the samples will cause the sample to send a message back in the format of:
 
 ```
-DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$capabilities,$maxPacketSize@$name,$hardwareType,$productType&
+DISCOVERY_PACKET,$majorAPI,$minorAPI,$usingCRC,$capabilities,$maxPacketSize,$numOfDevices,@$name,$hardwareType,$productType&
 ```
 
 | Parameter     | Range         |  Description   |
@@ -230,9 +232,13 @@ DISCOVERY_PACKET,$majorAPI,$minorAPI,$numOfDevices,$usingCRC,$capabilities,$maxP
 | capabilities      |     0 - 1     |  0 if just arduino, 1 if arduino controlled by Raspberry Pi |
 | maxPacketSize |     1 - 500  |  max number of characters accepted in a single message        |
 | numOfDevices  |     1 - 20    |  Number of RGB devices connected to arduino    |
-| name  |    N/A    |  A hardcoded identifier of up to 16 characters   |
+| name  |    N/A    |  A hardcoded identifier of up to 16 characters  |
 | hardwareType  |    0 -  4   |  An enum denoting the type of hardware (light strip, light cube, etc.)  |
 | productType   |    0 -  2   |  An enum denoting the type of product (Neopixels, Rainbowduino, LED RGB, etc.)  |
+
+
+**Example:** `DISCOVERY_PACKET,3,3,0,0,200,1@Cool Light,1,1&` *(v3.3,no CRC,only arduino,max packet size of 200,1 device@named "Cool Light",hardware type 1,product type 1)*
+
 * *NOTE: even if CRC is on, discovery packets do not require or send out a CRC!*
 
 Discovery packets are used both as a way to check if an arduino is running a sketch with the proper messaging protocol and to set up the client sending messages to the arduino. An API level is provided to allow applications to know the exact features and messaging protocol of the light controller. The major API level is incremented when theres a significant change and previous protocols will no longer work. A minor API level is incremented when most messages will still work, but new protocols are added, or messages are switched around, or any other minor change was made.
@@ -251,8 +257,8 @@ The CRC packet is formatted like this:
 ```
 #$crc&
 ```
-where `$crc` is the CRC computed by the sample code. 
-It is recommended to turn on the CRC for serial communication with a client but turn it off if you are writing the ASCII commands yourself into the Serial Monitor (computing the CRC by hand is extra work!). As for what samples to use it with, it is strongly recommended for use with the Serial or any samples that have serial somewhere in their communication stream, such as the server samples. It is not recommended for HTTP. 
+where `$crc` is the CRC computed by the sample code.
+It is recommended to turn on the CRC for serial communication with a client but turn it off if you are writing the ASCII commands yourself into the Serial Monitor (computing the CRC by hand is extra work!). As for what samples to use it with, it is strongly recommended for use with the Serial or any samples that have serial somewhere in their communication stream, such as the server samples. It is not recommended for HTTP.
 
 If you want to test if cyclic redundancy is working properly, I would recommend using this packet, which requests a state update packet with the proper CRC appended (add a `;` to the end of the packet if communicating with a serial device):
 
@@ -272,14 +278,14 @@ If you want to test if cyclic redundancy is working properly, I would recommend 
 # single wave green with 100 speed on device 1
 1,1,2,0,255,0,100&#2246576319&
 
-# multi bars with bar size 4, using fire palette and speed 100 on device 1 
+# multi bars with bar size 4, using fire palette and speed 100 on device 1
 1,1,10,6,100,4&#3942318360&
 
 ```
 
 ### <a name="multi-sample"></a>Multi Device Samples
 
-The Multi Device Samples are an example of how to use the device index in the control packets to control multiple sets of LEDs from one Arduino. The sample uses two ArduCor objects to control two halves of a Neopixels Light Strip separately. The samples work with Serial communication. When dealing with significantly more than 64 LEDs on a single arduino, it is recommended that you use a Arduino Mega so that you have more memory. The current samples is designed for Arduino Unos, but it takes a hit on max_packet_size in order to conserve memory. This requires packets to be broken up to be sent to the application, leading to slower to update speeds. 
+The Multi Device Samples are an example of how to use the device index in the control packets to control multiple sets of LEDs from one Arduino. The sample uses two ArduCor objects to control two halves of a Neopixels Light Strip separately. The samples work with Serial communication. When dealing with significantly more than 64 LEDs on a single arduino, it is recommended that you use a Arduino Mega so that you have more memory. The current samples is designed for Arduino Unos, but it takes a hit on max_packet_size in order to conserve memory. This requires packets to be broken up to be sent to the application, leading to slower to update speeds.
 
 ### <a name="generating-samples"></a>Generating Samples
 
