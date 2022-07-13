@@ -67,16 +67,20 @@ def sortMessages(packet):
             values = message.split(",")
             if len(values) > 0:
                 if values[0] != '':
-                    if (int(values[0]) in [stateUpdatePacketHeader,customColorUpdatePacketHeader]):
-                        multiCastMessage(message)
-                    if len(values) > 1:
-                        hardwareIndex = int(values[1])
-                        if (hardwareIndex == 0):
+                    try:
+                        if (int(values[0]) in [stateUpdatePacketHeader,customColorUpdatePacketHeader]):
                             multiCastMessage(message)
-                        else:
-                            # find serial index by using hardware index
-                            index = findSerialIndexForHardwareIndex(hardwareIndex)
-                            messageDict[index].append(message)
+                        if len(values) > 1:
+                            hardwareIndex = int(values[1])
+                            if (hardwareIndex == 0):
+                                multiCastMessage(message)
+                            else:
+                                # find serial index by using hardware index
+                                index = findSerialIndexForHardwareIndex(hardwareIndex)
+                                messageDict[index].append(message)
+                    except ValueError:
+                        print(f"could not convert {message}")
+                        pass
 
 #-----
 # helper to convert a hardware index to a serial index
@@ -334,15 +338,15 @@ def crcUpdate(crc, data):
 # Takes a message, loops through its characters, and computes a CRC that can
 # represent that message
 def crcCalculator(message):
-    crc = c_uint32(~0L)
+    crc = c_uint32(~0)
     #print "input: " + input
     for c in message:
         crc = crcUpdate(crc, ord(c))
         #print "CRC: " + str(crc)
     try:
-        crc = long(~crc)
+        crc = ~crc
     except:
-        crc = long(0)
+        crc = 0
     #print "final crc: " + str(crc)
     return crc
 
@@ -358,7 +362,7 @@ def writeSerialMessages():
     for x in range(0, numOfSerialDevices):
         if (len(messageDict[x])):
             message = convertMessageListToPacket(messageDict[x], x)
-            serialDevices[x].write(message)
+            serialDevices[x].write(message.encode())
 
 #-----
 # Takes a serial port as an argument, reads all available
@@ -379,23 +383,37 @@ def echoSerial(serialPort, serialIndex):
                     messageArray = convertMultiCastPackets(message, serialIndex)
                     for multiCastMessage in messageArray:
                         if (len(multiCastMessage) > 1):
-                            sock.sendto(multiCastMessage, (addr[0], UDP_PORT))
+                            sock.sendto(multiCastMessage.encode(), (addr[0], UDP_PORT))
                 else:
                     if (len(message) > 1):
-                        sock.sendto(message, (addr[0], UDP_PORT))
+                        sock.sendto(message.encode(), (addr[0], UDP_PORT))
 
 
+def setupSerial():
+    #-----
+    #  Serial Setup
+    # configure the serial connections (the parameters differs on the device you are connecting to)
+    print("Setup Serial...")
+    serialDevices = []
+    for x in range(1, len(sys.argv)):
+        try:
+            # a timeout of 0 makes serial.read nonblocking
+            serialDevices.append(serial.Serial(sys.argv[x], 9600, timeout=0.0))
+        except serial.serialutil.SerialException:
+            print("ERROR: Could not connect to serial device at: " + str(sys.argv[x]))
+            sys.exit()
+    return serialDevices
 #-----
 # read a message from a serial port, returning it when the serial port has
 # no more bytes to read
 def readSerialPort(serialPort):
-    message = ''
-    charReturned = 'junk'
+    message = b''
+    charReturned = b'junk'
     while charReturned:
         # reads up to 200 bytes at a time.
         charReturned = serialPort.read(200)
         message += charReturned
-    return message
+    return message.decode('utf-8')
 
 #--------------------------------
 # Setup Connections and Variables
@@ -404,28 +422,18 @@ def readSerialPort(serialPort):
 #-----
 # Check for valid script usage
 if (len(sys.argv) < 2):
-    print "Incorrect format!"
-    print "Please provide at least one or more serial addresses as arguments"
-    print "Example: python UDPtoSerial.py /dev/ttyUSB0"
+    print("Incorrect format!")
+    print("Please provide at least one or more serial addresses as arguments")
+    print("Example: python UDPtoSerial.py /dev/ttyUSB0")
     sys.exit()
 
 
-#-----
-#  Serial Setup
-# configure the serial connections (the parameters differs on the device you are connecting to)
-print "Setup Serial..."
-serialDevices = []
-for x in range(1, len(sys.argv)):
-    try:
-        # a timeout of 0 makes serial.read nonblocking
-        serialDevices.append(serial.Serial(sys.argv[x], 9600, timeout=0.0))
-    except serial.serialutil.SerialException:
-        print "ERROR: Could not connect to serial device at: " + str(sys.argv[x])
-        sys.exit()
+# setup serial
+serialDevices = setupSerial()
 numOfSerialDevices = len(serialDevices)
 
 #-----------------------------
-lightHardwareIndices = [[] for i in xrange(numOfSerialDevices)]
+lightHardwareIndices = [[] for i in range(numOfSerialDevices)]
 messageDict = {k: [] for k in range(numOfSerialDevices)}
 #-----------------------------
 
@@ -444,7 +452,7 @@ nameList = []
 typeList = []
 productList = []
 # this list is used to store the max packet size for each serial device.
-maxPacketSizeList = [0 for i in xrange(numOfSerialDevices)]
+maxPacketSizeList = [0 for i in range(numOfSerialDevices)]
 # set this to define the max packet size sent to the server. The server will
 # simplify packets and only send relevant information to different arduinos,
 # so it can accept a larger packet size.
@@ -457,22 +465,22 @@ maxPacketSizeServer = 250
 
 # First, check that a serial stream can be successfully used by sending discovery
 # packets to the connetctd serial devices
-serialDiscoveryFlags = [False for i in xrange(numOfSerialDevices)]
-fullyDiscoveredFlags  = [False for i in xrange(numOfSerialDevices)]
+serialDiscoveryFlags = [False for i in range(numOfSerialDevices)]
+fullyDiscoveredFlags  = [False for i in range(numOfSerialDevices)]
 index = 0
 while not all(fullyDiscoveredFlags):
     # first send discovery packets and find devices
     if not serialDiscoveryFlags[index]:
-        serialDevices[index].write("DISCOVERY_PACKET;")
+        serialDevices[index].write("DISCOVERY_PACKET;".encode())
         serialDiscoveryFlags[index] = readForDiscovery(serialDevices[index], index)
     else:
         # once a serial device is discovered, send state update packets and
         # parse responses to find the hardware indices associated with the serial
         # device.
-        serialDevices[index].write(stateUpdatePacket())
+        serialDevices[index].write(stateUpdatePacket().encode())
         fullyDiscoveredFlags[index] = parseStateUpdateForHardwareIndices(serialDevices[index], index)
         if fullyDiscoveredFlags[index]:
-            print "Serial Device #" + str(index) + " found with lighting devices " + str(lightHardwareIndices[index])
+            print(f"Serial Device #{index} found with lighting devices {lightHardwareIndices[index]}")
             index = index + 1 # move on to the next index
     time.sleep(0.1)
 
@@ -488,12 +496,12 @@ deviceCount = maxIndex
 discoveryPacket = buildDiscoveryPacket()
 
 if deviceCount == 1:
-    print "Serial stream confirmed with " + str(deviceCount) + " device."
+    print(f"Serial stream confirmed with {deviceCount} device.")
 else:
-    print "Serial stream confirmed with " + str(deviceCount) + " devices."
+    print(f"Serial stream confirmed with {deviceCount} devices.")
 
 #-----
-print "Setup the UDP Socket..."
+print("Setup the UDP Socket...")
 # set up UDP server.
 sock = socket.socket(socket.AF_INET,    # Internet
                      socket.SOCK_DGRAM) # UDP
@@ -510,25 +518,26 @@ while not receivedUDP:
     except socket.timeout:
         pass
 
-print "UDP packet received!"
+print("UDP packet received!")
 
 #--------------------------------
 # Main loop
 #--------------------------------
 
-print "Starting main loop..."
+print("Starting main loop...")
 # Once a serial stream has been estbalished, repeat this ad nauseam
 while True:
     try:
         # waits to receive data
         udp_data, addr = sock.recvfrom(512)
+        udp_data = udp_data.decode('utf-8')
         #print "UDP: %r from %r" % (udp_data, addr)
         if udp_data:
             # discovery packets are special case, the relevant info from
             # discovery packets are stored in this script already, so instead
             # send back over UDP the stored discoveryPacket string
             if checkIfDiscoveryPacket(udp_data):
-                sock.sendto(discoveryPacket, (addr[0], UDP_PORT))
+                sock.sendto(discoveryPacket.encode(), (addr[0], UDP_PORT))
             else:
                 messageDict = {k: [] for k in range(numOfSerialDevices)}
                 # checks a CRC and strips its information out of the packet
